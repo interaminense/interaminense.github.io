@@ -1,26 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { DataBase } from "./firebase";
+
+const config = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGIN_SENDER_ID,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+};
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const projectsDataBase = new DataBase({ path: "projects" }, config);
+  const profileDataBase = new DataBase({ path: "profile" }, config);
+
+  projectsDataBase.listData((data) => console.log({ projects: data }));
+
+  profileDataBase.listData((data) => console.log({ profile: data }));
+
+  return <div className="App">hello, world.</div>;
 }
 
 export default App;
