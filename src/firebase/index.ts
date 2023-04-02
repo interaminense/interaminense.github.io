@@ -8,6 +8,8 @@ import {
   signInAnonymously,
   signInWithEmailAndPassword,
   signOut as _signOut,
+  User,
+  UserCredential,
 } from "firebase/auth";
 import {
   child,
@@ -44,19 +46,15 @@ export class DataBase {
     this.auth = getAuth(this.app);
     this.database = getDatabase(this.app);
     this.props = props;
-
-    this.signIn(this.props.credentials);
   }
 
-  get _isAuth() {
-    return !!this.auth.currentUser;
+  get isKnownUser() {
+    return this.auth.currentUser && !this.auth.currentUser.isAnonymous;
   }
 
-  get isAnonymous() {
-    return !this.auth.currentUser || this.auth.currentUser.isAnonymous;
-  }
-
-  async signIn(credentials?: Credentials) {
+  async signIn(
+    credentials?: Credentials
+  ): Promise<{ user: User | UserCredential | null; error: unknown | null }> {
     await setPersistence(this.auth, browserSessionPersistence);
 
     try {
@@ -64,15 +62,29 @@ export class DataBase {
         if (credentials) {
           const { emailAddress, password } = credentials;
 
-          await signInWithEmailAndPassword(this.auth, emailAddress, password);
-        } else {
-          await signInAnonymously(this.auth);
+          const user = await signInWithEmailAndPassword(
+            this.auth,
+            emailAddress,
+            password
+          );
+
+          this._log(MESSAGES.USER_IS_AUTH);
+
+          return { error: null, user };
         }
+
+        const user = await signInAnonymously(this.auth);
+
+        this._log(MESSAGES.USER_IS_AUTH);
+
+        return { error: null, user };
       }
 
-      this._log(MESSAGES.USER_IS_AUTH);
-    } catch (error) {
       this._log(MESSAGES.USER_IS_NOT_AUTH);
+
+      return { error: null, user: this.auth.currentUser };
+    } catch (error) {
+      return { error, user: null };
     }
   }
 
@@ -99,13 +111,13 @@ export class DataBase {
   }
 
   private _isValidToWrite(id: string) {
-    if (!this._isAuth) {
+    if (!this.auth.currentUser) {
       this._error(MESSAGES.PLEASE_AUTH_USER);
 
       return false;
     }
 
-    if (this._isAuth && this.isAnonymous) {
+    if (!this.isKnownUser) {
       this._error(MESSAGES.USER_DOES_NOT_HAVE_PERMISSION);
 
       return false;
@@ -121,7 +133,7 @@ export class DataBase {
   }
 
   async create(project: Data) {
-    if (!this._isAuth) {
+    if (!this.auth.currentUser) {
       return this._error(MESSAGES.PLEASE_AUTH_USER);
     }
 
@@ -137,7 +149,7 @@ export class DataBase {
 
       return this._success(MESSAGES.PROJECT_CREATED);
     } catch (error) {
-      if (!this._isAuth) {
+      if (!this.auth.currentUser) {
         return this._error(MESSAGES.PROJECT_CREATED_FAIL);
       }
 
@@ -170,7 +182,7 @@ export class DataBase {
   }
 
   async get(id: string) {
-    if (!this._isAuth) {
+    if (!this.auth.currentUser) {
       return this._error(MESSAGES.PLEASE_AUTH_USER);
     }
 
@@ -208,7 +220,7 @@ export class DataBase {
       onlyOnce?: boolean;
     } = {}
   ) {
-    !this._isAuth && (await this.signIn(this.props.credentials));
+    !this.auth.currentUser && (await this.signIn(this.props.credentials));
 
     try {
       const result = query(
@@ -254,7 +266,7 @@ export class DataBase {
   }
 
   async upgrade(callback: (project: Data) => Data) {
-    if (!this._isAuth) {
+    if (!this.auth.currentUser) {
       return this._error(MESSAGES.PLEASE_AUTH_USER);
     }
 
