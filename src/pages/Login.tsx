@@ -1,5 +1,10 @@
+import { FirebaseError } from "@firebase/util";
+import { FormGroup, Container, TextField } from "@mui/material";
 import { FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Header } from "../components/private-components/Header";
+import { Title } from "../components/Title";
+import { LoadingButton } from "@mui/lab";
 
 export function Login() {
   const navigate = useNavigate();
@@ -7,14 +12,21 @@ export function Login() {
   const from = location.state?.from?.pathname || "/";
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<FirebaseError | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     // @ts-ignore
     const result = await window.profileDB?.signIn({ emailAddress, password });
 
+    setLoading(false);
+
     if (result?.error) {
+      setError(result.error);
+
       return;
     }
 
@@ -22,28 +34,43 @@ export function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="email">email</label>
-        <input
-          onChange={({ target: { value } }) => setEmailAddress(value)}
-          id="email"
-          required
-          type="email"
-          value={emailAddress}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">password</label>
-        <input
-          onChange={({ target: { value } }) => setPassword(value)}
-          id="password"
-          required
-          type="password"
-          value={password}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
+    <>
+      <Header title="Admin" />
+
+      <Container maxWidth="sm">
+        <Title>Login</Title>
+
+        <form onSubmit={handleSubmit}>
+          <FormGroup>
+            <TextField
+              error={!!error}
+              onChange={({ target: { value } }) => setEmailAddress(value)}
+              id="emailAddress"
+              label="email"
+              variant="outlined"
+              type="email"
+              required
+              value={emailAddress}
+              margin="dense"
+            />
+            <TextField
+              error={!!error}
+              onChange={({ target: { value } }) => setPassword(value)}
+              id="password"
+              label="password"
+              variant="outlined"
+              type="password"
+              required
+              value={password}
+              margin="dense"
+              helperText={error?.message}
+            />
+            <LoadingButton type="submit" loading={loading}>
+              <span>Login</span>
+            </LoadingButton>
+          </FormGroup>
+        </form>
+      </Container>
+    </>
   );
 }

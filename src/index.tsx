@@ -1,44 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Admin } from "./pages/Admin";
-import { Login } from "./pages/Login";
-import { RequireAuth } from "./components/RequireAuth";
-import { DataBase } from "./firebase";
-import { config } from "./firebase/config";
+import { App } from "./App";
 
-// @ts-ignore
-if (!window.profileDB) {
-  // @ts-ignore
-  window.profileDB = new DataBase({ path: "projects" }, config);
-}
-
-// @ts-ignore
-if (!window.projectsDB) {
-  // @ts-ignore
-  window.projectsDB = new DataBase({ path: "profile" }, config);
-}
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
-  {
-    path: "/admin",
-    element: (
-      <RequireAuth>
-        <Admin />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-]);
+import "./css/index.scss";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -46,7 +11,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <App />
   </React.StrictMode>
 );
 

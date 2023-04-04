@@ -1,5 +1,5 @@
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
-import { FirebaseApp, initializeApp } from "firebase/app";
+import { FirebaseApp, FirebaseError, initializeApp } from "firebase/app";
 import {
   Auth,
   browserSessionPersistence,
@@ -52,9 +52,10 @@ export class DataBase {
     return this.auth.currentUser && !this.auth.currentUser.isAnonymous;
   }
 
-  async signIn(
-    credentials?: Credentials
-  ): Promise<{ user: User | UserCredential | null; error: unknown | null }> {
+  async signIn(credentials?: Credentials): Promise<{
+    user: User | UserCredential | null;
+    error: FirebaseError | null;
+  }> {
     await setPersistence(this.auth, browserSessionPersistence);
 
     try {
@@ -84,7 +85,12 @@ export class DataBase {
 
       return { error: null, user: this.auth.currentUser };
     } catch (error) {
-      return { error, user: null };
+      this._log(MESSAGES.USER_IS_NOT_AUTH);
+
+      return { error, user: null } as {
+        user: null;
+        error: FirebaseError;
+      };
     }
   }
 
@@ -101,13 +107,13 @@ export class DataBase {
   private _error(message: string) {
     this._log(message);
 
-    return Promise.resolve(null);
+    return Promise.resolve({ error: new Error(message) });
   }
 
   private _success(message: string) {
     this._log(message);
 
-    return Promise.resolve();
+    return Promise.resolve({ error: null });
   }
 
   private _isValidToWrite(id: string) {
@@ -158,7 +164,9 @@ export class DataBase {
   }
 
   async update(id: string, project: Data) {
-    if (!this._isValidToWrite(id)) return;
+    if (!this._isValidToWrite(id)) {
+      throw new Error("Invalid Id");
+    }
 
     try {
       await set(ref(this.database, `${this.props.path}/${id}`), project);
