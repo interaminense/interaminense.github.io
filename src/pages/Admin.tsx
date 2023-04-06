@@ -2,6 +2,7 @@ import { Box, Tabs, Tab, Typography } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
 import { Profile } from "../components/private-components/Profile";
 import { Projects } from "../components/private-components/Projects";
+import { Skills } from "../components/private-components/Skills";
 import { Title } from "../components/Title";
 
 interface TabPanelProps {
@@ -61,13 +62,17 @@ export function Admin() {
             aria-label="basic tabs example"
           >
             <Tab label="Profile" {...a11yProps(0)} />
-            <Tab label="Projects" {...a11yProps(1)} />
+            <Tab label="Skills" {...a11yProps(1)} />
+            <Tab label="Projects" {...a11yProps(2)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
           <Profile />
         </TabPanel>
         <TabPanel value={value} index={1}>
+          <Skills />
+        </TabPanel>
+        <TabPanel value={value} index={2}>
           <Projects />
         </TabPanel>
       </Box>
