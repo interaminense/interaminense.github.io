@@ -1,5 +1,5 @@
 import { DataBase } from "../../firebase";
-import { Formik } from "formik";
+import { Formik, Form } from "formik";
 import {
   Alert,
   Box,
@@ -8,39 +8,16 @@ import {
   Container,
   FormGroup,
   Snackbar,
-  TextField,
   Typography,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useEffect, useState } from "react";
+import { Loading } from "../Loading";
+import { Field } from "./form/Field";
+import { TProfile } from "../../types";
 
 type Errors = {
   name?: string;
-};
-
-type TProfile = {
-  about: {
-    description: string;
-    label: string;
-  };
-  createDate: number;
-  description: string;
-  id: string;
-  links: {
-    label: string;
-    url: string;
-  }[];
-  name: string;
-  reactions: {
-    fire: number;
-    hi: number;
-    "thumbs-down": number;
-    "thumbs-up": number;
-  };
-  skills: {
-    label: string;
-    values: string[];
-  };
 };
 
 const initialValues: Partial<TProfile> = {
@@ -50,10 +27,7 @@ const initialValues: Partial<TProfile> = {
   },
   links: [],
   name: "",
-  skills: {
-    label: "",
-    values: [],
-  },
+  skills: [],
 };
 
 export function Profile() {
@@ -67,6 +41,7 @@ export function Profile() {
     label: "",
     type: "success",
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     profileDB.listData((data) => {
@@ -74,8 +49,14 @@ export function Profile() {
       if (profile) {
         setProfile(profile as TProfile);
       }
+
+      setLoading(false);
     });
   }, [profileDB]);
+
+  if (loading) {
+    return <Loading page />;
+  }
 
   return (
     <>
@@ -104,16 +85,12 @@ export function Profile() {
                 return;
               }
 
+              setSubmitting(false);
               setResultRequest({
                 label: "saved as successfully",
                 type: "success",
               });
             }
-
-            setTimeout(() => {
-              setSubmitting(false);
-              console.log("saved", { values });
-            }, 400);
           }}
         >
           {({
@@ -126,31 +103,23 @@ export function Profile() {
             isSubmitting,
           }) => {
             return (
-              <form onSubmit={handleSubmit}>
+              <Form onSubmit={handleSubmit}>
                 <FormGroup>
-                  <TextField
-                    error={!!errors.name}
-                    helperText={errors.name && touched.name && errors.name}
-                    id="name"
-                    label="name"
-                    margin="dense"
+                  <Field
                     name="name"
+                    label="name"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     value={values.name}
-                    InputLabelProps={{ shrink: true }}
                   />
 
-                  <TextField
-                    id="description"
-                    label="description"
-                    margin="dense"
+                  <Field
                     name="description"
+                    label="description"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    multiline
                     value={values.description}
-                    InputLabelProps={{ shrink: true }}
+                    multiline
                   />
                 </FormGroup>
 
@@ -162,122 +131,30 @@ export function Profile() {
                       </Typography>
 
                       <FormGroup>
-                        <TextField
-                          id="label"
-                          label="label"
-                          margin="dense"
-                          name="label"
+                        <Field
+                          name="about.label"
                           onBlur={handleBlur}
                           onChange={handleChange}
+                          label="label"
                           value={values.about?.label}
-                          InputLabelProps={{ shrink: true }}
                         />
 
-                        <TextField
-                          id="description"
+                        <Field
                           label="description"
-                          margin="dense"
-                          name="description"
+                          name="about.description"
                           onBlur={handleBlur}
                           onChange={handleChange}
                           multiline
-                          value={values?.about?.description}
-                          InputLabelProps={{ shrink: true }}
+                          value={values.about?.description}
                         />
                       </FormGroup>
                     </CardContent>
                   </Card>
                 </Box>
-
-                <Box my={1}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="subtitle1" marginBottom={1}>
-                        Links
-                      </Typography>
-
-                      <FormGroup>
-                        {values.links?.map((link, index) => {
-                          return (
-                            <Box my={1} key={index}>
-                              <Card variant="outlined">
-                                <CardContent>
-                                  <FormGroup>
-                                    <TextField
-                                      id="link"
-                                      label="label"
-                                      margin="dense"
-                                      name="label"
-                                      onBlur={handleBlur}
-                                      onChange={handleChange}
-                                      value={link.label}
-                                      InputLabelProps={{ shrink: true }}
-                                    />
-
-                                    <TextField
-                                      id="link"
-                                      label="url"
-                                      margin="dense"
-                                      name="url"
-                                      onBlur={handleBlur}
-                                      onChange={handleChange}
-                                      value={link.url}
-                                      InputLabelProps={{ shrink: true }}
-                                    />
-                                  </FormGroup>
-                                </CardContent>
-                              </Card>
-                            </Box>
-                          );
-                        })}
-                      </FormGroup>
-                    </CardContent>
-                  </Card>
-                </Box>
-
-                <Box my={1}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="subtitle1" marginBottom={1}>
-                        Skills
-                      </Typography>
-
-                      <FormGroup>
-                        <TextField
-                          id="label"
-                          label="label"
-                          margin="dense"
-                          name="label"
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          value={values.skills?.label}
-                          InputLabelProps={{ shrink: true }}
-                        />
-
-                        {values.skills?.values?.map((value, index) => {
-                          return (
-                            <TextField
-                              key={index}
-                              id="skill"
-                              label="skill"
-                              margin="dense"
-                              name="skill"
-                              onBlur={handleBlur}
-                              onChange={handleChange}
-                              value={value}
-                              InputLabelProps={{ shrink: true }}
-                            />
-                          );
-                        })}
-                      </FormGroup>
-                    </CardContent>
-                  </Card>
-                </Box>
-
                 <LoadingButton type="submit" loading={isSubmitting}>
                   <span>Save</span>
                 </LoadingButton>
-              </form>
+              </Form>
             );
           }}
         </Formik>

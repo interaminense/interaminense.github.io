@@ -4,6 +4,7 @@ import { DataBase } from "../../firebase";
 import { Button, Container } from "@mui/material";
 import { Header } from "./Header";
 import { useNavigate } from "react-router-dom";
+import { Loading } from "../Loading";
 
 export function PrivatePage({ children }: { children: JSX.Element }) {
   const location = useLocation();
@@ -30,7 +31,7 @@ export function PrivatePage({ children }: { children: JSX.Element }) {
   }, [profileDB]);
 
   if (loading) {
-    return <div>loading...</div>;
+    return <Loading page />;
   }
 
   if (!profileDB.isKnownUser) {
