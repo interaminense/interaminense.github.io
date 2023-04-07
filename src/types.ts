@@ -17,5 +17,15 @@ export type TProfile = {
     "thumbs-down": number;
     "thumbs-up": number;
   };
-  skills: { label: string; id: string }[];
+};
+
+export type TSkill = {
+  id: string;
+  label: string;
+};
+
+export type TLink = {
+  id: string;
+  label: string;
+  url: string;
 };

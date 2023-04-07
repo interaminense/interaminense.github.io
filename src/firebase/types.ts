@@ -1,5 +1,3 @@
-import { FirebaseOptions } from "firebase/app";
-
 export type Credentials = {
   emailAddress: string;
   password: string;
@@ -22,6 +20,9 @@ export interface IDataBase {
   credentials?: Credentials;
 }
 
-export type SortBy = { value: string; type: "ASC" | "DESC" };
+export interface IAuth {
+  disableLog?: boolean;
+  credentials?: Credentials;
+}
 
-export interface IDataBaseConfig extends FirebaseOptions {}
+export type SortBy = { value: string; type: "ASC" | "DESC" };

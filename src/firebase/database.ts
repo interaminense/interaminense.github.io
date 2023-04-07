@@ -1,16 +1,6 @@
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
-import { FirebaseApp, FirebaseError, initializeApp } from "firebase/app";
-import {
-  Auth,
-  browserSessionPersistence,
-  getAuth,
-  setPersistence,
-  signInAnonymously,
-  signInWithEmailAndPassword,
-  signOut as _signOut,
-  User,
-  UserCredential,
-} from "firebase/auth";
+import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
+import { Auth, getAuth } from "firebase/auth";
 import {
   child,
   Database,
@@ -25,14 +15,7 @@ import {
   onValue,
   limitToFirst,
 } from "firebase/database";
-import {
-  Credentials,
-  Data,
-  IDataBase,
-  IDataBaseConfig,
-  SortBy,
-  GroupedData,
-} from "./types";
+import { Data, IDataBase, SortBy, GroupedData } from "./types";
 import { MESSAGES } from "./constants";
 
 export class DataBase {
@@ -41,67 +24,11 @@ export class DataBase {
   database: Database;
   props: IDataBase;
 
-  constructor(props: IDataBase, config: IDataBaseConfig) {
+  constructor(props: IDataBase, config: FirebaseOptions) {
     this.app = initializeApp(config);
     this.auth = getAuth(this.app);
     this.database = getDatabase(this.app);
     this.props = props;
-  }
-
-  get isKnownUser() {
-    return this.auth.currentUser && !this.auth.currentUser.isAnonymous;
-  }
-
-  async signIn(credentials?: Credentials): Promise<{
-    user: User | UserCredential | null;
-    error: FirebaseError | null;
-  }> {
-    await setPersistence(this.auth, browserSessionPersistence);
-
-    try {
-      if (!this.auth.currentUser) {
-        if (credentials) {
-          const { emailAddress, password } = credentials;
-
-          const user = await signInWithEmailAndPassword(
-            this.auth,
-            emailAddress,
-            password
-          );
-
-          this._log(MESSAGES.USER_IS_AUTH);
-
-          return { error: null, user };
-        }
-
-        const user = await signInAnonymously(this.auth);
-
-        this._log(MESSAGES.USER_IS_AUTH);
-
-        return { error: null, user };
-      }
-
-      this._log(MESSAGES.USER_IS_NOT_AUTH);
-
-      return { error: null, user: this.auth.currentUser };
-    } catch (error) {
-      this._log(MESSAGES.USER_IS_NOT_AUTH);
-
-      return { error, user: null } as {
-        user: null;
-        error: FirebaseError;
-      };
-    }
-  }
-
-  async signOut() {
-    try {
-      await _signOut(this.auth);
-
-      this._log(MESSAGES.USER_IS_NOT_AUTH);
-    } catch (error) {
-      this._log(MESSAGES.USER_IS_NOT_AUTH_FAIL);
-    }
   }
 
   private _error(message: string) {
@@ -130,12 +57,16 @@ export class DataBase {
     }
 
     if (!uuidValidate(id)) {
-      this._error(MESSAGES.PLEASE_INSERT_CORRECT_PROJECT_ID);
+      this._error(MESSAGES.PLEASE_INSERT_CORRECT_ID);
 
       return false;
     }
 
     return true;
+  }
+
+  get isKnownUser(): boolean {
+    return !!this.auth.currentUser && !this.auth.currentUser.isAnonymous;
   }
 
   async create(project: Data) {
@@ -153,10 +84,10 @@ export class DataBase {
         id,
       });
 
-      return this._success(MESSAGES.PROJECT_CREATED);
+      return this._success(MESSAGES.DATA_CREATED);
     } catch (error) {
       if (!this.auth.currentUser) {
-        return this._error(MESSAGES.PROJECT_CREATED_FAIL);
+        return this._error(MESSAGES.DATA_CREATED_FAIL);
       }
 
       return this._error(MESSAGES.AN_ERROR_OCCURRED);
@@ -164,14 +95,12 @@ export class DataBase {
   }
 
   async update(id: string, project: Data) {
-    if (!this._isValidToWrite(id)) {
-      throw new Error("Invalid Id");
-    }
+    if (!this._isValidToWrite(id)) return;
 
     try {
       await set(ref(this.database, `${this.props.path}/${id}`), project);
 
-      return this._success(MESSAGES.PROJECT_UPDATED);
+      return this._success(MESSAGES.DATA_UPDATED);
     } catch (error) {
       return this._error(MESSAGES.AN_ERROR_OCCURRED);
     }
@@ -183,20 +112,14 @@ export class DataBase {
     try {
       await remove(ref(this.database, `${this.props.path}/${id}`));
 
-      return this._success(MESSAGES.PROJECT_DELETED);
+      return this._success(MESSAGES.DATA_DELETED);
     } catch (error) {
       return this._error(MESSAGES.AN_ERROR_OCCURRED);
     }
   }
 
   async get(id: string) {
-    if (!this.auth.currentUser) {
-      return this._error(MESSAGES.PLEASE_AUTH_USER);
-    }
-
-    if (!uuidValidate(id)) {
-      return this._error(MESSAGES.PLEASE_INSERT_CORRECT_PROJECT_ID);
-    }
+    if (!this._isValidToWrite(id)) return;
 
     const snapshot = await get(
       child(ref(this.database), `${this.props.path}/${id}`)
@@ -228,7 +151,7 @@ export class DataBase {
       onlyOnce?: boolean;
     } = {}
   ) {
-    !this.auth.currentUser && (await this.signIn(this.props.credentials));
+    if (!this.auth.currentUser) return;
 
     try {
       const result = query(

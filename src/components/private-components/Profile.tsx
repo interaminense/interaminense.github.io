@@ -1,4 +1,4 @@
-import { DataBase } from "../../firebase";
+import { DataBase } from "../../firebase/database";
 import { Formik, Form } from "formik";
 import {
   Alert,
@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { Loading } from "../Loading";
 import { Field } from "./form/Field";
 import { TProfile } from "../../types";
+import { config } from "../../firebase/config";
 
 type Errors = {
   name?: string;
@@ -27,12 +28,11 @@ const initialValues: Partial<TProfile> = {
   },
   links: [],
   name: "",
-  skills: [],
 };
 
+const profileDB = new DataBase({ path: "profile" }, config);
+
 export function Profile() {
-  // @ts-ignore
-  const profileDB: DataBase = window.profileDB;
   const [profile, setProfile] = useState<TProfile | null>(null);
   const [resultRequest, setResultRequest] = useState<{
     label: string;
@@ -52,7 +52,7 @@ export function Profile() {
 
       setLoading(false);
     });
-  }, [profileDB]);
+  }, []);
 
   if (loading) {
     return <Loading page />;
@@ -76,7 +76,7 @@ export function Profile() {
             if (values.id) {
               const result = await profileDB.update(values.id, values);
 
-              if (result.error) {
+              if (result?.error) {
                 setResultRequest({
                   label: result.error.message,
                   type: "error",

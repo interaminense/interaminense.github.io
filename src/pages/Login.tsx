@@ -5,8 +5,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Header } from "../components/private-components/Header";
 import { Title } from "../components/Title";
 import { LoadingButton } from "@mui/lab";
+import { useAppContext } from "../AppContext";
 
 export function Login() {
+  const { auth } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -19,8 +21,7 @@ export function Login() {
     e.preventDefault();
     setLoading(true);
 
-    // @ts-ignore
-    const result = await window.profileDB?.signIn({ emailAddress, password });
+    const result = await auth?.signIn({ emailAddress, password });
 
     setLoading(false);
 

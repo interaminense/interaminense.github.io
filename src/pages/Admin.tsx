@@ -1,5 +1,6 @@
 import { Box, Tabs, Tab, Typography } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
+import { Links } from "../components/private-components/Links";
 import { Profile } from "../components/private-components/Profile";
 import { Projects } from "../components/private-components/Projects";
 import { Skills } from "../components/private-components/Skills";
@@ -63,7 +64,8 @@ export function Admin() {
           >
             <Tab label="Profile" {...a11yProps(0)} />
             <Tab label="Skills" {...a11yProps(1)} />
-            <Tab label="Projects" {...a11yProps(2)} />
+            <Tab label="Links" {...a11yProps(2)} />
+            <Tab label="Projects" {...a11yProps(3)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -73,6 +75,9 @@ export function Admin() {
           <Skills />
         </TabPanel>
         <TabPanel value={value} index={2}>
+          <Links />
+        </TabPanel>
+        <TabPanel value={value} index={3}>
           <Projects />
         </TabPanel>
       </Box>

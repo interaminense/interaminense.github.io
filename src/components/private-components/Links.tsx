@@ -3,25 +3,25 @@ import { FormEvent, useEffect, useState } from "react";
 import { Loading } from "../Loading";
 import { Table } from "./form/Table";
 import { Modal } from "./Modal";
-import { TSkill } from "../../types";
+import { TLink } from "../../types";
 import { DataBase } from "../../firebase/database";
 import { config } from "../../firebase/config";
 import { Data } from "../../firebase/types";
 
-const skillsDB = new DataBase({ path: "skills" }, config);
+const linksDB = new DataBase({ path: "links" }, config);
 
-export function Skills() {
-  const [skills, setSkills] = useState<TSkill[]>([]);
+export function Links() {
+  const [links, setLinks] = useState<TLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalAdd, setOpenModalAdd] = useState(false);
-  const [selectedSkill, setSelectedSkill] = useState<TSkill | null>(null);
+  const [selectedLink, setSelectedLink] = useState<TLink | null>(null);
 
   useEffect(() => {
-    skillsDB.listData((groupedData) => {
+    linksDB.listData((groupedData) => {
       if (groupedData) {
-        setSkills(groupedData.data as TSkill[]);
+        setLinks(groupedData.data as TLink[]);
       }
 
       setLoading(false);
@@ -35,7 +35,7 @@ export function Skills() {
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
 
-    const result = await skillsDB.create(selectedSkill as Data);
+    const result = await linksDB.create(selectedLink as Data);
 
     if (!result?.error) {
       setOpenModalAdd(false);
@@ -45,23 +45,23 @@ export function Skills() {
   async function handleEdit(e: FormEvent) {
     e.preventDefault();
 
-    const result = await skillsDB.update(
-      selectedSkill?.id as string,
-      selectedSkill as Data
+    const result = await linksDB.update(
+      selectedLink?.id as string,
+      selectedLink as Data
     );
 
     if (!result?.error) {
       setOpenModalEdit(false);
-      setSelectedSkill(null);
+      setSelectedLink(null);
     }
   }
 
   async function handleDelete() {
-    const result = await skillsDB.delete(selectedSkill?.id as string);
+    const result = await linksDB.delete(selectedLink?.id as string);
 
     if (!result?.error) {
       setOpenModalDelete(false);
-      setSelectedSkill(null);
+      setSelectedLink(null);
     }
   }
 
@@ -69,16 +69,16 @@ export function Skills() {
     <>
       <Container maxWidth="sm">
         <Table
-          header="skills"
-          rows={skills}
+          header="links"
+          rows={links}
           onAdd={() => setOpenModalAdd(true)}
-          onEdit={(skillId) => {
+          onEdit={(linkId) => {
             setOpenModalEdit(true);
-            setSelectedSkill(skills.find(({ id }) => id === skillId) ?? null);
+            setSelectedLink(links.find(({ id }) => id === linkId) ?? null);
           }}
-          onDelete={(skillId) => {
+          onDelete={(linkId) => {
             setOpenModalDelete(true);
-            setSelectedSkill(skills.find(({ id }) => id === skillId) ?? null);
+            setSelectedLink(links.find(({ id }) => id === linkId) ?? null);
           }}
         />
       </Container>
@@ -92,11 +92,22 @@ export function Skills() {
           <FormGroup>
             <TextField
               onChange={({ target: { value } }) =>
-                setSelectedSkill({ ...selectedSkill, label: value } as TSkill)
+                setSelectedLink({ ...selectedLink, label: value } as TLink)
               }
-              value={selectedSkill?.label}
+              value={selectedLink?.label}
               label="name"
               required
+              margin="dense"
+            />
+
+            <TextField
+              onChange={({ target: { value } }) =>
+                setSelectedLink({ ...selectedLink, url: value } as TLink)
+              }
+              value={selectedLink?.url}
+              label="url"
+              required
+              margin="dense"
             />
           </FormGroup>
 
@@ -112,7 +123,7 @@ export function Skills() {
         open={openModalDelete}
         onClose={() => setOpenModalDelete(false)}
       >
-        Are you sure to delete <strong>{selectedSkill?.label}</strong>?
+        Are you sure to delete <strong>{selectedLink?.label}</strong>?
         <Box sx={{ textAlign: "right" }} mt={1}>
           <Button onClick={() => setOpenModalDelete(false)}>cancel</Button>
           <Button onClick={handleDelete}>delete</Button>
@@ -120,7 +131,7 @@ export function Skills() {
       </Modal>
 
       <Modal
-        title="Add Skill"
+        title="Add Link"
         open={openModalAdd}
         onClose={() => setOpenModalAdd(false)}
       >
@@ -128,11 +139,22 @@ export function Skills() {
           <FormGroup>
             <TextField
               onChange={({ target: { value } }) =>
-                setSelectedSkill({ ...selectedSkill, label: value } as TSkill)
+                setSelectedLink({ ...selectedLink, label: value } as TLink)
               }
-              value={selectedSkill?.label}
+              value={selectedLink?.label}
               label="label"
               required
+              margin="dense"
+            />
+
+            <TextField
+              onChange={({ target: { value } }) =>
+                setSelectedLink({ ...selectedLink, url: value } as TLink)
+              }
+              value={selectedLink?.url}
+              label="url"
+              required
+              margin="dense"
             />
           </FormGroup>
 
