@@ -17,16 +17,11 @@ import { Field } from "./form/Field";
 import { TProfile } from "../../types";
 import { config } from "../../firebase/config";
 
-type Errors = {
-  name?: string;
-};
-
 const initialValues: Partial<TProfile> = {
   about: {
     description: "",
     label: "",
   },
-  links: [],
   name: "",
 };
 
@@ -64,14 +59,6 @@ export function Profile() {
         <Formik
           enableReinitialize
           initialValues={{ ...(profile || initialValues) }}
-          validate={(values) => {
-            const errors: Errors = {};
-            if (!values.name) {
-              errors.name = "Required";
-            }
-
-            return errors;
-          }}
           onSubmit={async (values, { setSubmitting }) => {
             if (values.id) {
               const result = await profileDB.update(values.id, values);
@@ -95,8 +82,6 @@ export function Profile() {
         >
           {({
             values,
-            errors,
-            touched,
             handleChange,
             handleBlur,
             handleSubmit,
@@ -131,14 +116,6 @@ export function Profile() {
                       </Typography>
 
                       <FormGroup>
-                        <Field
-                          name="about.label"
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          label="label"
-                          value={values.about?.label}
-                        />
-
                         <Field
                           label="description"
                           name="about.description"

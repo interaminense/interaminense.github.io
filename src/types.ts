@@ -1,3 +1,15 @@
+enum Reactions {
+  ThumbsUp = "👍",
+  ThumbsDown = "👎",
+  Fire = "🔥",
+  Heart = "💖",
+  Hello = "👋",
+}
+
+type TReactions = {
+  [key in Reactions]: number;
+};
+
 export type TProfile = {
   about: {
     description: string;
@@ -6,17 +18,19 @@ export type TProfile = {
   createDate: number;
   description: string;
   id: string;
-  links: {
-    label: string;
-    url: string;
-  }[];
   name: string;
-  reactions: {
-    fire: number;
-    hi: number;
-    "thumbs-down": number;
-    "thumbs-up": number;
-  };
+  reactions: TReactions;
+};
+
+export type TProject = {
+  createDate: number;
+  description: string;
+  id: string;
+  imageURL: string;
+  reactions: TReactions;
+  tags: TTag[];
+  label: string;
+  url: string;
 };
 
 export type TSkill = {
@@ -24,8 +38,25 @@ export type TSkill = {
   label: string;
 };
 
+export enum SocialNetwork {
+  Behance = "behance",
+  Codepen = "codepen",
+  Facebook = "facebook",
+  Github = "github",
+  Instagram = "instagram",
+  LinkedIn = "linkedIn",
+  Medium = "medium",
+  Twitter = "twitter",
+  Youtube = "youtube",
+}
+
 export type TLink = {
   id: string;
-  label: string;
+  label: SocialNetwork;
   url: string;
+};
+
+export type TTag = {
+  id: string;
+  label: string;
 };

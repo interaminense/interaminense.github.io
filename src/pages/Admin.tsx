@@ -4,6 +4,7 @@ import { Links } from "../components/private-components/Links";
 import { Profile } from "../components/private-components/Profile";
 import { Projects } from "../components/private-components/Projects";
 import { Skills } from "../components/private-components/Skills";
+import { Tags } from "../components/private-components/Tags";
 import { Title } from "../components/Title";
 
 interface TabPanelProps {
@@ -57,15 +58,12 @@ export function Admin() {
 
       <Box sx={{ width: "100%" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-          >
+          <Tabs value={value} onChange={handleChange} aria-label="tabs">
             <Tab label="Profile" {...a11yProps(0)} />
             <Tab label="Skills" {...a11yProps(1)} />
             <Tab label="Links" {...a11yProps(2)} />
             <Tab label="Projects" {...a11yProps(3)} />
+            <Tab label="Tags" {...a11yProps(4)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -79,6 +77,9 @@ export function Admin() {
         </TabPanel>
         <TabPanel value={value} index={3}>
           <Projects />
+        </TabPanel>
+        <TabPanel value={value} index={4}>
+          <Tags />
         </TabPanel>
       </Box>
     </>

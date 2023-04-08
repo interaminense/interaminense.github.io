@@ -1,16 +1,16 @@
 import { FormGroup, TextField } from "@mui/material";
-import { TSkill } from "../../types";
+import { TTag } from "../../types";
 import { DataBase } from "../../firebase/database";
 import { config } from "../../firebase/config";
 import { ItemsManager } from "./ItemsManager";
 
-const skillsDB = new DataBase({ path: "skills" }, config);
+const tagsDB = new DataBase({ path: "tags" }, config);
 
-export function Skills() {
+export function Tags() {
   return (
-    <ItemsManager<TSkill>
-      dataBase={skillsDB}
-      name="Skills"
+    <ItemsManager<TTag>
+      dataBase={tagsDB}
+      name="Tag"
       header={["label"]}
       rows={(items) =>
         items.map((data) => {
@@ -24,7 +24,7 @@ export function Skills() {
         <FormGroup>
           <TextField
             onChange={({ target: { value } }) =>
-              onChange({ ...item, label: value } as TSkill)
+              onChange({ ...item, label: value } as TTag)
             }
             value={item?.label}
             label="label"
