@@ -2,39 +2,35 @@ import { DataBase } from "../../firebase/database";
 import { Formik, Form } from "formik";
 import {
   Alert,
-  Box,
-  Card,
-  CardContent,
   Container,
   FormGroup,
   Snackbar,
-  Typography,
+  TextField,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useEffect, useState } from "react";
 import { Loading } from "../Loading";
-import { Field } from "./form/Field";
-import { TProfile } from "../../types";
+import { TProfile, AlertStatus } from "../../types";
 import { config } from "../../firebase/config";
 
 const initialValues: Partial<TProfile> = {
-  about: {
-    description: "",
-    label: "",
-  },
-  name: "",
+  about: "",
+  firstName: "",
+  lastName: "",
+  description: "",
+  imageURL: "",
 };
 
 const profileDB = new DataBase({ path: "profile" }, config);
 
 export function Profile() {
   const [profile, setProfile] = useState<TProfile | null>(null);
-  const [resultRequest, setResultRequest] = useState<{
+  const [alert, setAlert] = useState<{
     label: string;
-    type: "success" | "error";
+    type: AlertStatus;
   }>({
     label: "",
-    type: "success",
+    type: AlertStatus.Success,
   });
   const [loading, setLoading] = useState(true);
 
@@ -48,6 +44,10 @@ export function Profile() {
       setLoading(false);
     });
   }, []);
+
+  function resetAlertStatus() {
+    setAlert({ label: "", type: AlertStatus.Success });
+  }
 
   if (loading) {
     return <Loading page />;
@@ -64,18 +64,18 @@ export function Profile() {
               const result = await profileDB.update(values.id, values);
 
               if (result?.error) {
-                setResultRequest({
+                setAlert({
                   label: result.error.message,
-                  type: "error",
+                  type: AlertStatus.Error,
                 });
 
                 return;
               }
 
               setSubmitting(false);
-              setResultRequest({
+              setAlert({
                 label: "saved as successfully",
-                type: "success",
+                type: AlertStatus.Success,
               });
             }
           }}
@@ -90,44 +90,56 @@ export function Profile() {
             return (
               <Form onSubmit={handleSubmit}>
                 <FormGroup>
-                  <Field
-                    name="name"
-                    label="name"
+                  <TextField
+                    name="firstName"
+                    label="first name"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.name}
+                    value={values.firstName}
+                    margin="dense"
+                    required
                   />
 
-                  <Field
+                  <TextField
+                    name="lastName"
+                    label="last name"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.lastName}
+                    margin="dense"
+                    required
+                  />
+
+                  <TextField
                     name="description"
                     label="description"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     value={values.description}
+                    margin="dense"
                     multiline
+                  />
+
+                  <TextField
+                    name="imageURL"
+                    label="image"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.imageURL}
+                    margin="dense"
+                  />
+
+                  <TextField
+                    label="about me"
+                    name="about"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    multiline
+                    value={values.about}
+                    margin="dense"
                   />
                 </FormGroup>
 
-                <Box my={1}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Typography variant="subtitle1" marginBottom={1}>
-                        About Me
-                      </Typography>
-
-                      <FormGroup>
-                        <Field
-                          label="description"
-                          name="about.description"
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          multiline
-                          value={values.about?.description}
-                        />
-                      </FormGroup>
-                    </CardContent>
-                  </Card>
-                </Box>
                 <LoadingButton type="submit" loading={isSubmitting}>
                   <span>Save</span>
                 </LoadingButton>
@@ -138,16 +150,16 @@ export function Profile() {
       </Container>
 
       <Snackbar
-        open={!!resultRequest.label}
+        open={!!alert.label}
         autoHideDuration={6000}
-        onClose={() => setResultRequest({ label: "", type: "success" })}
+        onClose={resetAlertStatus}
       >
         <Alert
-          onClose={() => setResultRequest({ label: "", type: "success" })}
+          onClose={resetAlertStatus}
           severity="success"
           sx={{ width: "100%" }}
         >
-          {resultRequest.label}
+          {alert.label}
         </Alert>
       </Snackbar>
     </>

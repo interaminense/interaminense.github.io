@@ -1,12 +1,13 @@
 import { DataBase } from "../../firebase/database";
 import { config } from "../../firebase/config";
-import { TProject, TTag } from "../../types";
+import { Reactions, TProject, TReactions, TTag } from "../../types";
 import { Autocomplete, Chip, FormGroup, TextField } from "@mui/material";
 import { ItemsManager } from "./ItemsManager";
 import { useEffect, useState } from "react";
 
 const projectsDB = new DataBase({ path: "projects" }, config);
 const tagsDB = new DataBase({ path: "tags" }, config);
+const reactionsDB = new DataBase({ path: "reactions" }, config);
 
 export function Projects() {
   const [options, setOptions] = useState<TTag[]>([]);
@@ -21,6 +22,21 @@ export function Projects() {
 
   return (
     <ItemsManager<TProject>
+      onAddItem={async (item) => {
+        await reactionsDB.create(
+          {
+            [Reactions.ThumbsUp]: 0,
+            [Reactions.ThumbsDown]: 0,
+            [Reactions.Hello]: 0,
+            [Reactions.Heart]: 0,
+            [Reactions.Fire]: 0,
+          } as TReactions,
+          item.id
+        );
+      }}
+      onDeleteItem={async (item) => {
+        await reactionsDB.delete(item.id);
+      }}
       dataBase={projectsDB}
       name="Project"
       header={["image", "title", "description", "url", "tags"]}
@@ -29,19 +45,15 @@ export function Projects() {
           return {
             id: data.id,
             columns: [
-              <img
-                style={{ width: 32, height: 32, borderRadius: "50%" }}
-                src={data.imageURL}
-                alt=""
-              />,
+              <ImageURLRenderer url={data.imageURL} />,
               data.label,
               data.description,
               <a href={data.url} target="_blank" rel="noreferrer">
                 {data.url}
               </a>,
               <>
-                {data.tags?.map(({ label }) => (
-                  <Chip label={label} style={{ marginRight: 4 }} />
+                {data.tags?.map(({ label }, index) => (
+                  <Chip key={index} label={label} style={{ marginRight: 4 }} />
                 ))}
               </>,
             ],
@@ -78,6 +90,7 @@ export function Projects() {
             value={item?.imageURL}
             label="image"
             margin="dense"
+            type="url"
           />
 
           <TextField
@@ -88,6 +101,7 @@ export function Projects() {
             label="url"
             required
             margin="dense"
+            type="url"
           />
 
           <Autocomplete
@@ -110,6 +124,20 @@ export function Projects() {
           />
         </FormGroup>
       )}
+    />
+  );
+}
+
+function ImageURLRenderer({ url }: { url: string }) {
+  if (!url) {
+    return <>no image url</>;
+  }
+
+  return (
+    <img
+      style={{ width: 32, height: 32, borderRadius: "50%" }}
+      src={url}
+      alt=""
     />
   );
 }

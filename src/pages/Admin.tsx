@@ -1,11 +1,12 @@
 import { Box, Tabs, Tab, Typography } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
-import { Links } from "../components/private-components/Links";
+import { SocialNetwork } from "../components/private-components/SocialNetwork";
 import { Profile } from "../components/private-components/Profile";
 import { Projects } from "../components/private-components/Projects";
 import { Skills } from "../components/private-components/Skills";
 import { Tags } from "../components/private-components/Tags";
-import { Title } from "../components/Title";
+import { Title } from "../components/private-components/Title";
+import { Links } from "../components/private-components/Links";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -24,11 +25,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -61,9 +58,10 @@ export function Admin() {
           <Tabs value={value} onChange={handleChange} aria-label="tabs">
             <Tab label="Profile" {...a11yProps(0)} />
             <Tab label="Skills" {...a11yProps(1)} />
-            <Tab label="Links" {...a11yProps(2)} />
+            <Tab label="Social Network" {...a11yProps(2)} />
             <Tab label="Projects" {...a11yProps(3)} />
             <Tab label="Tags" {...a11yProps(4)} />
+            <Tab label="Links" {...a11yProps(5)} />
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -73,13 +71,16 @@ export function Admin() {
           <Skills />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <Links />
+          <SocialNetwork />
         </TabPanel>
         <TabPanel value={value} index={3}>
           <Projects />
         </TabPanel>
         <TabPanel value={value} index={4}>
           <Tags />
+        </TabPanel>
+        <TabPanel value={value} index={5}>
+          <Links />
         </TabPanel>
       </Box>
     </>

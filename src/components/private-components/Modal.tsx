@@ -27,13 +27,16 @@ export function Modal({ open, onClose, title, children }: IModalProps) {
       aria-describedby="modal-modal-description"
     >
       <Box sx={modalStyle}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
+        <Typography
+          id="modal-modal-title"
+          variant="h6"
+          component="h2"
+          sx={{ marginBottom: 2 }}
+        >
           {title}
         </Typography>
 
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          {children}
-        </Typography>
+        {children}
       </Box>
     </MaterialModal>
   );

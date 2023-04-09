@@ -42,8 +42,10 @@ export function Table({ header, onAdd, onEdit, onDelete, rows }: ITableProps) {
         <MaterialTable aria-label="simple table">
           <TableHead>
             <TableRow>
-              {header.map((label) => (
-                <TableCell variant="head">{label}</TableCell>
+              {header.map((label, index) => (
+                <TableCell key={index} variant="head">
+                  {label}
+                </TableCell>
               ))}
               <TableCell variant="head"></TableCell>
             </TableRow>
@@ -51,8 +53,8 @@ export function Table({ header, onAdd, onEdit, onDelete, rows }: ITableProps) {
           <TableBody>
             {rows.map(({ columns, id }) => (
               <TableRow key={id}>
-                {columns.map((label) => (
-                  <TableCell component="th" scope="row">
+                {columns.map((label, index) => (
+                  <TableCell key={index} component="th" scope="row">
                     {label}
                   </TableCell>
                 ))}

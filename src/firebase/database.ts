@@ -18,6 +18,9 @@ import {
 import { Data, IDataBase, SortBy, GroupedData } from "./types";
 import { MESSAGES } from "./constants";
 
+export type TResultError = { error: Error | null };
+export type TResultSuccess = { error: null; data: Data };
+
 export class DataBase {
   app: FirebaseApp;
   auth: Auth;
@@ -31,16 +34,16 @@ export class DataBase {
     this.props = props;
   }
 
-  private _error(message: string) {
+  private _error(message: string): Promise<TResultError> {
     this._log(message);
 
     return Promise.resolve({ error: new Error(message) });
   }
 
-  private _success(message: string) {
+  private _success(message: string, data: Data): Promise<TResultSuccess> {
     this._log(message);
 
-    return Promise.resolve({ error: null });
+    return Promise.resolve({ error: null, data });
   }
 
   private _isValidToWrite(id: string) {
@@ -69,13 +72,20 @@ export class DataBase {
     return !!this.auth.currentUser && !this.auth.currentUser.isAnonymous;
   }
 
-  async create(project: Data) {
+  async create(
+    project: Data,
+    initialId?: string
+  ): Promise<TResultSuccess | TResultError> {
+    if (initialId && !uuidValidate(initialId)) {
+      return this._error(MESSAGES.PLEASE_INSERT_CORRECT_ID);
+    }
+
     if (!this.auth.currentUser) {
       return this._error(MESSAGES.PLEASE_AUTH_USER);
     }
 
     try {
-      const id = uuidv4();
+      const id = initialId ?? uuidv4();
       const createDate = Date.now();
 
       await set(ref(this.database, `${this.props.path}/${id}`), {
@@ -84,7 +94,7 @@ export class DataBase {
         id,
       });
 
-      return this._success(MESSAGES.DATA_CREATED);
+      return this._success(MESSAGES.DATA_CREATED, { id });
     } catch (error) {
       if (!this.auth.currentUser) {
         return this._error(MESSAGES.DATA_CREATED_FAIL);
@@ -100,7 +110,7 @@ export class DataBase {
     try {
       await set(ref(this.database, `${this.props.path}/${id}`), project);
 
-      return this._success(MESSAGES.DATA_UPDATED);
+      return this._success(MESSAGES.DATA_UPDATED, { id });
     } catch (error) {
       return this._error(MESSAGES.AN_ERROR_OCCURRED);
     }
@@ -112,7 +122,7 @@ export class DataBase {
     try {
       await remove(ref(this.database, `${this.props.path}/${id}`));
 
-      return this._success(MESSAGES.DATA_DELETED);
+      return this._success(MESSAGES.DATA_DELETED, { id });
     } catch (error) {
       return this._error(MESSAGES.AN_ERROR_OCCURRED);
     }
