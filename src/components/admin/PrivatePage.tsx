@@ -19,13 +19,13 @@ export function PrivatePage({ children }: { children: JSX.Element }) {
   }
 
   useEffect(() => {
-    async function test() {
+    async function onAuthStateChanged() {
       auth?.auth.onAuthStateChanged(() => {
         setLoading(false);
       });
     }
 
-    test();
+    onAuthStateChanged();
   }, [auth?.auth]);
 
   if (loading) {

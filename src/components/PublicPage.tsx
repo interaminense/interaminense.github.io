@@ -1,6 +1,25 @@
-import React from "react";
-import { DBContextProvider } from "../contexts/DBContext";
+import React, { useEffect, useState } from "react";
+import { useAppContext } from "../AppContext";
+import { ProfileDBContextProvider } from "../contexts/ProfileDBContext";
+import { Loading } from "./Loading";
 
 export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
-  return <DBContextProvider>{children}</DBContextProvider>;
+  const { auth } = useAppContext();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function signIn() {
+      await auth?.signIn();
+
+      setLoading(false);
+    }
+
+    signIn();
+  }, [auth]);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  return <ProfileDBContextProvider>{children}</ProfileDBContextProvider>;
 }

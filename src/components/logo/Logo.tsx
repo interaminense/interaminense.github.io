@@ -1,9 +1,9 @@
-import { useDB } from "../../contexts/DBContext";
+import { useProfileDB } from "../../contexts/ProfileDBContext";
 
 import "./Logo.scss";
 
 export function Logo() {
-  const { profile } = useDB();
+  const { profile } = useProfileDB();
 
   return (
     <div className="logo">

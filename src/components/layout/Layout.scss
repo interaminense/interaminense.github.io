@@ -2,11 +2,14 @@
   &__header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 2rem;
   }
 
   &__footer {
     padding: 2rem;
+    margin-top: 8rem;
+    border-bottom: 3px solid #ff007a;
   }
 
   &__presentation {
@@ -19,7 +22,7 @@
 
   &__body {
     width: 100%;
-    max-width: calc(700px + 2rem);
+    max-width: calc(700px + 4rem);
     padding: 2rem;
     margin: 0 auto;
   }

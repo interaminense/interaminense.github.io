@@ -1,12 +1,19 @@
-import { useDB } from "../../contexts/DBContext";
-import { SocialIcons } from "../../types";
+import { DBPath, SocialIcons, TSocialNetwork } from "../../types";
 import { socialNetworkIcons } from "../../utils/socialNetworkIcons";
+import { useDB } from "../../utils/useDB";
+import { Loading } from "../Loading";
+
+import "./SocialNetwork.scss";
 
 export function SocialNetwork() {
-  const { socialNetwork } = useDB();
+  const socialNetwork = useDB<TSocialNetwork[]>(DBPath.SocialNetwork);
+
+  if (!socialNetwork) {
+    return <Loading />;
+  }
 
   return (
-    <ul>
+    <ul className="social-network">
       {socialNetwork.map(({ id, label, url }) => (
         <li key={id}>
           <a href={url} target="_blank" rel="noreferrer">

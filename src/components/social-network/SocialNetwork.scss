@@ -1,0 +1,15 @@
+.social-network {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  font-size: 22px;
+
+  li {
+    margin-left: 1rem;
+
+    a {
+      color: #000;
+    }
+  }
+}

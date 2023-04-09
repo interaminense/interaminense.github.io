@@ -1,6 +1,6 @@
 import { FirebaseError } from "@firebase/util";
 import { FormGroup, Container, TextField } from "@mui/material";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Header } from "../components/admin/Header";
 import { Title } from "../components/admin/Title";
@@ -16,6 +16,16 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<FirebaseError | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function signOut() {
+      await auth?.signOut();
+    }
+
+    if (!auth?.isKnownUser) {
+      signOut();
+    }
+  }, [auth]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

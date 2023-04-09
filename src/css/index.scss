@@ -6,14 +6,7 @@ body {
 }
 
 body {
-  font-size: 14px;
+  font-size: 16px;
   font-family: "Roboto", sans-serif;
-}
-
-.my {
-  &-title {
-    font-family: "Quicksand", sans-serif !important;
-    font-weight: bold !important;
-    letter-spacing: -0.25rem !important;
-  }
+  line-height: 1.5rem;
 }
