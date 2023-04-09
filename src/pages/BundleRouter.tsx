@@ -3,7 +3,7 @@ import {
   RouteObject,
   RouterProvider,
 } from "react-router-dom";
-import { PrivatePage } from "../components/private-components/PrivatePage";
+import { PrivatePage } from "../components/admin/PrivatePage";
 import { RootBoundary } from "../components/RootBoundary";
 import { routes } from "./routes";
 

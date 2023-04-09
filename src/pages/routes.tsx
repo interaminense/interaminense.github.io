@@ -1,4 +1,4 @@
-import { Home } from "../Home";
+import { Home } from "./Home";
 import { Admin } from "./Admin";
 import { Analytics } from "./Analytics";
 import { Route } from "./BundleRouter";

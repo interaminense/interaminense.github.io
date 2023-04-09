@@ -2,8 +2,8 @@ import { FirebaseError } from "@firebase/util";
 import { FormGroup, Container, TextField } from "@mui/material";
 import { FormEvent, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Header } from "../components/private-components/Header";
-import { Title } from "../components/private-components/Title";
+import { Header } from "../components/admin/Header";
+import { Title } from "../components/admin/Title";
 import { LoadingButton } from "@mui/lab";
 import { useAppContext } from "../AppContext";
 

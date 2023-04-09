@@ -1,12 +1,12 @@
 import { Box, Tabs, Tab, Typography } from "@mui/material";
 import { SyntheticEvent, useState } from "react";
-import { SocialNetwork } from "../components/private-components/SocialNetwork";
-import { Profile } from "../components/private-components/Profile";
-import { Projects } from "../components/private-components/Projects";
-import { Skills } from "../components/private-components/Skills";
-import { Tags } from "../components/private-components/Tags";
-import { Title } from "../components/private-components/Title";
-import { Links } from "../components/private-components/Links";
+import { SocialNetwork } from "../components/admin/SocialNetwork";
+import { Profile } from "../components/admin/Profile";
+import { Projects } from "../components/admin/Projects";
+import { Skills } from "../components/admin/Skills";
+import { Tags } from "../components/admin/Tags";
+import { Title } from "../components/admin/Title";
+import { Links } from "../components/admin/Links";
 
 interface TabPanelProps {
   children?: React.ReactNode;
