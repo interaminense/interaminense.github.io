@@ -10,7 +10,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { useEffect, useState } from "react";
 import { Loading } from "../Loading";
-import { TProfile, AlertStatus } from "../../types";
+import { TProfile, AlertStatus, DBPath } from "../../types";
 import { config } from "../../firebase/config";
 
 const initialValues: Partial<TProfile> = {
@@ -21,7 +21,7 @@ const initialValues: Partial<TProfile> = {
   imageURL: "",
 };
 
-const profileDB = new DataBase({ path: "profile" }, config);
+const profileDB = new DataBase({ path: DBPath.Profile }, config);
 
 export function Profile() {
   const [profile, setProfile] = useState<TProfile | null>(null);
@@ -91,52 +91,54 @@ export function Profile() {
               <Form onSubmit={handleSubmit}>
                 <FormGroup>
                   <TextField
-                    name="firstName"
                     label="first name"
+                    margin="dense"
+                    name="firstName"
                     onBlur={handleBlur}
                     onChange={handleChange}
+                    required
                     value={values.firstName}
-                    margin="dense"
-                    required
                   />
 
                   <TextField
-                    name="lastName"
                     label="last name"
+                    margin="dense"
+                    name="lastName"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.lastName}
-                    margin="dense"
                     required
+                    value={values.lastName}
                   />
 
                   <TextField
-                    name="description"
                     label="description"
+                    margin="dense"
+                    maxRows={2}
+                    multiline
+                    name="description"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     value={values.description}
-                    margin="dense"
-                    multiline
                   />
 
                   <TextField
-                    name="imageURL"
                     label="image"
+                    margin="dense"
+                    name="imageURL"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     value={values.imageURL}
-                    margin="dense"
                   />
 
                   <TextField
                     label="about me"
+                    margin="dense"
+                    maxRows={2}
+                    multiline
                     name="about"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    multiline
                     value={values.about}
-                    margin="dense"
                   />
                 </FormGroup>
 

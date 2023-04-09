@@ -68,3 +68,13 @@ export enum AlertStatus {
   Success = "success",
   Error = "error",
 }
+
+export enum DBPath {
+  Profile = "profile",
+  Projects = "projects",
+  SocialNetwork = "social-network",
+  Links = "links",
+  Reactions = "reactions",
+  Skills = "skills",
+  Tags = "tags",
+}

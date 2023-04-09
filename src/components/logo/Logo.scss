@@ -1,0 +1,23 @@
+.logo {
+  font-family: "Quicksand", sans-serif !important;
+  text-transform: uppercase;
+  font-size: 18px;
+  letter-spacing: -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__image {
+    margin-right: 0.5rem;
+
+    img {
+      border-radius: 50%;
+      width: 46px;
+      height: 46px;
+    }
+  }
+
+  &__first-name {
+    font-weight: bold;
+  }
+}

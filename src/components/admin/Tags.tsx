@@ -1,10 +1,10 @@
 import { FormGroup, TextField } from "@mui/material";
-import { TTag } from "../../types";
+import { DBPath, TTag } from "../../types";
 import { DataBase } from "../../firebase/database";
 import { config } from "../../firebase/config";
 import { ItemsManager } from "./ItemsManager";
 
-const tagsDB = new DataBase({ path: "tags" }, config);
+const tagsDB = new DataBase({ path: DBPath.Tags }, config);
 
 export function Tags() {
   return (

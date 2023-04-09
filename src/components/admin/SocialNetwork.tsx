@@ -6,35 +6,13 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import { SocialIcons, TSocialNetwork } from "../../types";
+import { DBPath, SocialIcons, TSocialNetwork } from "../../types";
 import { DataBase } from "../../firebase/database";
 import { config } from "../../firebase/config";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebook,
-  faLinkedin,
-  faGithub,
-  faYoutube,
-  faInstagram,
-  faCodepen,
-  faBehance,
-  faMedium,
-} from "@fortawesome/free-brands-svg-icons";
 import { ItemsManager } from "./ItemsManager";
+import { socialNetworkIcons } from "../../utils/socialNetworkIcons";
 
-const socialNetworkIcons = {
-  [SocialIcons.Behance]: <FontAwesomeIcon icon={faBehance} />,
-  [SocialIcons.Codepen]: <FontAwesomeIcon icon={faCodepen} />,
-  [SocialIcons.Facebook]: <FontAwesomeIcon icon={faFacebook} />,
-  [SocialIcons.Github]: <FontAwesomeIcon icon={faGithub} />,
-  [SocialIcons.Instagram]: <FontAwesomeIcon icon={faInstagram} />,
-  [SocialIcons.LinkedIn]: <FontAwesomeIcon icon={faLinkedin} />,
-  [SocialIcons.Medium]: <FontAwesomeIcon icon={faMedium} />,
-  [SocialIcons.Twitter]: <FontAwesomeIcon icon={faFacebook} />,
-  [SocialIcons.Youtube]: <FontAwesomeIcon icon={faYoutube} />,
-};
-
-const socialNetworkDB = new DataBase({ path: "social-network" }, config);
+const socialNetworkDB = new DataBase({ path: DBPath.SocialNetwork }, config);
 
 export function SocialNetwork() {
   return (

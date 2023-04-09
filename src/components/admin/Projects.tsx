@@ -1,13 +1,13 @@
 import { DataBase } from "../../firebase/database";
 import { config } from "../../firebase/config";
-import { Reactions, TProject, TReactions, TTag } from "../../types";
+import { DBPath, Reactions, TProject, TReactions, TTag } from "../../types";
 import { Autocomplete, Chip, FormGroup, TextField } from "@mui/material";
 import { ItemsManager } from "./ItemsManager";
 import { useEffect, useState } from "react";
 
-const projectsDB = new DataBase({ path: "projects" }, config);
-const tagsDB = new DataBase({ path: "tags" }, config);
-const reactionsDB = new DataBase({ path: "reactions" }, config);
+const projectsDB = new DataBase({ path: DBPath.Projects }, config);
+const tagsDB = new DataBase({ path: DBPath.Tags }, config);
+const reactionsDB = new DataBase({ path: DBPath.Reactions }, config);
 
 export function Projects() {
   const [options, setOptions] = useState<TTag[]>([]);

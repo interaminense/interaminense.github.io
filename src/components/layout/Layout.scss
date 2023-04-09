@@ -1,0 +1,26 @@
+.layout {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+  }
+
+  &__footer {
+    padding: 2rem;
+  }
+
+  &__presentation {
+    padding: 8rem 0;
+  }
+
+  &__paragraph {
+    padding: 2rem 0;
+  }
+
+  &__body {
+    width: 100%;
+    max-width: calc(700px + 2rem);
+    padding: 2rem;
+    margin: 0 auto;
+  }
+}
