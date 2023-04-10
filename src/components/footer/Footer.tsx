@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <div className="footer">
       Made with ❤️, just like grandmothers make food 🥗 for their grandchildren.
-      Adriano Interaminense © {currentYear}
+      <strong> Adriano Interaminense © {currentYear}</strong>
     </div>
   );
 }

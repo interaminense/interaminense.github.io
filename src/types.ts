@@ -24,8 +24,8 @@ export type TProject = {
   createDate: number;
   description: string;
   id: string;
-  imageURL: string;
-  tags: TTag[];
+  imageURL?: string;
+  tags?: TTag[];
   label: string;
   url: string;
 };

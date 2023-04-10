@@ -6,9 +6,9 @@ export function Skills() {
   const skills = useDB<TSkill[]>(DBPath.Skills);
 
   return (
-    <div style={{ marginTop: "2rem" }}>
-      {skills?.map(({ label }) => (
-        <Badge label={label} />
+    <div>
+      {skills?.map(({ label, id }) => (
+        <Badge key={id} label={label} />
       ))}
     </div>
   );

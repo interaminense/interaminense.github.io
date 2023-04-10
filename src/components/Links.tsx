@@ -7,8 +7,8 @@ export function Links() {
 
   return (
     <div>
-      {links?.map((link) => (
-        <Link {...link} />
+      {links?.map(({ url, label, id }) => (
+        <Link key={id} url={url} label={label} />
       ))}
     </div>
   );

@@ -45,7 +45,7 @@ export function Projects() {
           return {
             id: data.id,
             columns: [
-              <ImageURLRenderer url={data.imageURL} />,
+              data.imageURL ? <ImageURLRenderer url={data.imageURL} /> : <></>,
               data.label,
               data.description,
               <a href={data.url} target="_blank" rel="noreferrer">

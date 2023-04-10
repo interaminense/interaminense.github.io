@@ -1,13 +1,19 @@
 .layout {
+  &__header,
+  &__footer {
+    padding: 2rem 4rem;
+  }
+
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem;
+    position: sticky;
+    top: 0;
+    background-color: #fff;
   }
 
   &__footer {
-    padding: 2rem;
     margin-top: 8rem;
     border-bottom: 3px solid #ff007a;
   }

@@ -9,6 +9,7 @@ import { Layout } from "../components/layout/Layout";
 import { Links } from "../components/Links";
 import { Logo } from "../components/logo/Logo";
 import { Presentation } from "../components/presentation/Presentation";
+import { Projects } from "../components/projects/Projects";
 import { Skills } from "../components/Skills";
 import { SocialNetwork } from "../components/social-network/SocialNetwork";
 import { Title } from "../components/title/Title";
@@ -21,30 +22,40 @@ export function Home() {
     <Layout>
       <Layout.Header>
         <Logo />
+
         <SocialNetwork />
       </Layout.Header>
+
       <Layout.Body>
         <Layout.Presentation>
           <Presentation />
         </Layout.Presentation>
 
         <Layout.Paragraph>
-          <Title label="More About Me" />
-
-          <HTMLRenderer html={profile?.about as string} />
-        </Layout.Paragraph>
-        <Layout.Paragraph>
           <Title label="Main Skills" />
 
           <Skills />
         </Layout.Paragraph>
+
+        <Layout.Paragraph>
+          <Title label="More About Me" />
+
+          <HTMLRenderer html={profile?.about as string} />
+        </Layout.Paragraph>
+
+        <Layout.Paragraph>
+          <Title label="Personal Featured Projects" />
+
+          <Projects />
+        </Layout.Paragraph>
+
         <Layout.Paragraph>
           <Title label="Links" />
 
           <Links />
         </Layout.Paragraph>
-        <Layout.Paragraph>P4</Layout.Paragraph>
       </Layout.Body>
+
       <Layout.Footer>
         <Footer />
       </Layout.Footer>

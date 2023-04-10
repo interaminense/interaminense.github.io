@@ -1,0 +1,13 @@
+.projects {
+  column-count: 3;
+  column-gap: 2rem;
+  padding: 0;
+  position: relative;
+
+  &__item {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    margin-bottom: 2rem;
+    break-inside: avoid;
+  }
+}
