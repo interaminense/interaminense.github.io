@@ -3,6 +3,7 @@ export enum MESSAGES {
   DATA_CREATED = "data created.",
   DATA_CREATED_FAIL = "an error occurred while creating data.",
   DATA_DELETED = "data deleted.",
+  DATA_NOT_FOUND = "data not found.",
   DATA_UPDATED = "data updated.",
   PLEASE_AUTH_USER = "please, authenticate user.",
   PLEASE_INSERT_CORRECT_ID = "please, insert a valid id.",

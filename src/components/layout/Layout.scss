@@ -11,6 +11,7 @@
     position: sticky;
     top: 0;
     background-color: #fff;
+    z-index: 1;
   }
 
   &__footer {
@@ -28,8 +29,26 @@
 
   &__body {
     width: 100%;
-    max-width: calc(700px + 4rem);
     padding: 2rem;
     margin: 0 auto;
+  }
+
+  &__projects {
+    background-color: #efefef;
+    padding: 8rem 0;
+  }
+
+  &__breadcrumb a {
+    margin-right: 2rem;
+    font-size: 1.5rem;
+    color: #000;
+  }
+
+  &__link {
+    text-align: center;
+    display: block;
+    width: 100%;
+    margin-top: 3rem;
+    text-transform: uppercase;
   }
 }

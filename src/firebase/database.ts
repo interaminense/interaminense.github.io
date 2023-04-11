@@ -14,6 +14,8 @@ import {
   set,
   onValue,
   limitToFirst,
+  equalTo,
+  QueryConstraint,
 } from "firebase/database";
 import { Data, IDataBase, SortBy, GroupedData } from "./types";
 import { MESSAGES } from "./constants";
@@ -53,11 +55,11 @@ export class DataBase {
       return false;
     }
 
-    if (!this.isKnownUser) {
-      this._error(MESSAGES.USER_DOES_NOT_HAVE_PERMISSION);
+    // if (!this.isKnownUser) {
+    //   this._error(MESSAGES.USER_DOES_NOT_HAVE_PERMISSION);
 
-      return false;
-    }
+    //   return false;
+    // }
 
     if (!uuidValidate(id)) {
       this._error(MESSAGES.PLEASE_INSERT_CORRECT_ID);
@@ -142,20 +144,22 @@ export class DataBase {
 
       return project;
     } else {
-      return this._error(MESSAGES.AN_ERROR_OCCURRED);
+      return this._error(MESSAGES.DATA_NOT_FOUND);
     }
   }
 
   async listData(
     callback: (data: GroupedData) => void,
     {
+      filterValue,
       topResults = 10,
       sortBy = {
         value: "date",
         type: "DESC",
       },
-      onlyOnce = false,
+      onlyOnce = true,
     }: {
+      filterValue?: string;
       topResults?: number;
       sortBy?: SortBy;
       onlyOnce?: boolean;
@@ -163,14 +167,16 @@ export class DataBase {
   ) {
     if (!this.auth.currentUser) return;
 
+    const params = [
+      orderByChild(sortBy.value),
+      filterValue && equalTo(filterValue),
+      sortBy.type === "DESC"
+        ? limitToLast(topResults)
+        : limitToFirst(topResults),
+    ].filter(Boolean) as QueryConstraint[];
+
     try {
-      const result = query(
-        ref(this.database, this.props.path),
-        orderByChild(sortBy.value),
-        sortBy.type === "DESC"
-          ? limitToLast(topResults)
-          : limitToFirst(topResults)
-      );
+      const result = query(ref(this.database, this.props.path), ...params);
 
       return onValue(
         result,

@@ -1,9 +1,17 @@
 import { DataBase } from "../../firebase/database";
 import { config } from "../../firebase/config";
 import { DBPath, Reactions, TProject, TReactions, TTag } from "../../types";
-import { Autocomplete, Chip, FormGroup, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Checkbox,
+  Chip,
+  FormControlLabel,
+  FormGroup,
+  TextField,
+} from "@mui/material";
 import { ItemsManager } from "./ItemsManager";
 import { useEffect, useState } from "react";
+import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 
 const projectsDB = new DataBase({ path: DBPath.Projects }, config);
 const tagsDB = new DataBase({ path: DBPath.Tags }, config);
@@ -13,11 +21,14 @@ export function Projects() {
   const [options, setOptions] = useState<TTag[]>([]);
 
   useEffect(() => {
-    tagsDB.listData((groupedData) => {
-      if (groupedData.data) {
-        setOptions(groupedData.data as TTag[]);
-      }
-    });
+    tagsDB.listData(
+      (groupedData) => {
+        if (groupedData.data) {
+          setOptions(groupedData.data as TTag[]);
+        }
+      },
+      { ...DEFAULT_LIST_DATA_PROPS, onlyOnce: false }
+    );
   }, []);
 
   return (
@@ -39,7 +50,7 @@ export function Projects() {
       }}
       dataBase={projectsDB}
       name="Project"
-      header={["image", "title", "description", "url", "tags"]}
+      header={["image", "title", "description", "featured", "url", "tags"]}
       rows={(items) =>
         items?.map((data) => {
           return {
@@ -48,6 +59,7 @@ export function Projects() {
               data.imageURL ? <ImageURLRenderer url={data.imageURL} /> : <></>,
               data.label,
               data.description,
+              data.featured ? "yes" : "no",
               <a href={data.url} target="_blank" rel="noreferrer">
                 {data.url}
               </a>,
@@ -121,6 +133,15 @@ export function Projects() {
             renderInput={(params) => (
               <TextField {...params} label="Tags" placeholder="type tag..." />
             )}
+          />
+
+          <FormControlLabel
+            checked={item?.featured}
+            control={<Checkbox />}
+            label="Featured"
+            onChange={(event, newValue) => {
+              onChange({ ...item, featured: newValue } as TProject);
+            }}
           />
         </FormGroup>
       )}

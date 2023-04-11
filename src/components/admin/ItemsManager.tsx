@@ -6,6 +6,7 @@ import { Modal } from "./Modal";
 import { DataBase, TResultSuccess } from "../../firebase/database";
 import { Data } from "../../firebase/types";
 import { AlertStatus } from "../../types";
+import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 
 interface IItemsManagerProps<TItem> {
   dataBase: DataBase;
@@ -47,13 +48,16 @@ export function ItemsManager<TItem extends { label: string; id: string }>({
   });
 
   useEffect(() => {
-    dataBase.listData((groupedData) => {
-      if (groupedData) {
-        setItems(groupedData.data as TItem[]);
-      }
+    dataBase.listData(
+      (groupedData) => {
+        if (groupedData) {
+          setItems(groupedData.data as TItem[]);
+        }
 
-      setLoading(false);
-    });
+        setLoading(false);
+      },
+      { ...DEFAULT_LIST_DATA_PROPS, onlyOnce: false }
+    );
   }, [dataBase]);
 
   async function handleAdd(e: FormEvent) {

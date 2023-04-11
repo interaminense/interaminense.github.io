@@ -8,6 +8,7 @@ import {
   faCodepen,
   faBehance,
   faMedium,
+  faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import { SocialIcons } from "../types";
 
@@ -19,6 +20,6 @@ export const socialNetworkIcons = {
   [SocialIcons.Instagram]: <FontAwesomeIcon icon={faInstagram} />,
   [SocialIcons.LinkedIn]: <FontAwesomeIcon icon={faLinkedin} />,
   [SocialIcons.Medium]: <FontAwesomeIcon icon={faMedium} />,
-  [SocialIcons.Twitter]: <FontAwesomeIcon icon={faFacebook} />,
+  [SocialIcons.Twitter]: <FontAwesomeIcon icon={faTwitter} />,
   [SocialIcons.Youtube]: <FontAwesomeIcon icon={faYoutube} />,
 };

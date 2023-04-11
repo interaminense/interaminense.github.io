@@ -8,7 +8,7 @@ export enum Reactions {
 
 export type TReactions = {
   [key in Reactions]: number;
-};
+} & { createDate: string; id: string };
 
 export type TProfile = {
   about: string;
@@ -23,6 +23,7 @@ export type TProfile = {
 export type TProject = {
   createDate: number;
   description: string;
+  featured: boolean;
   id: string;
   imageURL?: string;
   tags?: TTag[];

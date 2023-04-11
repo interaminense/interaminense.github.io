@@ -10,8 +10,15 @@ import {
 import { LoadingButton } from "@mui/lab";
 import { useEffect, useState } from "react";
 import { Loading } from "../Loading";
-import { TProfile, AlertStatus, DBPath } from "../../types";
+import {
+  TProfile,
+  AlertStatus,
+  DBPath,
+  Reactions,
+  TReactions,
+} from "../../types";
 import { config } from "../../firebase/config";
+import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 
 const initialValues: Partial<TProfile> = {
   about: "",
@@ -22,6 +29,7 @@ const initialValues: Partial<TProfile> = {
 };
 
 const profileDB = new DataBase({ path: DBPath.Profile }, config);
+const reactionsDB = new DataBase({ path: DBPath.Reactions }, config);
 
 export function Profile() {
   const [profile, setProfile] = useState<TProfile | null>(null);
@@ -35,14 +43,36 @@ export function Profile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    profileDB.listData((data) => {
-      const profile = data?.data[0];
-      if (profile) {
-        setProfile(profile as TProfile);
-      }
+    async function createReaction(profileId: string) {
+      const reaction = await reactionsDB.get(profileId);
 
-      setLoading(false);
-    });
+      if (reaction?.error) {
+        await reactionsDB.create(
+          {
+            [Reactions.ThumbsUp]: 0,
+            [Reactions.ThumbsDown]: 0,
+            [Reactions.Hello]: 0,
+            [Reactions.Heart]: 0,
+            [Reactions.Fire]: 0,
+          } as TReactions,
+          profileId
+        );
+      }
+    }
+
+    profileDB.listData(
+      (data) => {
+        const profile = data?.data[0];
+
+        if (profile) {
+          setProfile(profile as TProfile);
+          createReaction(profile.id as string);
+        }
+
+        setLoading(false);
+      },
+      { ...DEFAULT_LIST_DATA_PROPS, onlyOnce: false }
+    );
   }, []);
 
   function resetAlertStatus() {
