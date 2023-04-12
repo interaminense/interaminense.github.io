@@ -38,5 +38,11 @@ function processRoutes(routes: Route[]) {
 }
 
 export function BundleRouter() {
-  return <RouterProvider router={createBrowserRouter(processRoutes(routes))} />;
+  return (
+    <RouterProvider
+      router={createBrowserRouter(processRoutes(routes), {
+        basename: "/homepage",
+      })}
+    />
+  );
 }

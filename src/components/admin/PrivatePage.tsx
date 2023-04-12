@@ -5,7 +5,6 @@ import { Header } from "./Header";
 import { useNavigate } from "react-router-dom";
 import { Loading } from "../Loading";
 import { useAppContext } from "../../AppContext";
-import { createPath } from "../../pages/routes";
 
 export function PrivatePage({ children }: { children: JSX.Element }) {
   const { auth } = useAppContext();
@@ -16,7 +15,7 @@ export function PrivatePage({ children }: { children: JSX.Element }) {
   async function handleSignOut() {
     await auth?.signOut();
 
-    navigate(createPath("/"), { replace: true });
+    navigate("/", { replace: true });
   }
 
   useEffect(() => {
@@ -34,9 +33,7 @@ export function PrivatePage({ children }: { children: JSX.Element }) {
   }
 
   if (!auth?.isKnownUser) {
-    return (
-      <Navigate to={createPath("/login")} state={{ from: location }} replace />
-    );
+    return <Navigate to={"/login"} state={{ from: location }} replace />;
   }
 
   return (
