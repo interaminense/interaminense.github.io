@@ -1,7 +1,8 @@
 {
   "name": "homepage",
-  "version": "0.1.0",
-  "private": true,
+  "homepage": "http://interaminense.github.io/homepage",
+  "version": "2.0.0",
+  "private": false,
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
@@ -56,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "gh-pages": "^5.0.0",
     "uuid": "^9.0.0"
   }
 }
