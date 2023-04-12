@@ -7,3 +7,5 @@ In addition to the projects, you'll also find a brief description about myself a
 One fun feature of this homepage is the Easter egg that allows you to toggle between dark/light mode. Just click on the moon icon in the top right corner to switch between the two.
 
 I hope you enjoy exploring my portfolio and getting to know a little bit about me. If you have any questions or just want to connect, feel free to reach out via my contact information on the homepage or here on github. See ya!
+
+Soon I will show how you can use my website to create your own and with administration interface!
