@@ -5,34 +5,38 @@ import { Route } from "./BundleRouter";
 import { Login } from "./Login";
 import { Projects } from "./Projects";
 
+function createPath(path: string) {
+  return `/homepage${path}`;
+}
+
 export const routes: Route[] = [
   {
-    path: "/",
+    path: createPath("/"),
     element: <Home />,
     publicPage: true,
   },
   {
-    path: "/home",
+    path: createPath("/home"),
     element: <Home />,
     publicPage: true,
   },
   {
-    path: "/projects",
+    path: createPath("/projects"),
     element: <Projects />,
     publicPage: true,
   },
   {
-    path: "/admin",
+    path: createPath("/admin"),
     element: <Admin />,
     publicPage: false,
   },
   {
-    path: "/analytics",
+    path: createPath("/analytics"),
     element: <Analytics />,
     publicPage: false,
   },
   {
-    path: "/login",
+    path: createPath("/login"),
     element: <Login />,
     publicPage: true,
   },
