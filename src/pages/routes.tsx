@@ -5,7 +5,7 @@ import { Route } from "./BundleRouter";
 import { Login } from "./Login";
 import { Projects } from "./Projects";
 
-function createPath(path: string) {
+export function createPath(path: string) {
   return `/homepage${path}`;
 }
 
