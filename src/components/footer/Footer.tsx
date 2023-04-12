@@ -4,7 +4,9 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
   return (
     <div className="footer">
-      Made with ❤️, just like grandmothers make food 🥗 for their grandchildren.
+      Made with care, just like grandmothers prepare food 🥗 for their
+      grandchildren
+      <br />
       <strong> Adriano Interaminense © {currentYear}</strong>
     </div>
   );
