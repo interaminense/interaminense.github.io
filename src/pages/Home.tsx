@@ -16,7 +16,6 @@ import { Skills } from "../components/Skills";
 import { SocialNetwork } from "../components/social-network/SocialNetwork";
 import { Title } from "../components/title/Title";
 import { useProfileDB } from "../contexts/ProfileDBContext";
-import { createPath } from "./routes";
 
 export function Home() {
   const { profile } = useProfileDB();
@@ -55,7 +54,7 @@ export function Home() {
           <Layout.Paragraph>
             <Projects featured />
 
-            <Link className="layout__link" to={createPath("/projects")}>
+            <Link className="layout__link" to={"/projects"}>
               see all projects
             </Link>
           </Layout.Paragraph>
