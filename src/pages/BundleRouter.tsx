@@ -1,5 +1,5 @@
 import {
-  createBrowserRouter,
+  createHashRouter,
   RouteObject,
   RouterProvider,
 } from "react-router-dom";
@@ -38,5 +38,5 @@ function processRoutes(routes: Route[]) {
 }
 
 export function BundleRouter() {
-  return <RouterProvider router={createBrowserRouter(processRoutes(routes))} />;
+  return <RouterProvider router={createHashRouter(processRoutes(routes))} />;
 }
