@@ -17,8 +17,9 @@ import {
   equalTo,
   QueryConstraint,
 } from "firebase/database";
-import { Data, IDataBase, SortBy, GroupedData } from "./types";
-import { MESSAGES } from "./constants";
+import { Data, IDataBaseProps, SortBy, GroupedData } from "./types";
+import { MESSAGES, PREFIX } from "./constants";
+import { DEV_MODE } from "../utils/constants";
 
 export type TResultError = { error: Error | null };
 export type TResultSuccess = { error: null; data: Data };
@@ -27,9 +28,9 @@ export class DataBase {
   app: FirebaseApp;
   auth: Auth;
   database: Database;
-  props: IDataBase;
+  props: IDataBaseProps;
 
-  constructor(props: IDataBase, config: FirebaseOptions) {
+  constructor(props: IDataBaseProps, config: FirebaseOptions) {
     this.app = initializeApp(config);
     this.auth = getAuth(this.app);
     this.database = getDatabase(this.app);
@@ -54,12 +55,6 @@ export class DataBase {
 
       return false;
     }
-
-    // if (!this.isKnownUser) {
-    //   this._error(MESSAGES.USER_DOES_NOT_HAVE_PERMISSION);
-
-    //   return false;
-    // }
 
     if (!uuidValidate(id)) {
       this._error(MESSAGES.PLEASE_INSERT_CORRECT_ID);
@@ -231,10 +226,10 @@ export class DataBase {
   }
 
   private _log(...params: any) {
-    if (this.props.disableLog) {
+    if (!DEV_MODE) {
       return;
     }
 
-    console.log(MESSAGES.PREFIX, ...params);
+    console.log(PREFIX(this.props.path), ...params);
   }
 }

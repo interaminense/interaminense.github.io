@@ -14,14 +14,11 @@ export type Data = {
   [key: string]: DataOptions | DataOptions[];
 };
 
-export interface IDataBase {
-  disableLog?: boolean;
+export interface IDataBaseProps {
   path: string;
-  credentials?: Credentials;
 }
 
 export interface IAuth {
-  disableLog?: boolean;
   credentials?: Credentials;
 }
 
