@@ -126,6 +126,10 @@ export class DataBase {
     }
   }
 
+  /**
+   * It must be used to get the static data and will not change
+   * until you make a new request
+   */
   async get(id: string) {
     if (!this._isValidToWrite(id)) return;
 
@@ -142,6 +146,26 @@ export class DataBase {
     } else {
       return this._error(MESSAGES.DATA_NOT_FOUND);
     }
+  }
+
+  /**
+   * It must be used to obtain data updated in real time
+   */
+  getLive(id: string, callback: (data: Data) => void) {
+    if (!this._isValidToWrite(id)) return;
+
+    const projectRef = child(ref(this.database), `${this.props.path}/${id}`);
+
+    onValue(projectRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const project: Data = snapshot.val();
+        this._log(project);
+
+        callback(project);
+      } else {
+        this._error(MESSAGES.DATA_NOT_FOUND);
+      }
+    });
   }
 
   async listData(
