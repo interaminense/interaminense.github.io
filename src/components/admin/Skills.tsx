@@ -1,10 +1,9 @@
 import { FormGroup, TextField } from "@mui/material";
 import { DBPath, TSkill } from "../../types";
 import { DataBase } from "../../firebase/database";
-import { config } from "../../firebase/config";
 import { ItemsManager } from "./ItemsManager";
 
-const skillsDB = new DataBase({ path: DBPath.Skills }, config);
+const skillsDB = new DataBase({ path: DBPath.Skills });
 
 export function Skills() {
   return (

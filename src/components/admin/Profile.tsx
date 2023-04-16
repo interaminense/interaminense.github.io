@@ -17,7 +17,6 @@ import {
   Reactions,
   TReactions,
 } from "../../types";
-import { config } from "../../firebase/config";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 
 const initialValues: Partial<TProfile> = {
@@ -28,8 +27,8 @@ const initialValues: Partial<TProfile> = {
   imageURL: "",
 };
 
-const profileDB = new DataBase({ path: DBPath.Profile }, config);
-const reactionsDB = new DataBase({ path: DBPath.Reactions }, config);
+const profileDB = new DataBase({ path: DBPath.Profile });
+const reactionsDB = new DataBase({ path: DBPath.Reactions });
 
 export function Profile() {
   const [profile, setProfile] = useState<TProfile | null>(null);

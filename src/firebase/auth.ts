@@ -1,9 +1,4 @@
-import {
-  FirebaseApp,
-  FirebaseError,
-  FirebaseOptions,
-  initializeApp,
-} from "firebase/app";
+import { FirebaseApp, FirebaseError, initializeApp } from "firebase/app";
 import {
   Auth as FirebaseAuth,
   browserSessionPersistence,
@@ -15,19 +10,18 @@ import {
   User,
   UserCredential,
 } from "firebase/auth";
-import { Credentials, IAuth } from "./types";
+import { Credentials } from "./types";
 import { MESSAGES, PREFIX } from "./constants";
 import { DEV_MODE } from "../utils/constants";
+import { config } from "./config";
 
 export class Auth {
   app: FirebaseApp;
   auth: FirebaseAuth;
-  props: IAuth | null;
 
-  constructor(props: IAuth | null, config: FirebaseOptions) {
+  constructor() {
     this.app = initializeApp(config);
     this.auth = getAuth(this.app);
-    this.props = props;
   }
 
   get isKnownUser(): boolean {

@@ -1,5 +1,4 @@
 import { DataBase } from "../../firebase/database";
-import { config } from "../../firebase/config";
 import { DBPath, Reactions, TProject, TReactions, TTag } from "../../types";
 import {
   Autocomplete,
@@ -13,9 +12,9 @@ import { ItemsManager } from "./ItemsManager";
 import { useEffect, useState } from "react";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 
-const projectsDB = new DataBase({ path: DBPath.Projects }, config);
-const tagsDB = new DataBase({ path: DBPath.Tags }, config);
-const reactionsDB = new DataBase({ path: DBPath.Reactions }, config);
+const projectsDB = new DataBase({ path: DBPath.Projects });
+const tagsDB = new DataBase({ path: DBPath.Tags });
+const reactionsDB = new DataBase({ path: DBPath.Reactions });
 
 export function Projects() {
   const [options, setOptions] = useState<TTag[]>([]);

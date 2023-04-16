@@ -1,10 +1,9 @@
 import { FormGroup, TextField } from "@mui/material";
 import { DBPath, TLink } from "../../types";
 import { DataBase } from "../../firebase/database";
-import { config } from "../../firebase/config";
 import { ItemsManager } from "./ItemsManager";
 
-const linksDB = new DataBase({ path: DBPath.Links }, config);
+const linksDB = new DataBase({ path: DBPath.Links });
 
 export function Links() {
   return (
