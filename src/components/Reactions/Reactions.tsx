@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { config } from "../../firebase/config";
 import { DataBase } from "../../firebase/database";
 import { DBPath, TReactions } from "../../types";
+import { formatNumber } from "../../utils/numbers";
 import { Loading } from "../Loading";
 
 import "./Reactions.scss";
@@ -59,7 +60,7 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
             key={key}
           >
             <span className="reactions__items-total">
-              {items[key as keyof TReactions]}
+              {formatNumber(items[key as keyof TReactions] as number)}
             </span>
             <span className="reactions__items-icon">{key}</span>
           </div>
