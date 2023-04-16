@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { config } from "../../firebase/config";
 import { DataBase } from "../../firebase/database";
 import { DBPath, TReactions } from "../../types";
 import { formatNumber } from "../../utils/numbers";
@@ -7,7 +6,7 @@ import { Loading } from "../Loading";
 
 import "./Reactions.scss";
 
-const reactionsDB = new DataBase({ path: DBPath.Reactions }, config);
+const reactionsDB = new DataBase({ path: DBPath.Reactions });
 
 interface IReactionsProps {
   reactionId: string;

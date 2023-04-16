@@ -1,6 +1,5 @@
 import React, { createContext, useContext } from "react";
 import { Auth } from "./firebase/auth";
-import { config } from "./firebase/config";
 
 interface IAppContext {
   auth?: Auth;
@@ -15,7 +14,7 @@ export function useAppContext() {
 export function AppContextProvider({
   children,
 }: React.HTMLAttributes<HTMLElement>) {
-  const auth = new Auth(null, config);
+  const auth = new Auth();
 
   return <AppContext.Provider value={{ auth }}>{children}</AppContext.Provider>;
 }

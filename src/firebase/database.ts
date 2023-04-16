@@ -1,5 +1,5 @@
 import { v4 as uuidv4, validate as uuidValidate } from "uuid";
-import { FirebaseApp, FirebaseOptions, initializeApp } from "firebase/app";
+import { FirebaseApp, initializeApp } from "firebase/app";
 import { Auth, getAuth } from "firebase/auth";
 import {
   child,
@@ -20,6 +20,7 @@ import {
 import { Data, IDataBaseProps, SortBy, GroupedData } from "./types";
 import { MESSAGES, PREFIX } from "./constants";
 import { DEV_MODE } from "../utils/constants";
+import { config } from "./config";
 
 export type TResultError = { error: Error | null };
 export type TResultSuccess = { error: null; data: Data };
@@ -30,7 +31,7 @@ export class DataBase {
   database: Database;
   props: IDataBaseProps;
 
-  constructor(props: IDataBaseProps, config: FirebaseOptions) {
+  constructor(props: IDataBaseProps) {
     this.app = initializeApp(config);
     this.auth = getAuth(this.app);
     this.database = getDatabase(this.app);

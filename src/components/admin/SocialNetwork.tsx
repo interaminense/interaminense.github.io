@@ -8,11 +8,10 @@ import {
 } from "@mui/material";
 import { DBPath, SocialIcons, TSocialNetwork } from "../../types";
 import { DataBase } from "../../firebase/database";
-import { config } from "../../firebase/config";
 import { ItemsManager } from "./ItemsManager";
 import { socialNetworkIcons } from "../../utils/socialNetworkIcons";
 
-const socialNetworkDB = new DataBase({ path: DBPath.SocialNetwork }, config);
+const socialNetworkDB = new DataBase({ path: DBPath.SocialNetwork });
 
 export function SocialNetwork() {
   return (
