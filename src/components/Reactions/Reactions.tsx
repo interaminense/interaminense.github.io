@@ -18,16 +18,10 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchReactions() {
-      const result = await reactionsDB?.get(reactionId as string);
-
-      if (!result?.error) {
-        setReactions(result as TReactions);
-      }
-
+    reactionsDB?.getLive(reactionId, (reaction) => {
+      setReactions(reaction as TReactions);
       setLoading(false);
-    }
-    fetchReactions();
+    });
   }, [reactionId]);
 
   async function handleUpdateReaction(key: string) {
