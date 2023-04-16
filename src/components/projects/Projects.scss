@@ -17,3 +17,9 @@
     }
   }
 }
+
+@media (max-width: 992px) {
+  .projects {
+    column-count: 1;
+  }
+}

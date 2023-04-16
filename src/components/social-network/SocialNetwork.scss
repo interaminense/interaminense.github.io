@@ -13,3 +13,14 @@
     }
   }
 }
+
+@media (max-width: 992px) {
+  .social-network {
+    display: block;
+
+    li {
+      display: inline-block;
+      margin: 1rem;
+    }
+  }
+}
