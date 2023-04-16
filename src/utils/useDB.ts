@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { config } from "../firebase/config";
 import { DataBase } from "../firebase/database";
 import { DBPath } from "../types";
-import { DEFAULT_LIST_DATA_PROPS, DEV_MODE } from "./constants";
+import { DEFAULT_LIST_DATA_PROPS } from "./constants";
 
 export function useDB<TData>(path: DBPath, props = {}) {
   const [data, setData] = useState<TData | null>(null);
 
   useEffect(() => {
-    const DB = new DataBase({ path, disableLog: !DEV_MODE }, config);
+    const DB = new DataBase({ path }, config);
 
     DB.listData(
       (groupedData) => {

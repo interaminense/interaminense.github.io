@@ -16,14 +16,15 @@ import {
   UserCredential,
 } from "firebase/auth";
 import { Credentials, IAuth } from "./types";
-import { MESSAGES } from "./constants";
+import { MESSAGES, PREFIX } from "./constants";
+import { DEV_MODE } from "../utils/constants";
 
 export class Auth {
   app: FirebaseApp;
   auth: FirebaseAuth;
-  props: IAuth;
+  props: IAuth | null;
 
-  constructor(props: IAuth, config: FirebaseOptions) {
+  constructor(props: IAuth | null, config: FirebaseOptions) {
     this.app = initializeApp(config);
     this.auth = getAuth(this.app);
     this.props = props;
@@ -86,10 +87,10 @@ export class Auth {
   }
 
   private _log(...params: any) {
-    if (this.props.disableLog) {
+    if (!DEV_MODE) {
       return;
     }
 
-    console.log(MESSAGES.PREFIX, ...params);
+    console.log(PREFIX("Auth"), ...params);
   }
 }
