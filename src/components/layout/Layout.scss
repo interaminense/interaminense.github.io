@@ -45,7 +45,7 @@
   }
 
   &__body {
-    width: 100%;
+    width: calc(100% - 4rem);
     padding: 2rem;
     margin: 0 auto;
   }
@@ -67,5 +67,24 @@
     width: 100%;
     margin-top: 3rem;
     text-transform: uppercase;
+  }
+}
+
+@media (max-width: 992px) {
+  .layout {
+    &__header {
+      position: relative;
+      flex-direction: column;
+      padding-top: 8rem;
+    }
+
+    &__header,
+    &__footer {
+      padding: 2rem;
+    }
+
+    &__presentation {
+      padding: 2rem 0;
+    }
   }
 }

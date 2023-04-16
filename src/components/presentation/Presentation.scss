@@ -5,3 +5,10 @@
   line-height: 4rem;
   margin-bottom: 2rem;
 }
+
+@media (max-width: 992px) {
+  .presentation {
+    font-size: 36px;
+    line-height: 3rem;
+  }
+}
