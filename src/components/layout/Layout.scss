@@ -58,7 +58,6 @@
   &__breadcrumb a {
     margin-right: 2rem;
     font-size: 1.5rem;
-    color: #000;
   }
 
   &__link {
@@ -85,6 +84,18 @@
 
     &__presentation {
       padding: 2rem 0;
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .layout {
+    &__header {
+      background-color: #333;
+    }
+
+    &__projects {
+      background-color: #292929;
     }
   }
 }

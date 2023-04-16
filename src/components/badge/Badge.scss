@@ -9,3 +9,9 @@
   margin-bottom: 0.5rem;
   line-height: 1rem;
 }
+
+@media (prefers-color-scheme: dark) {
+  .badge {
+    background-color: #292929;
+  }
+}

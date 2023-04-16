@@ -35,3 +35,10 @@
     margin-right: 0.25em;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: #242424;
+    border: 1px solid #222;
+  }
+}
