@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+// @ts-nocheck
+
+import { useEffect, useRef, useState } from "react";
 import { DataBase } from "../../firebase/database";
 import { DBPath, TReactions } from "../../types";
 import { formatNumber } from "../../utils/numbers";
@@ -24,13 +26,12 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
     });
   }, [reactionId]);
 
-  async function handleUpdateReaction(key: string) {
+  async function handleUpdateReaction(key: string, count: number) {
+    console.log(count);
     const newReactions = {
       ...reactions,
-      [key]: (reactions?.[key as keyof TReactions] as number) + 1,
+      [key]: (reactions?.[key as keyof TReactions] as number) + count,
     };
-
-    setReactions(newReactions as TReactions);
 
     await reactionsDB.update(reactionId, newReactions as TReactions);
   }
@@ -47,17 +48,56 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
     <div className={`reactions reactions--${size}`}>
       {reactions &&
         Object.keys(reactionsKeys).map((key) => (
-          <div
-            onClick={() => handleUpdateReaction(key)}
-            className="reactions__items"
+          <Reaction
             key={key}
-          >
-            <span className="reactions__items-total">
-              {formatNumber(items[key as keyof TReactions] as number)}
-            </span>
-            <span className="reactions__items-icon">{key}</span>
-          </div>
+            icon={key}
+            onClick={(count) => handleUpdateReaction(key, count)}
+            value={formatNumber(items[key as keyof TReactions] as number)}
+          />
         ))}
+    </div>
+  );
+}
+
+interface IReactionProps {
+  onClick: (count: number) => void;
+  value: string;
+  icon: string;
+}
+
+function Reaction({ onClick, value, icon }: IReactionProps) {
+  const [count, setCount] = useState(0);
+  const [showReaction, setShowReaction] = useState(false);
+  const timeoutRef = useRef(null);
+
+  return (
+    <div
+      onClick={() => {
+        let count = 0;
+        clearTimeout(timeoutRef.current);
+        setCount((newVal) => {
+          count = newVal + 1;
+
+          return count;
+        });
+
+        timeoutRef.current = setTimeout(() => {
+          setShowReaction(true);
+          onClick(count);
+
+          setTimeout(() => {
+            count = 0;
+            setCount(count);
+            setShowReaction(false);
+          }, 500);
+        }, 500);
+      }}
+      className="reactions__items"
+    >
+      <span className="reactions__items-total">{value}</span>
+      <span className="reactions__items-icon">{icon}</span>
+
+      {showReaction && <span className="reactions__animation">+{count}</span>}
     </div>
   );
 }
