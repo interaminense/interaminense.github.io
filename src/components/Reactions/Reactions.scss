@@ -16,6 +16,7 @@
   &__items {
     margin-right: 1.25rem;
     cursor: pointer;
+    position: relative;
   }
 
   &__items-icon {
@@ -25,5 +26,29 @@
 
   &__items-total {
     font-weight: 400;
+  }
+
+  &__animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation-name: animation;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+  }
+}
+
+@keyframes animation {
+  0% {
+    opacity: 0;
+    transform: translate(0, -50%);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(0, -100%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -150%);
   }
 }
