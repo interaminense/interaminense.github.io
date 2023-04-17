@@ -1,10 +1,9 @@
-// @ts-nocheck
-
 import { useEffect, useRef, useState } from "react";
+import { useAppContext } from "../../AppContext";
 import { DataBase } from "../../firebase/database";
 import { DBPath, TReactions } from "../../types";
+import { TOTAL_REACTION_COUNT } from "../../utils/constants";
 import { formatNumber } from "../../utils/numbers";
-import { Loading } from "../Loading";
 
 import "./Reactions.scss";
 
@@ -17,17 +16,14 @@ interface IReactionsProps {
 
 export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
   const [reactions, setReactions] = useState<TReactions | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     reactionsDB?.getLive(reactionId, (reaction) => {
       setReactions(reaction as TReactions);
-      setLoading(false);
     });
   }, [reactionId]);
 
   async function handleUpdateReaction(key: string, count: number) {
-    console.log(count);
     const newReactions = {
       ...reactions,
       [key]: (reactions?.[key as keyof TReactions] as number) + count,
@@ -36,11 +32,7 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
     await reactionsDB.update(reactionId, newReactions as TReactions);
   }
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  const { createDate, id, ...reactionsKeys } = reactions as TReactions;
+  const { createDate, id, ...reactionsKeys } = (reactions as TReactions) || {};
 
   const items = reactionsKeys as Partial<TReactions>;
 
@@ -68,22 +60,58 @@ interface IReactionProps {
 function Reaction({ onClick, value, icon }: IReactionProps) {
   const [count, setCount] = useState(0);
   const [showReaction, setShowReaction] = useState(false);
-  const timeoutRef = useRef(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  const { auth } = useAppContext();
+  const [isAbleToReact, setIsAbleToReact] = useState(() => {
+    const userSession = sessionStorage.getItem(
+      auth?.auth.currentUser?.uid as string
+    );
+    const userSessionObj = userSession ? JSON.parse(userSession) : null;
+
+    return userSessionObj?.count <= TOTAL_REACTION_COUNT;
+  });
 
   return (
     <div
       onClick={() => {
         let count = 0;
-        clearTimeout(timeoutRef.current);
-        setCount((newVal) => {
-          count = newVal + 1;
 
-          return count;
-        });
+        clearTimeout(timeoutRef.current);
+
+        if (isAbleToReact) {
+          setCount((newVal) => {
+            count = newVal + 1;
+
+            return count;
+          });
+        }
 
         timeoutRef.current = setTimeout(() => {
+          const userSession = sessionStorage.getItem(
+            auth?.auth.currentUser?.uid as string
+          );
+
+          const userSessionObj = userSession ? JSON.parse(userSession) : {};
+
+          if (
+            count > TOTAL_REACTION_COUNT ||
+            userSessionObj.count > TOTAL_REACTION_COUNT
+          ) {
+            setIsAbleToReact(false);
+          } else {
+            sessionStorage.setItem(
+              auth?.auth.currentUser?.uid as string,
+              JSON.stringify({
+                ...userSessionObj,
+                count: userSessionObj.count ? userSessionObj.count + count : 1,
+              })
+            );
+
+            setIsAbleToReact(true);
+            onClick(count);
+          }
+
           setShowReaction(true);
-          onClick(count);
 
           setTimeout(() => {
             count = 0;
@@ -97,7 +125,12 @@ function Reaction({ onClick, value, icon }: IReactionProps) {
       <span className="reactions__items-total">{value}</span>
       <span className="reactions__items-icon">{icon}</span>
 
-      {showReaction && <span className="reactions__animation">+{count}</span>}
+      {showReaction &&
+        (isAbleToReact ? (
+          <span className="reactions__animation">+{count}</span>
+        ) : (
+          <span className="reactions__animation">max limit reached</span>
+        ))}
     </div>
   );
 }
