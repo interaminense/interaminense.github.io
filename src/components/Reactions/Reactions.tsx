@@ -62,13 +62,13 @@ function Reaction({ onClick, value, icon }: IReactionProps) {
   const [showReaction, setShowReaction] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const { auth } = useAppContext();
-  const [isAbleToReact, setIsAbleToReact] = useState(() => {
+  const [ableToReaction, setAbleToReaction] = useState(() => {
     const userSession = sessionStorage.getItem(
       auth?.auth.currentUser?.uid as string
     );
     const userSessionObj = userSession ? JSON.parse(userSession) : null;
 
-    return userSessionObj?.count <= TOTAL_REACTION_COUNT;
+    return !userSessionObj || userSessionObj?.count <= TOTAL_REACTION_COUNT;
   });
 
   return (
@@ -78,7 +78,7 @@ function Reaction({ onClick, value, icon }: IReactionProps) {
 
         clearTimeout(timeoutRef.current);
 
-        if (isAbleToReact) {
+        if (ableToReaction) {
           setCount((newVal) => {
             count = newVal + 1;
 
@@ -97,7 +97,7 @@ function Reaction({ onClick, value, icon }: IReactionProps) {
             count > TOTAL_REACTION_COUNT ||
             userSessionObj.count > TOTAL_REACTION_COUNT
           ) {
-            setIsAbleToReact(false);
+            setAbleToReaction(false);
           } else {
             sessionStorage.setItem(
               auth?.auth.currentUser?.uid as string,
@@ -107,7 +107,7 @@ function Reaction({ onClick, value, icon }: IReactionProps) {
               })
             );
 
-            setIsAbleToReact(true);
+            setAbleToReaction(true);
             onClick(count);
           }
 
@@ -126,7 +126,7 @@ function Reaction({ onClick, value, icon }: IReactionProps) {
       <span className="reactions__items-icon">{icon}</span>
 
       {showReaction &&
-        (isAbleToReact ? (
+        (ableToReaction ? (
           <span className="reactions__animation">+{count}</span>
         ) : (
           <span className="reactions__animation">max limit reached</span>
