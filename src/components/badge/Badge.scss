@@ -10,8 +10,18 @@
   line-height: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
+@mixin darkTheme {
   .badge {
     background-color: #292929;
+  }
+}
+
+.theme--dark {
+  @include darkTheme();
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme--auto {
+    @include darkTheme();
   }
 }
