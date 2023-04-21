@@ -1,0 +1,50 @@
+.popup {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  transform: translateY(-3rem);
+  min-width: 400px;
+  width: 100%;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  &__content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 4px;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &__close {
+    border: 0 none;
+    background-color: transparent;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+}
+
+@mixin darkTheme {
+  .popup {
+    &__content {
+      background-color: #292929;
+    }
+
+    &__close {
+      color: #fff;
+    }
+  }
+}
+
+.theme--dark {
+  @include darkTheme();
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme--auto {
+    @include darkTheme();
+  }
+}

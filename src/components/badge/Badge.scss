@@ -8,6 +8,10 @@
   font-size: 14px;
   margin-bottom: 0.5rem;
   line-height: 1rem;
+
+  &.clickable {
+    cursor: pointer;
+  }
 }
 
 @mixin darkTheme {
