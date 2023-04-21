@@ -45,13 +45,13 @@ export const ThemeContext = createContext<ThemeContextType>({
   dispatch: () => {},
 });
 
-// TODO - Create warning to the user accepts or not cookies policy
+// TODO - Create warning to the user accepts cookies policy
 
 function setTheme(theme: Theme) {
   const expirationDate = new Date();
 
   expirationDate.setDate(expirationDate.getDate() + 30);
-  document.cookie = `theme="${theme}"; expires="${expirationDate.toUTCString()}"; path=/`;
+  document.cookie = `interaminense_website_theme="${theme}"; expires="${expirationDate.toUTCString()}"; path=/`;
 }
 
 function getTheme() {
@@ -60,9 +60,9 @@ function getTheme() {
   for (let i = 0; i < cookies.length; i++) {
     const cookie = cookies[i].trim();
 
-    if (cookie.indexOf("theme=") === 0) {
+    if (cookie.indexOf("interaminense_website_theme=") === 0) {
       return cookie
-        .substring("theme=".length, cookie.length)
+        .substring("interaminense_website_theme=".length, cookie.length)
         .replace(/"/g, "") as Theme;
     }
   }
