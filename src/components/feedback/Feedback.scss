@@ -1,0 +1,62 @@
+.feedback {
+  position: relative;
+
+  &__popup {
+    width: 100%;
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      background-color: #fff;
+      border: 0 none;
+      border-radius: 4px;
+      font-size: 18px;
+      outline: none;
+      font-family: "Roboto", sans-serif;
+      font-weight: 300;
+      line-height: 1.75rem;
+    }
+
+    button {
+      width: 100%;
+      border: 0 none;
+      background-color: #efefef;
+      padding: 1rem;
+      text-transform: uppercase;
+      margin-top: 1rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  }
+
+  &__error-message {
+    color: red;
+  }
+}
+
+@mixin darkTheme {
+  .feedback {
+    &__popup {
+      textarea {
+        color: #fff;
+        background-color: #292929;
+      }
+
+      button {
+        background-color: #555555;
+        color: #fff;
+      }
+    }
+  }
+}
+
+.theme--dark {
+  @include darkTheme();
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme--auto {
+    @include darkTheme();
+  }
+}

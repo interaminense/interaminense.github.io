@@ -6,9 +6,27 @@
   margin-bottom: 2rem;
 }
 
+.presentation-feedback {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .badge {
+    margin: 0;
+  }
+}
+
 @media (max-width: 992px) {
   .presentation {
     font-size: 36px;
     line-height: 3rem;
+  }
+
+  .presentation-feedback {
+    flex-direction: column;
+
+    .badge {
+      margin-top: 2rem;
+    }
   }
 }
