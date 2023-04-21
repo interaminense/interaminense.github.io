@@ -67,6 +67,11 @@
     margin-top: 3rem;
     text-transform: uppercase;
   }
+
+  &--d-flex {
+    display: flex;
+    align-items: center;
+  }
 }
 
 @media (max-width: 992px) {
@@ -85,10 +90,14 @@
     &__presentation {
       padding: 2rem 0;
     }
+
+    &--d-flex {
+      flex-direction: column;
+    }
   }
 }
 
-@media (prefers-color-scheme: dark) {
+@mixin darkTheme {
   .layout {
     &__header {
       background-color: #333;
@@ -97,5 +106,15 @@
     &__projects {
       background-color: #292929;
     }
+  }
+}
+
+.theme--dark {
+  @include darkTheme();
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme--auto {
+    @include darkTheme();
   }
 }

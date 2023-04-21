@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useAppContext } from "../AppContext";
 import { ProfileDBContextProvider } from "../contexts/ProfileDBContext";
+import { ThemeContext } from "../ThemeContext";
 import { Loading } from "./Loading";
 
 export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
+  const {
+    state: { theme },
+  } = useContext(ThemeContext);
   const { auth } = useAppContext();
   const [loading, setLoading] = useState(true);
 
@@ -21,5 +25,9 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
     return <Loading />;
   }
 
-  return <ProfileDBContextProvider>{children}</ProfileDBContextProvider>;
+  return (
+    <ProfileDBContextProvider>
+      <div className={`theme--${theme}`}>{children}</div>
+    </ProfileDBContextProvider>
+  );
 }

@@ -8,12 +8,10 @@ import { Footer } from "../components/footer/Footer";
 import { HTMLRenderer } from "../components/HTMLRenderer";
 import { Layout } from "../components/layout/Layout";
 import { Links } from "../components/Links/Links";
-import { Logo } from "../components/logo/Logo";
 import { Paragraph } from "../components/paragraph/Paragraph";
 import { Presentation } from "../components/presentation/Presentation";
 import { Projects } from "../components/projects/Projects";
 import { Skills } from "../components/Skills";
-import { SocialNetwork } from "../components/social-network/SocialNetwork";
 import { Title } from "../components/title/Title";
 import { useProfileDB } from "../contexts/ProfileDBContext";
 
@@ -22,12 +20,6 @@ export function Home() {
 
   return (
     <Layout>
-      <Layout.Header>
-        <Logo />
-
-        <SocialNetwork />
-      </Layout.Header>
-
       <Layout.Body>
         <Layout.Presentation>
           <Presentation />

@@ -36,9 +36,19 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+@mixin darkTheme {
   .card {
     background-color: #242424;
     border: 1px solid #222;
+  }
+}
+
+.theme--dark {
+  @include darkTheme();
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme--auto {
+    @include darkTheme();
   }
 }
