@@ -2,8 +2,6 @@
   display: flex;
   align-items: center;
   user-select: none;
-  max-width: 100%;
-  overflow-x: auto;
 
   &--small &__items-icon {
     font-size: 14px;
@@ -63,5 +61,13 @@
   100% {
     opacity: 0;
     transform: translate(0, -150%);
+  }
+}
+
+@media (max-width: 992px) {
+  .reactions {
+    max-width: 100%;
+    overflow-x: auto;
+    height: 100px;
   }
 }
