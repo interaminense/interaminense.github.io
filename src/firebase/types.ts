@@ -8,7 +8,7 @@ export type GroupedData = {
   total: number;
 };
 
-type DataOptions = string | number | Data;
+type DataOptions = string | number | boolean | Data;
 
 export type Data = {
   [key: string]: DataOptions | DataOptions[];

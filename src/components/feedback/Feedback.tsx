@@ -1,6 +1,6 @@
 import { faComment } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DataBase } from "../../firebase/database";
 import { Popup } from "../../popup/Popup";
 import { Badge } from "../badge/Badge";
@@ -14,6 +14,7 @@ export function Feedback() {
   const [submitted, setSubmitted] = useState(false);
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  const textareaRef = useRef(null);
 
   return (
     <div className="feedback">
@@ -53,6 +54,8 @@ export function Feedback() {
               }}
             >
               <textarea
+                autoFocus
+                ref={textareaRef}
                 required
                 maxLength={400}
                 placeholder="It is a anonymous channel, give me a feedback!"

@@ -22,6 +22,7 @@ export function Tags() {
       modalRenderer={({ item, onChange }) => (
         <FormGroup>
           <TextField
+            autoFocus
             onChange={({ target: { value } }) =>
               onChange({ ...item, label: value } as TTag)
             }

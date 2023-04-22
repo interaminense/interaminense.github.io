@@ -18,6 +18,8 @@ export type TProfile = {
   firstName: string;
   lastName: string;
   imageURL: string;
+  checked: string[];
+  showFeedbackPopup: boolean;
 };
 
 export type TProject = {
@@ -65,6 +67,12 @@ export type TLink = {
   url: string;
 };
 
+export type TFeedback = {
+  id: string;
+  message: string;
+  createDate: number;
+};
+
 export enum AlertStatus {
   Success = "success",
   Error = "error",
@@ -78,4 +86,5 @@ export enum DBPath {
   Reactions = "reactions",
   Skills = "skills",
   Tags = "tags",
+  Feedback = "feedback",
 }

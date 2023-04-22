@@ -24,19 +24,21 @@ export interface ITableRow {
 interface ITableProps {
   header: string[];
   rows: ITableRow[];
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-  onAdd: () => void;
+  onEdit: ((id: string) => void) | null;
+  onDelete: ((id: string) => void) | null;
+  onAdd: (() => void) | null;
 }
 
 export function Table({ header, onAdd, onEdit, onDelete, rows }: ITableProps) {
   return (
     <Box sx={{ position: "relative" }}>
-      <Box sx={{ position: "absolute", right: "10px", top: "10px" }}>
-        <Button onClick={() => onAdd()}>
-          <FontAwesomeIcon icon={faCirclePlus} size="2x" />
-        </Button>
-      </Box>
+      {onAdd && (
+        <Box sx={{ position: "absolute", right: "10px", top: "10px" }}>
+          <Button onClick={() => onAdd()}>
+            <FontAwesomeIcon icon={faCirclePlus} size="2x" />
+          </Button>
+        </Box>
+      )}
 
       <TableContainer component={Paper}>
         <MaterialTable aria-label="simple table">
@@ -59,12 +61,17 @@ export function Table({ header, onAdd, onEdit, onDelete, rows }: ITableProps) {
                   </TableCell>
                 ))}
                 <TableCell align="right" component="th" scope="row">
-                  <Button onClick={() => onEdit(id)} size="large">
-                    <FontAwesomeIcon icon={faPen} />
-                  </Button>
-                  <Button onClick={() => onDelete(id)} size="large">
-                    <FontAwesomeIcon icon={faTrash} />
-                  </Button>
+                  {onEdit && (
+                    <Button onClick={() => onEdit(id)} size="large">
+                      <FontAwesomeIcon icon={faPen} />
+                    </Button>
+                  )}
+
+                  {onDelete && (
+                    <Button onClick={() => onDelete(id)} size="large">
+                      <FontAwesomeIcon icon={faTrash} />
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

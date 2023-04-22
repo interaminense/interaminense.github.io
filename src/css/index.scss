@@ -32,14 +32,14 @@ a {
 }
 
 body {
-  .theme--dark {
+  .theme--dark:not(.page--login) {
     @include darkTheme();
   }
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    .theme--auto {
+    .theme--auto:not(.page--login) {
       @include darkTheme();
     }
   }

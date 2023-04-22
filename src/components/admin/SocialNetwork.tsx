@@ -36,7 +36,9 @@ export function SocialNetwork() {
       modalRenderer={({ item, onChange }) => (
         <FormGroup>
           <FormControl fullWidth>
-            <InputLabel id="socialNetwork">Social Network</InputLabel>
+            <InputLabel autoFocus id="socialNetwork">
+              Social Network
+            </InputLabel>
 
             <Select
               labelId="socialNetwork"

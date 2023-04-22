@@ -13,7 +13,7 @@ interface IItemsManagerProps<TItem> {
   name: string;
   header: string[];
   rows: (items: TItem[]) => ITableRow[];
-  modalRenderer: ({
+  modalRenderer?: ({
     item,
     onChange,
   }: {
@@ -22,9 +22,12 @@ interface IItemsManagerProps<TItem> {
   }) => JSX.Element;
   onAddItem?: (item: TItem) => void;
   onDeleteItem?: (item: TItem) => void;
+  showAddButton?: boolean;
+  showEditButton?: boolean;
+  showDeleteButton?: boolean;
 }
 
-export function ItemsManager<TItem extends { label: string; id: string }>({
+export function ItemsManager<TItem extends { label?: string; id: string }>({
   dataBase,
   name,
   header,
@@ -32,6 +35,9 @@ export function ItemsManager<TItem extends { label: string; id: string }>({
   modalRenderer,
   onAddItem,
   onDeleteItem,
+  showAddButton = true,
+  showEditButton = true,
+  showDeleteButton = true,
 }: IItemsManagerProps<TItem>) {
   const [items, setItems] = useState<TItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +62,11 @@ export function ItemsManager<TItem extends { label: string; id: string }>({
 
         setLoading(false);
       },
-      { ...DEFAULT_LIST_DATA_PROPS, onlyOnce: false }
+      {
+        ...DEFAULT_LIST_DATA_PROPS,
+        onlyOnce: false,
+        sortBy: { type: "DESC", value: "createDate" },
+      }
     );
   }, [dataBase]);
 
@@ -143,38 +153,76 @@ export function ItemsManager<TItem extends { label: string; id: string }>({
         <Table
           header={header}
           rows={rows(items)}
-          onAdd={() => {
-            setOpenModalAdd(true);
-            setSelectedItem(null);
-          }}
-          onEdit={(itemId) => {
-            setOpenModalEdit(true);
-            setSelectedItem(items.find(({ id }) => id === itemId) ?? null);
-          }}
-          onDelete={(itemId) => {
-            setOpenModalDelete(true);
-            setSelectedItem(items.find(({ id }) => id === itemId) ?? null);
-          }}
+          onAdd={
+            showAddButton
+              ? () => {
+                  setOpenModalAdd(true);
+                  setSelectedItem(null);
+                }
+              : null
+          }
+          onEdit={
+            showEditButton
+              ? (itemId) => {
+                  setOpenModalEdit(true);
+                  setSelectedItem(
+                    items.find(({ id }) => id === itemId) ?? null
+                  );
+                }
+              : null
+          }
+          onDelete={
+            showDeleteButton
+              ? (itemId) => {
+                  setOpenModalDelete(true);
+                  setSelectedItem(
+                    items.find(({ id }) => id === itemId) ?? null
+                  );
+                }
+              : null
+          }
         />
       </Container>
 
-      <Modal
-        title={`Edit ${name}`}
-        open={openModalEdit}
-        onClose={() => setOpenModalEdit(false)}
-      >
-        <form onSubmit={handleEdit}>
-          {modalRenderer({
-            item: selectedItem,
-            onChange: (item) => setSelectedItem(item),
-          })}
+      {modalRenderer && (
+        <>
+          <Modal
+            title={`Edit ${name}`}
+            open={openModalEdit}
+            onClose={() => setOpenModalEdit(false)}
+          >
+            <form onSubmit={handleEdit}>
+              {modalRenderer({
+                item: selectedItem,
+                onChange: (item) => setSelectedItem(item),
+              })}
 
-          <Box sx={{ textAlign: "right" }} mt={1}>
-            <Button onClick={() => setOpenModalEdit(false)}>cancel</Button>
-            <Button type="submit">save</Button>
-          </Box>
-        </form>
-      </Modal>
+              <Box sx={{ textAlign: "right" }} mt={1}>
+                <Button onClick={() => setOpenModalEdit(false)}>cancel</Button>
+                <Button type="submit">save</Button>
+              </Box>
+            </form>
+          </Modal>
+
+          <Modal
+            title={`Add ${name}`}
+            open={openModalAdd}
+            onClose={() => setOpenModalAdd(false)}
+          >
+            <form onSubmit={handleAdd}>
+              {modalRenderer({
+                item: selectedItem,
+                onChange: setSelectedItem,
+              })}
+
+              <Box sx={{ textAlign: "right" }} mt={1}>
+                <Button onClick={() => setOpenModalAdd(false)}>cancel</Button>
+                <Button type="submit">save</Button>
+              </Box>
+            </form>
+          </Modal>
+        </>
+      )}
 
       <Modal
         title={`Delete ${name}`}
@@ -186,24 +234,6 @@ export function ItemsManager<TItem extends { label: string; id: string }>({
           <Button onClick={() => setOpenModalDelete(false)}>cancel</Button>
           <Button onClick={handleDelete}>delete</Button>
         </Box>
-      </Modal>
-
-      <Modal
-        title={`Add ${name}`}
-        open={openModalAdd}
-        onClose={() => setOpenModalAdd(false)}
-      >
-        <form onSubmit={handleAdd}>
-          {modalRenderer({
-            item: selectedItem,
-            onChange: setSelectedItem,
-          })}
-
-          <Box sx={{ textAlign: "right" }} mt={1}>
-            <Button onClick={() => setOpenModalAdd(false)}>cancel</Button>
-            <Button type="submit">save</Button>
-          </Box>
-        </form>
       </Modal>
 
       <Snackbar

@@ -1,7 +1,9 @@
+import classNames from "classnames";
 import React, { useContext, useEffect, useState } from "react";
 import { useAppContext } from "../AppContext";
 import { ProfileDBContextProvider } from "../contexts/ProfileDBContext";
 import { ThemeContext } from "../ThemeContext";
+import { extractPath } from "../utils/path";
 import { Loading } from "./Loading";
 
 export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
@@ -25,9 +27,17 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
     return <Loading />;
   }
 
+  const extractedHash = extractPath(window.location.hash);
+
   return (
     <ProfileDBContextProvider>
-      <div className={`theme--${theme}`}>{children}</div>
+      <div
+        className={classNames(`theme--${theme}`, {
+          [`page--${extractedHash}`]: extractedHash,
+        })}
+      >
+        {children}
+      </div>
     </ProfileDBContextProvider>
   );
 }

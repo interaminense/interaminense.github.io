@@ -73,8 +73,6 @@ function getTheme() {
 export function ThemeProvider({ children }: React.HTMLAttributes<HTMLElement>) {
   const [state, dispatch] = useReducer(themeReducer, initialState);
 
-  console.log(getTheme());
-
   return (
     <ThemeContext.Provider
       value={{
