@@ -19,8 +19,6 @@ export function Popup({ onClose, centerWidth, children }: IPopupProps) {
     }
   }, [clickedOutside, onClose]);
 
-  console.log();
-
   return (
     <div
       ref={popupRef}

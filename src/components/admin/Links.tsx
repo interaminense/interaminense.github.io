@@ -27,6 +27,7 @@ export function Links() {
       modalRenderer={({ item, onChange }) => (
         <FormGroup>
           <TextField
+            autoFocus
             onChange={({ target: { value } }) =>
               onChange({ ...item, label: value } as TLink)
             }

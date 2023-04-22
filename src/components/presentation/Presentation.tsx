@@ -17,7 +17,7 @@ export function Presentation() {
       <div className="presentation-feedback">
         <Reactions reactionId={profile?.id as string} />
 
-        <Feedback />
+        {profile?.showFeedbackPopup && <Feedback />}
       </div>
     </>
   );

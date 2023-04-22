@@ -2,7 +2,9 @@ import { DataBase } from "../../firebase/database";
 import { Formik, Form } from "formik";
 import {
   Alert,
+  Checkbox,
   Container,
+  FormControlLabel,
   FormGroup,
   Snackbar,
   TextField,
@@ -19,12 +21,14 @@ import {
 } from "../../types";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 
-const initialValues: Partial<TProfile> = {
+const initialValues: Partial<TProfile> & { showFeedbackPopup: boolean } = {
   about: "",
   firstName: "",
   lastName: "",
   description: "",
   imageURL: "",
+  checked: ["showFeedbackPopup"],
+  showFeedbackPopup: true,
 };
 
 const profileDB = new DataBase({ path: DBPath.Profile });
@@ -116,6 +120,7 @@ export function Profile() {
             handleSubmit,
             isSubmitting,
           }) => {
+            console.log({ valuesBeforeSubmit: values });
             return (
               <Form onSubmit={handleSubmit}>
                 <FormGroup>
@@ -168,6 +173,14 @@ export function Profile() {
                     onBlur={handleBlur}
                     onChange={handleChange}
                     value={values.about}
+                  />
+
+                  <FormControlLabel
+                    sx={{ marginBottom: 2 }}
+                    control={<Checkbox checked={values.showFeedbackPopup} />}
+                    name="showFeedbackPopup"
+                    label="show feedback popup"
+                    onChange={handleChange}
                   />
                 </FormGroup>
 
