@@ -23,7 +23,7 @@ export function Feedback() {
         label={
           <>
             <FontAwesomeIcon icon={faComment} />
-            <span style={{ marginLeft: "0.5rem" }}>Give me a feedbak</span>
+            <span style={{ marginLeft: "0.5rem" }}>Give me a feedback</span>
           </>
         }
       />
