@@ -8,6 +8,7 @@ import {
   TableBody,
   Button,
   Box,
+  TableSortLabel,
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,21 +16,36 @@ import {
   faPen,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
+import { SortBy, SortType, SortValue } from "../../firebase/types";
 
 export interface ITableRow {
   columns: (string | JSX.Element)[];
   id: string;
 }
 
-interface ITableProps {
-  header: string[];
+interface ITableProps<TItem> {
+  header: Array<keyof TItem>;
   rows: ITableRow[];
   onEdit: ((id: string) => void) | null;
   onDelete: ((id: string) => void) | null;
   onAdd: (() => void) | null;
+  onSort: ((sortBy: SortBy) => void) | null;
 }
 
-export function Table({ header, onAdd, onEdit, onDelete, rows }: ITableProps) {
+export function Table<TItem>({
+  header,
+  onAdd,
+  onEdit,
+  onDelete,
+  onSort,
+  rows,
+}: ITableProps<TItem>) {
+  const [sortBy, setSortBy] = useState<SortBy>({
+    value: SortValue.CreateDate,
+    type: SortType.Desc,
+  });
+
   return (
     <Box sx={{ position: "relative" }}>
       {onAdd && (
@@ -44,11 +60,43 @@ export function Table({ header, onAdd, onEdit, onDelete, rows }: ITableProps) {
         <MaterialTable aria-label="simple table">
           <TableHead>
             <TableRow>
-              {header.map((label, index) => (
-                <TableCell key={index} variant="head">
-                  {label}
-                </TableCell>
-              ))}
+              {header.map((label, index) => {
+                const availableToSort =
+                  onSort &&
+                  Object.values(SortValue).find((value) => label === value);
+
+                return (
+                  <TableCell key={index} variant="head">
+                    {availableToSort ? (
+                      <TableSortLabel
+                        active={sortBy.value === label}
+                        direction={
+                          sortBy.type.toLowerCase() as
+                            | "asc"
+                            | "desc"
+                            | undefined
+                        }
+                        onClick={() => {
+                          const newVal: SortBy = {
+                            value: label as SortValue,
+                            type:
+                              sortBy.type === SortType.Asc
+                                ? SortType.Desc
+                                : SortType.Asc,
+                          };
+
+                          setSortBy(newVal);
+                          onSort && onSort(newVal);
+                        }}
+                      >
+                        <>{label}</>
+                      </TableSortLabel>
+                    ) : (
+                      <>{label}</>
+                    )}
+                  </TableCell>
+                );
+              })}
               <TableCell variant="head"></TableCell>
             </TableRow>
           </TableHead>
@@ -60,7 +108,12 @@ export function Table({ header, onAdd, onEdit, onDelete, rows }: ITableProps) {
                     {label}
                   </TableCell>
                 ))}
-                <TableCell align="right" component="th" scope="row">
+                <TableCell
+                  align="right"
+                  component="th"
+                  scope="row"
+                  sx={{ minWidth: 200 }}
+                >
                   {onEdit && (
                     <Button onClick={() => onEdit(id)} size="large">
                       <FontAwesomeIcon icon={faPen} />

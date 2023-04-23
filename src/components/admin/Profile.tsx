@@ -119,77 +119,74 @@ export function Profile() {
             handleBlur,
             handleSubmit,
             isSubmitting,
-          }) => {
-            console.log({ valuesBeforeSubmit: values });
-            return (
-              <Form onSubmit={handleSubmit}>
-                <FormGroup>
-                  <TextField
-                    label="first name"
-                    margin="dense"
-                    name="firstName"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    required
-                    value={values.firstName}
-                  />
+          }) => (
+            <Form onSubmit={handleSubmit}>
+              <FormGroup>
+                <TextField
+                  label="first name"
+                  margin="dense"
+                  name="firstName"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  required
+                  value={values.firstName}
+                />
 
-                  <TextField
-                    label="last name"
-                    margin="dense"
-                    name="lastName"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    required
-                    value={values.lastName}
-                  />
+                <TextField
+                  label="last name"
+                  margin="dense"
+                  name="lastName"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  required
+                  value={values.lastName}
+                />
 
-                  <TextField
-                    label="description"
-                    margin="dense"
-                    maxRows={2}
-                    multiline
-                    name="description"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.description}
-                  />
+                <TextField
+                  label="description"
+                  margin="dense"
+                  maxRows={2}
+                  multiline
+                  name="description"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.description}
+                />
 
-                  <TextField
-                    label="image"
-                    margin="dense"
-                    name="imageURL"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.imageURL}
-                  />
+                <TextField
+                  label="image"
+                  margin="dense"
+                  name="imageURL"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.imageURL}
+                />
 
-                  <TextField
-                    label="about me"
-                    margin="dense"
-                    maxRows={2}
-                    multiline
-                    name="about"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.about}
-                  />
+                <TextField
+                  label="about me"
+                  margin="dense"
+                  maxRows={2}
+                  multiline
+                  name="about"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.about}
+                />
 
-                  <FormControlLabel
-                    sx={{ marginBottom: 2 }}
-                    control={<Checkbox checked={values.showFeedbackPopup} />}
-                    name="showFeedbackPopup"
-                    label="show feedback popup"
-                    onChange={handleChange}
-                  />
-                </FormGroup>
+                <FormControlLabel
+                  sx={{ marginBottom: 2 }}
+                  control={<Checkbox checked={values.showFeedbackPopup} />}
+                  name="showFeedbackPopup"
+                  label="show feedback popup"
+                  onChange={handleChange}
+                />
+              </FormGroup>
 
-                <LoadingButton type="submit" loading={isSubmitting}>
-                  <span>Save</span>
-                </LoadingButton>
-              </Form>
-            );
-          }}
+              <LoadingButton type="submit" loading={isSubmitting}>
+                <span>Save</span>
+              </LoadingButton>
+            </Form>
+          )}
         </Formik>
       </Container>
 

@@ -11,6 +11,7 @@ import {
 import { ItemsManager } from "./ItemsManager";
 import { useEffect, useState } from "react";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
+import { timestampToDate } from "../../utils/date";
 
 const projectsDB = new DataBase({ path: DBPath.Projects });
 const tagsDB = new DataBase({ path: DBPath.Tags });
@@ -49,7 +50,14 @@ export function Projects() {
       }}
       dataBase={projectsDB}
       name="Project"
-      header={["image", "title", "description", "featured", "url", "tags"]}
+      header={[
+        "imageURL",
+        "label",
+        "description",
+        "featured",
+        "tags",
+        "createDate",
+      ]}
       rows={(items) =>
         items?.map((data) => {
           return {
@@ -57,16 +65,20 @@ export function Projects() {
             columns: [
               data.imageURL ? <ImageURLRenderer url={data.imageURL} /> : <></>,
               data.label,
-              data.description,
-              data.featured ? "yes" : "no",
               <a href={data.url} target="_blank" rel="noreferrer">
-                {data.url}
+                {data.description}
               </a>,
+              data.featured ? "yes" : "no",
               <>
                 {data.tags?.map(({ label }, index) => (
-                  <Chip key={index} label={label} style={{ marginRight: 4 }} />
+                  <Chip
+                    key={index}
+                    label={label}
+                    style={{ marginRight: 4, marginBottom: 4 }}
+                  />
                 ))}
               </>,
+              timestampToDate(data.createDate),
             ],
           };
         })

@@ -17,7 +17,14 @@ import {
   equalTo,
   QueryConstraint,
 } from "firebase/database";
-import { Data, IDataBaseProps, SortBy, GroupedData } from "./types";
+import {
+  Data,
+  IDataBaseProps,
+  SortBy,
+  GroupedData,
+  SortValue,
+  SortType,
+} from "./types";
 import { MESSAGES, PREFIX } from "./constants";
 import { DEV_MODE } from "../utils/constants";
 import { config } from "./config";
@@ -174,8 +181,8 @@ export class DataBase {
       filterValue,
       topResults = 10,
       sortBy = {
-        value: "date",
-        type: "DESC",
+        value: SortValue.CreateDate,
+        type: SortType.Desc,
       },
       onlyOnce = true,
     }: {

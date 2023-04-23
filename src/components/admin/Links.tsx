@@ -2,6 +2,7 @@ import { FormGroup, TextField } from "@mui/material";
 import { DBPath, TLink } from "../../types";
 import { DataBase } from "../../firebase/database";
 import { ItemsManager } from "./ItemsManager";
+import { timestampToDate } from "../../utils/date";
 
 const linksDB = new DataBase({ path: DBPath.Links });
 
@@ -10,7 +11,7 @@ export function Links() {
     <ItemsManager<TLink>
       dataBase={linksDB}
       name="Links"
-      header={["label", "url"]}
+      header={["label", "url", "createDate"]}
       rows={(items) =>
         items.map((data) => {
           return {
@@ -20,6 +21,7 @@ export function Links() {
               <a href={data.url} target="_blank" rel="noreferrer">
                 {data.url}
               </a>,
+              timestampToDate(data.createDate, true),
             ],
           };
         })

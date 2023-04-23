@@ -36,6 +36,7 @@ export type TProject = {
 export type TSkill = {
   id: string;
   label: string;
+  createDate: number;
 };
 
 export enum SocialIcons {
@@ -54,17 +55,20 @@ export type TSocialNetwork = {
   id: string;
   label: SocialIcons;
   url: string;
+  createDate: number;
 };
 
 export type TTag = {
   id: string;
   label: string;
+  createDate: number;
 };
 
 export type TLink = {
   id: string;
   label: string;
   url: string;
+  createDate: number;
 };
 
 export type TFeedback = {

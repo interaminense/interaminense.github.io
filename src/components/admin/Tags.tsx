@@ -2,6 +2,7 @@ import { FormGroup, TextField } from "@mui/material";
 import { DBPath, TTag } from "../../types";
 import { DataBase } from "../../firebase/database";
 import { ItemsManager } from "./ItemsManager";
+import { timestampToDate } from "../../utils/date";
 
 const tagsDB = new DataBase({ path: DBPath.Tags });
 
@@ -10,12 +11,12 @@ export function Tags() {
     <ItemsManager<TTag>
       dataBase={tagsDB}
       name="Tag"
-      header={["label"]}
+      header={["label", "createDate"]}
       rows={(items) =>
         items.map((data) => {
           return {
             id: data.id,
-            columns: [data.label],
+            columns: [data.label, timestampToDate(data.createDate, true)],
           };
         })
       }

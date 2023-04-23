@@ -18,4 +18,17 @@ export interface IDataBaseProps {
   path: string;
 }
 
-export type SortBy = { value: string; type: "ASC" | "DESC" };
+export enum SortType {
+  Asc = "ASC",
+  Desc = "DESC",
+}
+
+export enum SortValue {
+  CreateDate = "createDate",
+  Label = "label",
+}
+
+export type SortBy = {
+  value: SortValue;
+  type: SortType;
+};
