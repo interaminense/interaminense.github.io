@@ -12,10 +12,9 @@ export function Feedbacks() {
       showAddButton={false}
       dataBase={feedbackDB}
       name="Feedback"
-      header={["message", "create date"]}
+      header={["message", "createDate"]}
       rows={(items) =>
         items.map((data) => {
-          console.log({ data });
           return {
             id: data.id,
             columns: [data.message, timestampToDate(data.createDate, true)],

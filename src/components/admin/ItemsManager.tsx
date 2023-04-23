@@ -4,14 +4,14 @@ import { Loading } from "../Loading";
 import { ITableRow, Table } from "./Table";
 import { Modal } from "./Modal";
 import { DataBase, TResultSuccess } from "../../firebase/database";
-import { Data } from "../../firebase/types";
+import { Data, SortBy, SortType, SortValue } from "../../firebase/types";
 import { AlertStatus } from "../../types";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 
 interface IItemsManagerProps<TItem> {
   dataBase: DataBase;
   name: string;
-  header: string[];
+  header: Array<keyof TItem>;
   rows: (items: TItem[]) => ITableRow[];
   modalRenderer?: ({
     item,
@@ -52,6 +52,10 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
     label: "",
     type: AlertStatus.Success,
   });
+  const [sortBy, setSortBy] = useState<SortBy>({
+    value: SortValue.CreateDate,
+    type: SortType.Desc,
+  });
 
   useEffect(() => {
     dataBase.listData(
@@ -65,10 +69,10 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
       {
         ...DEFAULT_LIST_DATA_PROPS,
         onlyOnce: false,
-        sortBy: { type: "DESC", value: "createDate" },
+        sortBy,
       }
     );
-  }, [dataBase]);
+  }, [dataBase, sortBy]);
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
@@ -150,7 +154,7 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
   return (
     <>
       <Container maxWidth="lg">
-        <Table
+        <Table<TItem>
           header={header}
           rows={rows(items)}
           onAdd={
@@ -181,6 +185,7 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
                 }
               : null
           }
+          onSort={setSortBy}
         />
       </Container>
 

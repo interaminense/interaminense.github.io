@@ -5,7 +5,7 @@ export function Title({ children }: React.HTMLAttributes<HTMLElement>) {
   return (
     <Typography
       className="my-title"
-      variant="h3"
+      variant="h4"
       marginTop={5}
       marginBottom={3}
     >
