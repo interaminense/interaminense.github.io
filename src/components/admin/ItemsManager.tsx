@@ -1,4 +1,12 @@
-import { Alert, Box, Button, Container, Snackbar } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Container,
+  Snackbar,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 import { Loading } from "../Loading";
 import { ITableRow, Table } from "./Table";
@@ -7,6 +15,7 @@ import { DataBase, TResultSuccess } from "../../firebase/database";
 import { Data, SortBy, SortType, SortValue } from "../../firebase/types";
 import { AlertStatus } from "../../types";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
+import { useDebounce } from "../../utils/useDebounce";
 
 interface IItemsManagerProps<TItem> {
   dataBase: DataBase;
@@ -56,6 +65,8 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
     value: SortValue.CreateDate,
     type: SortType.Desc,
   });
+  const [filterValue, setFilterValue] = useState("");
+  const debouncedFilterValue = useDebounce(filterValue);
 
   useEffect(() => {
     dataBase.listData(
@@ -68,11 +79,11 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
       },
       {
         ...DEFAULT_LIST_DATA_PROPS,
-        onlyOnce: false,
         sortBy,
+        filterValue: debouncedFilterValue,
       }
     );
-  }, [dataBase, sortBy]);
+  }, [dataBase, sortBy, debouncedFilterValue]);
 
   async function handleAdd(e: FormEvent) {
     e.preventDefault();
@@ -147,46 +158,97 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
     setAlert({ label: "", type: AlertStatus.Success });
   }
 
-  if (loading) {
-    return <Loading page />;
-  }
-
   return (
     <>
-      <Container maxWidth="lg">
-        <Table<TItem>
-          header={header}
-          rows={rows(items)}
-          onAdd={
-            showAddButton
-              ? () => {
-                  setOpenModalAdd(true);
-                  setSelectedItem(null);
-                }
-              : null
-          }
-          onEdit={
-            showEditButton
-              ? (itemId) => {
-                  setOpenModalEdit(true);
-                  setSelectedItem(
-                    items.find(({ id }) => id === itemId) ?? null
-                  );
-                }
-              : null
-          }
-          onDelete={
-            showDeleteButton
-              ? (itemId) => {
-                  setOpenModalDelete(true);
-                  setSelectedItem(
-                    items.find(({ id }) => id === itemId) ?? null
-                  );
-                }
-              : null
-          }
-          onSort={setSortBy}
-        />
+      <Container>
+        {header.some((label) => label === SortValue.Label) && (
+          <Box marginBottom={2}>
+            <TextField
+              label="search"
+              type="search"
+              size="small"
+              value={filterValue}
+              placeholder="search by label column"
+              onChange={({ target: { value } }) => {
+                setFilterValue(value);
+
+                setSortBy({
+                  ...sortBy,
+                  value: value ? SortValue.Label : SortValue.CreateDate,
+                });
+              }}
+            />
+          </Box>
+        )}
+
+        {loading ? (
+          <Loading page />
+        ) : (
+          <>
+            <Table<TItem>
+              header={header}
+              rows={rows(items)}
+              onAdd={
+                showAddButton
+                  ? () => {
+                      setOpenModalAdd(true);
+                      setSelectedItem(null);
+                    }
+                  : null
+              }
+              onEdit={
+                showEditButton
+                  ? (itemId) => {
+                      setOpenModalEdit(true);
+                      setSelectedItem(
+                        items.find(({ id }) => id === itemId) ?? null
+                      );
+                    }
+                  : null
+              }
+              onDelete={
+                showDeleteButton
+                  ? (itemId) => {
+                      setOpenModalDelete(true);
+                      setSelectedItem(
+                        items.find(({ id }) => id === itemId) ?? null
+                      );
+                    }
+                  : null
+              }
+              sortBy={sortBy}
+              onSort={setSortBy}
+            />
+
+            {!items.length && (
+              <Box
+                display="flex"
+                marginTop={4}
+                justifyContent="center"
+                textAlign="center"
+                borderRadius={1}
+                padding={4}
+                sx={{ border: "1px solid #f0f0f0" }}
+              >
+                <div>
+                  <Typography variant="h6">
+                    There are no items found.
+                  </Typography>
+                  <Typography variant="body2">Try to search again.</Typography>
+                  <Button
+                    onClick={() => {
+                      setFilterValue("");
+                      setSortBy({ ...sortBy, value: SortValue.CreateDate });
+                    }}
+                    sx={{ marginTop: 2 }}
+                  >
+                    clear search
+                  </Button>
+                </div>
+              </Box>
+            )}
+          </>
+        )}
       </Container>
 
       {modalRenderer && (
@@ -202,9 +264,17 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
                 onChange: (item) => setSelectedItem(item),
               })}
 
-              <Box sx={{ textAlign: "right" }} mt={1}>
-                <Button onClick={() => setOpenModalEdit(false)}>cancel</Button>
-                <Button type="submit">save</Button>
+              <Box sx={{ textAlign: "right" }} mt={2}>
+                <Button
+                  sx={{ marginRight: 2 }}
+                  color="inherit"
+                  onClick={() => setOpenModalEdit(false)}
+                >
+                  cancel
+                </Button>
+                <Button variant="contained" color="primary" type="submit">
+                  save
+                </Button>
               </Box>
             </form>
           </Modal>
@@ -220,9 +290,17 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
                 onChange: setSelectedItem,
               })}
 
-              <Box sx={{ textAlign: "right" }} mt={1}>
-                <Button onClick={() => setOpenModalAdd(false)}>cancel</Button>
-                <Button type="submit">save</Button>
+              <Box sx={{ textAlign: "right" }} mt={2}>
+                <Button
+                  sx={{ marginRight: 2 }}
+                  color="inherit"
+                  onClick={() => setOpenModalAdd(false)}
+                >
+                  cancel
+                </Button>
+                <Button variant="contained" type="submit">
+                  save
+                </Button>
               </Box>
             </form>
           </Modal>
@@ -235,9 +313,17 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
         onClose={() => setOpenModalDelete(false)}
       >
         are you sure you want to delete <strong>{selectedItem?.label}</strong>?
-        <Box sx={{ textAlign: "right" }} mt={1}>
-          <Button onClick={() => setOpenModalDelete(false)}>cancel</Button>
-          <Button onClick={handleDelete}>delete</Button>
+        <Box sx={{ textAlign: "right" }} mt={2}>
+          <Button
+            sx={{ marginRight: 2 }}
+            color="inherit"
+            onClick={() => setOpenModalDelete(false)}
+          >
+            cancel
+          </Button>
+          <Button variant="contained" color="error" onClick={handleDelete}>
+            delete
+          </Button>
         </Box>
       </Modal>
 

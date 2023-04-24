@@ -1,3 +1,4 @@
+import { SortType } from "../../firebase/types";
 import { DBPath, TProject } from "../../types";
 import { useDB } from "../../utils/useDB";
 import { Card } from "../card/Card";
@@ -10,7 +11,7 @@ export function Projects({ featured }: { featured?: boolean }) {
 
   if (featured) {
     props = {
-      sortBy: { value: "featured", type: "DESC" },
+      sortBy: { value: "featured", type: SortType.Desc },
       filterValue: true,
     };
   }

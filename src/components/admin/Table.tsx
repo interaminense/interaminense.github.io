@@ -16,7 +16,7 @@ import {
   faPen,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SortBy, SortType, SortValue } from "../../firebase/types";
 
 export interface ITableRow {
@@ -31,6 +31,7 @@ interface ITableProps<TItem> {
   onDelete: ((id: string) => void) | null;
   onAdd: (() => void) | null;
   onSort: ((sortBy: SortBy) => void) | null;
+  sortBy: SortBy;
 }
 
 export function Table<TItem>({
@@ -40,11 +41,13 @@ export function Table<TItem>({
   onDelete,
   onSort,
   rows,
+  sortBy: initialSortBy,
 }: ITableProps<TItem>) {
-  const [sortBy, setSortBy] = useState<SortBy>({
-    value: SortValue.CreateDate,
-    type: SortType.Desc,
-  });
+  const [sortBy, setSortBy] = useState<SortBy>(initialSortBy);
+
+  useEffect(() => {
+    setSortBy(initialSortBy);
+  }, [initialSortBy]);
 
   return (
     <Box sx={{ position: "relative" }}>
