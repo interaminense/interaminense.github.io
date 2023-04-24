@@ -1,9 +1,14 @@
 import { useProfileDB } from "../../contexts/ProfileDBContext";
+import { Loading } from "../Loading";
 import "./Footer.scss";
 
 export function Footer() {
   const { profile } = useProfileDB();
   const currentYear = new Date().getFullYear();
+
+  if (!profile) {
+    return <Loading />;
+  }
 
   return (
     <div className="footer">

@@ -24,7 +24,7 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
   }, [auth]);
 
   if (loading) {
-    return <Loading />;
+    return <Loading page />;
   }
 
   const extractedHash = extractPath(window.location.hash);

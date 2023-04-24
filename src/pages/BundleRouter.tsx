@@ -26,8 +26,7 @@ function processRoute(route: Route) {
 
 function processRoutes(routes: Route[]) {
   return routes.map((route) => {
-    const parentRoute = route;
-    const processedRoute = processRoute(parentRoute);
+    const processedRoute = processRoute(route);
 
     if (route.children) {
       processedRoute.children = processRoutes(route.children);

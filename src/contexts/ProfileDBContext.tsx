@@ -1,5 +1,4 @@
 import { createContext, useContext } from "react";
-import { Loading } from "../components/Loading";
 import { DBPath, TProfile } from "../types";
 import { useDB } from "../utils/useDB";
 
@@ -12,12 +11,8 @@ export function ProfileDBContextProvider({
 }: React.HTMLAttributes<HTMLElement>) {
   const profile = useDB<TProfile[]>(DBPath.Profile);
 
-  if (!profile) {
-    return <Loading />;
-  }
-
   return (
-    <ProfileDBContext.Provider value={{ profile: profile[0] }}>
+    <ProfileDBContext.Provider value={{ profile: profile?.[0] ?? null }}>
       {children}
     </ProfileDBContext.Provider>
   );
