@@ -2,6 +2,7 @@ import { SortType } from "../../firebase/types";
 import { DBPath, TProject } from "../../types";
 import { useDB } from "../../utils/useDB";
 import { Card } from "../card/Card";
+import { Loading } from "../Loading";
 import { Reactions } from "../Reactions/Reactions";
 
 import "./Projects.scss";
@@ -19,7 +20,7 @@ export function Projects({ featured }: { featured?: boolean }) {
   const projects = useDB<TProject[]>(DBPath.Projects, props);
 
   if (!projects) {
-    return null;
+    return <Loading />;
   }
 
   return (

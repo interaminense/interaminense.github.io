@@ -1,9 +1,14 @@
 import { useProfileDB } from "../../contexts/ProfileDBContext";
+import { Loading } from "../Loading";
 
 import "./Logo.scss";
 
 export function Logo() {
   const { profile } = useProfileDB();
+
+  if (!profile) {
+    return <Loading />;
+  }
 
   return (
     <div className="logo">

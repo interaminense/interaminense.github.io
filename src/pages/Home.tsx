@@ -8,6 +8,7 @@ import { Footer } from "../components/footer/Footer";
 import { HTMLRenderer } from "../components/HTMLRenderer";
 import { Layout } from "../components/layout/Layout";
 import { Links } from "../components/Links/Links";
+import { Loading } from "../components/Loading";
 import { Paragraph } from "../components/paragraph/Paragraph";
 import { Presentation } from "../components/presentation/Presentation";
 import { Projects } from "../components/projects/Projects";
@@ -34,9 +35,13 @@ export function Home() {
         <Layout.Paragraph>
           <Title>More About Me</Title>
 
-          <Paragraph>
-            <HTMLRenderer html={profile?.about as string} />
-          </Paragraph>
+          {!profile ? (
+            <Loading />
+          ) : (
+            <Paragraph>
+              <HTMLRenderer html={profile?.about as string} />
+            </Paragraph>
+          )}
         </Layout.Paragraph>
       </Layout.Body>
       <div className="layout__projects">
@@ -66,3 +71,5 @@ export function Home() {
     </Layout>
   );
 }
+
+export default Home;

@@ -7,10 +7,10 @@ export function Loading({ page = false }: { page?: boolean }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: page ? "4rem" : "",
+        padding: page ? "10rem" : "",
       }}
     >
-      <CircularProgress />
+      <CircularProgress size={28} />
     </Box>
   );
 }
