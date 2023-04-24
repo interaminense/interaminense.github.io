@@ -14,8 +14,9 @@ import {
   set,
   onValue,
   limitToFirst,
-  equalTo,
   QueryConstraint,
+  startAt,
+  endAt,
 } from "firebase/database";
 import {
   Data,
@@ -175,7 +176,7 @@ export class DataBase {
     });
   }
 
-  async listData(
+  listData(
     callback: (data: GroupedData) => void,
     {
       filterValue,
@@ -194,16 +195,20 @@ export class DataBase {
   ) {
     if (!this.auth.currentUser) return;
 
-    const params = [
+    const queryConstraints = [
       orderByChild(sortBy.value),
-      filterValue && equalTo(filterValue),
-      sortBy.type === "DESC"
+      filterValue && startAt(filterValue),
+      filterValue && endAt(`${filterValue}\uf8ff`),
+      sortBy.type === SortType.Desc
         ? limitToLast(topResults)
         : limitToFirst(topResults),
     ].filter(Boolean) as QueryConstraint[];
 
     try {
-      const result = query(ref(this.database, this.props.path), ...params);
+      const result = query(
+        ref(this.database, this.props.path),
+        ...queryConstraints
+      );
 
       return onValue(
         result,
@@ -216,14 +221,16 @@ export class DataBase {
             const groupedData = {
               total: projects.length,
               data:
-                sortBy.type === "DESC"
+                sortBy.type === SortType.Desc
                   ? sortedProjects
                   : sortedProjects.reverse(),
             };
 
             callback(groupedData as GroupedData);
 
-            this._log({ groupedData, sortBy });
+            this._log({ groupedData, sortBy, filterValue });
+
+            return;
           } else {
             callback({
               total: 0,
