@@ -51,7 +51,7 @@ function setTheme(theme: Theme) {
   const expirationDate = new Date();
 
   expirationDate.setDate(expirationDate.getDate() + 30);
-  document.cookie = `interaminense_website_theme="${theme}"; expires="${expirationDate.toUTCString()}"; path=/`;
+  document.cookie = `interaminense_website_theme="${theme}"; expires="${expirationDate.toUTCString()}"; SameSite=None; Secure; path=/`;
 }
 
 function getTheme() {
