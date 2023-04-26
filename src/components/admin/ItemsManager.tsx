@@ -16,6 +16,7 @@ import { Data, SortBy, SortType, SortValue } from "../../firebase/types";
 import { AlertStatus } from "../../types";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
 import { useDebounce } from "../../utils/useDebounce";
+import { EmptyState } from "./EmptyState";
 
 interface IItemsManagerProps<TItem> {
   dataBase: DataBase;
@@ -81,6 +82,7 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
         ...DEFAULT_LIST_DATA_PROPS,
         sortBy,
         filterValue: debouncedFilterValue,
+        onlyOnce: false,
       }
     );
   }, [dataBase, sortBy, debouncedFilterValue]);
@@ -220,32 +222,28 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
               onSort={setSortBy}
             />
 
-            {!items.length && (
-              <Box
-                display="flex"
-                marginTop={4}
-                justifyContent="center"
-                textAlign="center"
-                borderRadius={1}
-                padding={4}
-                sx={{ border: "1px solid #f0f0f0" }}
+            {filterValue && !items.length && (
+              <EmptyState
+                title={`Any ${filterValue} were found.`}
+                description="Try searching a new keyword."
               >
-                <div>
-                  <Typography variant="h6">
-                    There are no items found.
-                  </Typography>
-                  <Typography variant="body2">Try to search again.</Typography>
-                  <Button
-                    onClick={() => {
-                      setFilterValue("");
-                      setSortBy({ ...sortBy, value: SortValue.CreateDate });
-                    }}
-                    sx={{ marginTop: 2 }}
-                  >
-                    clear search
-                  </Button>
-                </div>
-              </Box>
+                <Button
+                  onClick={() => {
+                    setFilterValue("");
+                    setSortBy({ ...sortBy, value: SortValue.CreateDate });
+                  }}
+                  sx={{ marginTop: 2 }}
+                >
+                  clear search
+                </Button>
+              </EmptyState>
+            )}
+
+            {!filterValue && !items.length && (
+              <EmptyState
+                title={`There are no items.`}
+                description="Create a new one or come back in another moment."
+              />
             )}
           </>
         )}

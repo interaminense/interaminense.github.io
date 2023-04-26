@@ -229,8 +229,6 @@ export class DataBase {
             callback(groupedData as GroupedData);
 
             this._log({ groupedData, sortBy, filterValue });
-
-            return;
           } else {
             callback({
               total: 0,
