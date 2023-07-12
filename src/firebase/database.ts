@@ -105,7 +105,7 @@ export class DataBase {
       if (!this.auth.currentUser) {
         return this._error(MESSAGES.DATA_CREATED_FAIL);
       }
-
+      console.log({ error });
       return this._error(MESSAGES.AN_ERROR_OCCURRED);
     }
   }

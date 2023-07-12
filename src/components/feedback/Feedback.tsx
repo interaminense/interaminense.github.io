@@ -1,6 +1,6 @@
 import { faComment } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DataBase } from "../../firebase/database";
 import { Popup } from "../../popup/Popup";
 import { Badge } from "../badge/Badge";
@@ -15,6 +15,12 @@ export function Feedback() {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (showPopup) {
+      window.Analytics.track("clickOnFeedbackButton", {});
+    }
+  }, [showPopup]);
 
   return (
     <div className="feedback">

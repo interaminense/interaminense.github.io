@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TProject } from "../../types";
 import { timestampToDate } from "../../utils/date";
 import { Badge } from "../badge/Badge";
-import { Link } from "../Link/Link";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 
 import "./Card.scss";
@@ -34,11 +33,29 @@ export function Card({
             </div>
           )}
 
-          <Link url={url} label={label} />
+          <a
+            href={url}
+            onClick={() => {
+              window.Analytics.track("clickOnProject", { label, url });
+            }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {label}
+          </a>
         </h3>
 
         <p>
-          <Link url={url} label={description} />
+          <a
+            href={url}
+            onClick={() => {
+              window.Analytics.track("clickOnProject", { label, url });
+            }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {description}
+          </a>
         </p>
 
         {tags && tags.map(({ label, id }) => <Badge key={id} label={label} />)}

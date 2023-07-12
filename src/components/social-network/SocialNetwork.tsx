@@ -16,7 +16,17 @@ export function SocialNetwork() {
     <ul className="social-network">
       {socialNetwork.map(({ id, label, url }) => (
         <li key={id}>
-          <a href={url} target="_blank" rel="noreferrer">
+          <a
+            onClick={() => {
+              window.Analytics.track("clickOnSocialNetworkLink", {
+                label,
+                url,
+              });
+            }}
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+          >
             {socialNetworkIcons[label as SocialIcons]}
           </a>
         </li>
