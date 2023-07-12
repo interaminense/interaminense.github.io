@@ -1,6 +1,5 @@
 import { DBPath, TLink } from "../../types";
 import { useDB } from "../../utils/useDB";
-import { Link } from "../Link/Link";
 import { Loading } from "../Loading";
 
 import "./Links.scss";
@@ -15,7 +14,18 @@ export function Links() {
   return (
     <div className="links">
       {links?.map(({ url, label, id }) => (
-        <Link key={id} url={url} label={label} />
+        <a
+          className="link"
+          onClick={() => {
+            window.Analytics.track("clickOnUsefulLink", { label, url });
+          }}
+          key={id}
+          href={url}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {label}
+        </a>
       ))}
     </div>
   );

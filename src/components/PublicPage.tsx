@@ -23,6 +23,15 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
     signIn();
   }, [auth]);
 
+  useEffect(() => {
+    if (theme && !loading) {
+      window.Analytics.track("pageViewed", {
+        theme,
+        pathname: window.location.pathname,
+      });
+    }
+  }, [theme, loading]);
+
   if (loading) {
     return <Loading page />;
   }

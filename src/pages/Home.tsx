@@ -51,7 +51,13 @@ export function Home() {
           <Layout.Paragraph>
             <Projects featured />
 
-            <Link className="layout__link" to={"/projects"}>
+            <Link
+              className="layout__link"
+              to={"/projects"}
+              onClick={() => {
+                window.Analytics.track("clickOnSeeAllButton", {});
+              }}
+            >
               see all projects
             </Link>
           </Layout.Paragraph>
