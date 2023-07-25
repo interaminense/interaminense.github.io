@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { Avatar, Button, Container } from "@mui/material";
-import { Header } from "./Header";
 import { useNavigate } from "react-router-dom";
 import { Loading } from "../Loading";
 import { useAppContext } from "../../AppContext";
 import { DataBase } from "../../firebase/database";
 import { TProfile } from "../../types";
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const profileDB = new DataBase({ path: "profile" });
 
@@ -16,6 +26,17 @@ export function PrivatePage({ children }: { children: JSX.Element }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<TProfile | null>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  function handleClose() {
+    setAnchorEl(null);
+  }
 
   async function handleSignOut() {
     await auth?.signOut();
@@ -52,19 +73,62 @@ export function PrivatePage({ children }: { children: JSX.Element }) {
 
   return (
     <>
-      <Header title="Admin">
-        <Button color="inherit" onClick={handleSignOut}>
-          signout
-        </Button>
+      <Box sx={{ flexGrow: 1 }}>
+        <AppBar position="static">
+          <Toolbar>
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+              onClick={handleClick}
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </IconButton>
 
-        {profile?.imageURL && (
-          <Avatar
-            sx={{ marginLeft: 2 }}
-            alt="Profile Avatar"
-            src={profile?.imageURL}
-          />
-        )}
-      </Header>
+            <Menu
+              id="demo-positioned-menu"
+              aria-labelledby="demo-positioned-button"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <MenuItem onClick={() => navigate("/")}>Home</MenuItem>
+              <MenuItem onClick={() => navigate("/analytics")}>
+                Analytics
+              </MenuItem>
+              <MenuItem onClick={() => navigate("/settings")}>
+                Settings
+              </MenuItem>
+            </Menu>
+
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Admin
+            </Typography>
+
+            <Button color="inherit" onClick={handleSignOut}>
+              signout
+            </Button>
+
+            {profile?.imageURL && (
+              <Avatar
+                sx={{ marginLeft: 2 }}
+                alt="Profile Avatar"
+                src={profile?.imageURL}
+              />
+            )}
+          </Toolbar>
+        </AppBar>
+      </Box>
 
       <Container fixed>{children}</Container>
     </>

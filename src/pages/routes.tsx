@@ -1,5 +1,5 @@
 import { Home } from "./Home";
-import { Admin } from "./Admin";
+import { Settings } from "./Settings";
 import { Analytics } from "./Analytics";
 import { Route } from "./BundleRouter";
 import { Login } from "./Login";
@@ -22,8 +22,8 @@ export const routes: Route[] = [
     publicPage: true,
   },
   {
-    path: "/admin",
-    element: <Admin />,
+    path: "/settings",
+    element: <Settings />,
     publicPage: false,
   },
   {
