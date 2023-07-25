@@ -74,7 +74,7 @@ function a11yProps(index: number) {
   };
 }
 
-export function Admin() {
+export function Settings() {
   const [value, setValue] = useState(0);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
@@ -83,7 +83,7 @@ export function Admin() {
 
   return (
     <>
-      <Title>Control Panel</Title>
+      <Title>Settings</Title>
 
       <Typography variant="subtitle1" marginBottom={2}>
         Update personal information and manage projects, including adding or

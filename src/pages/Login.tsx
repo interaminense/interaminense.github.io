@@ -2,7 +2,6 @@ import { FirebaseError } from "@firebase/util";
 import { FormGroup, Container, TextField } from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Header } from "../components/admin/Header";
 import { Title } from "../components/admin/Title";
 import { LoadingButton } from "@mui/lab";
 import { useAppContext } from "../AppContext";
@@ -46,8 +45,6 @@ export function Login() {
 
   return (
     <>
-      <Header title="Admin" />
-
       <Container maxWidth="sm">
         <Title>Login</Title>
 
