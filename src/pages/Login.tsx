@@ -2,9 +2,9 @@ import { FirebaseError } from "@firebase/util";
 import { FormGroup, Container, TextField } from "@mui/material";
 import { FormEvent, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Title } from "../components/admin/Title";
 import { LoadingButton } from "@mui/lab";
 import { useAppContext } from "../AppContext";
+import { Card } from "../components/admin/Card";
 
 export function Login() {
   const { auth } = useAppContext();
@@ -44,10 +44,8 @@ export function Login() {
   };
 
   return (
-    <>
-      <Container maxWidth="sm">
-        <Title>Login</Title>
-
+    <Container maxWidth="sm" sx={{ mt: 5 }}>
+      <Card title="ADMIN">
         <form onSubmit={handleSubmit}>
           <FormGroup>
             <TextField
@@ -78,7 +76,7 @@ export function Login() {
             </LoadingButton>
           </FormGroup>
         </form>
-      </Container>
-    </>
+      </Card>
+    </Container>
   );
 }

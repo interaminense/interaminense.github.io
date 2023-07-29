@@ -1,6 +1,6 @@
-import { XAxis, Tooltip, BarChart, Bar } from "recharts";
+import { YAxis, XAxis, Tooltip, BarChart, Bar } from "recharts";
 import { useAnalyticsData } from "../../../analytics";
-import { Card } from "./Card";
+import { Card } from "../Card";
 import { COLORS } from "../../../utils/constants";
 
 interface DataItem {
@@ -38,18 +38,19 @@ function generateNewObject(data: DataItem[]): NewObjectItem[] {
   return newData;
 }
 
-export function TotalClicksOnSocialNetwork() {
+export function ViewsBySocialNetworkClicks() {
   const data = useAnalyticsData("clickOnSocialNetworkLink");
   const result = generateNewObject(data?.data ?? []);
 
   if (!result) return null;
 
   return (
-    <Card title="TOTAL CLICKS ON SOCIAL NETWORK">
-      <BarChart width={400} height={400} data={result}>
+    <Card title="VIEWS BY SOCIAL NETWORK CLICKS">
+      <BarChart width={520} height={400} data={result}>
         <Tooltip />
         <Bar dataKey="total" fill={COLORS[0]} />
         <XAxis dataKey="name" />
+        <YAxis dataKey="total" />
       </BarChart>
     </Card>
   );

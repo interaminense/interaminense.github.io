@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
 import { DataBase } from "../firebase/database";
 import { UAParser } from "ua-parser-js";
+import { DEFAULT_LIST_DATA_PROPS } from "../utils/constants";
+import { SortValue } from "../firebase/types";
+import { SortType } from "../firebase/types";
+import { useSearchParams } from "react-router-dom";
 
 export function useAnalyticsData(id: string) {
+  const [searchParams] = useSearchParams();
   const [data, setData] = useState<{ data: any; total: number } | null>(null);
 
   useEffect(() => {
-    window.Analytics.listData(id, setData);
-  }, [id]);
+    window.Analytics.listData(id, setData, {
+      rangeKey: searchParams.get("rangeKey"),
+    });
+  }, [id, searchParams]);
 
   return data;
 }
@@ -33,7 +40,15 @@ export class Analytics {
     return this.db(id).create(data as any);
   }
 
-  listData(id: string, cb: (data: any) => void) {
-    this.db(id).listData(cb, { onlyOnce: false, topResults: 100000 });
+  listData(id: string, cb: (data: any) => void, options?: {}) {
+    this.db(id).listData(cb, {
+      ...options,
+      onlyOnce: false,
+      topResults: 10000000,
+      sortBy: {
+        value: SortValue.CreateDate,
+        type: SortType.Desc,
+      },
+    });
   }
 }
