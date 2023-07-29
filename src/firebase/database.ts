@@ -74,6 +74,16 @@ export class DataBase {
     return true;
   }
 
+  private _getDateInRange(rangeKey: number): {
+    currentTimestamp: number;
+    lastTimestamp: number;
+  } {
+    const currentTimestamp = Date.now();
+    const lastTimestamp = currentTimestamp - rangeKey * 24 * 60 * 60 * 1000;
+
+    return { currentTimestamp, lastTimestamp };
+  }
+
   get isKnownUser(): boolean {
     return !!this.auth.currentUser && !this.auth.currentUser.isAnonymous;
   }
@@ -186,11 +196,13 @@ export class DataBase {
         type: SortType.Desc,
       },
       onlyOnce = true,
+      rangeKey,
     }: {
       filterValue?: string;
       topResults?: number;
       sortBy?: SortBy;
       onlyOnce?: boolean;
+      rangeKey?: 1 | 7 | 30 | 90;
     } = {}
   ) {
     if (!this.auth.currentUser) return;
@@ -199,6 +211,7 @@ export class DataBase {
       orderByChild(sortBy.value),
       filterValue && startAt(filterValue),
       filterValue && endAt(`${filterValue}\uf8ff`),
+      rangeKey && startAt(Date.now() - rangeKey * 24 * 60 * 60 * 1000),
       sortBy.type === SortType.Desc
         ? limitToLast(topResults)
         : limitToFirst(topResults),

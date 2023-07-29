@@ -161,92 +161,91 @@ export function ItemsManager<TItem extends { label?: string; id: string }>({
 
   return (
     <>
-      <Container>
-        {header.some((label) => label === SortValue.Label) && (
-          <Box marginBottom={2}>
-            <TextField
-              label="search"
-              type="search"
-              size="small"
-              value={filterValue}
-              placeholder="search by label column"
-              onChange={({ target: { value } }) => {
-                setFilterValue(value);
+      {header.some((label) => label === SortValue.Label) && (
+        <Box marginBottom={2}>
+          <TextField
+            fullWidth
+            label="search"
+            type="search"
+            size="small"
+            value={filterValue}
+            placeholder="search by label column"
+            onChange={({ target: { value } }) => {
+              setFilterValue(value);
 
-                setSortBy({
-                  ...sortBy,
-                  value: value ? SortValue.Label : SortValue.CreateDate,
-                });
-              }}
-            />
-          </Box>
-        )}
+              setSortBy({
+                ...sortBy,
+                value: value ? SortValue.Label : SortValue.CreateDate,
+              });
+            }}
+          />
+        </Box>
+      )}
 
-        {loading ? (
-          <Loading page />
-        ) : (
-          <>
-            <Table<TItem>
-              header={header}
-              rows={rows(items)}
-              onAdd={
-                showAddButton
-                  ? () => {
-                      setOpenModalAdd(true);
-                      setSelectedItem(null);
-                    }
-                  : null
-              }
-              onEdit={
-                showEditButton
-                  ? (itemId) => {
-                      setOpenModalEdit(true);
-                      setSelectedItem(
-                        items.find(({ id }) => id === itemId) ?? null
-                      );
-                    }
-                  : null
-              }
-              onDelete={
-                showDeleteButton
-                  ? (itemId) => {
-                      setOpenModalDelete(true);
-                      setSelectedItem(
-                        items.find(({ id }) => id === itemId) ?? null
-                      );
-                    }
-                  : null
-              }
-              sortBy={sortBy}
-              onSort={setSortBy}
-            />
+      {loading ? (
+        <Loading page />
+      ) : (
+        <>
+          <Table<TItem>
+            header={header}
+            rows={rows(items)}
+            onAdd={
+              showAddButton
+                ? () => {
+                    setOpenModalAdd(true);
+                    setSelectedItem(null);
+                  }
+                : null
+            }
+            onEdit={
+              showEditButton
+                ? (itemId) => {
+                    setOpenModalEdit(true);
+                    setSelectedItem(
+                      items.find(({ id }) => id === itemId) ?? null
+                    );
+                  }
+                : null
+            }
+            onDelete={
+              showDeleteButton
+                ? (itemId) => {
+                    setOpenModalDelete(true);
+                    setSelectedItem(
+                      items.find(({ id }) => id === itemId) ?? null
+                    );
+                  }
+                : null
+            }
+            sortBy={sortBy}
+            onSort={setSortBy}
+          />
 
-            {filterValue && !items.length && (
-              <EmptyState
-                title={`Any ${filterValue} were found.`}
-                description="Try searching a new keyword."
+          {filterValue && !items.length && (
+            <EmptyState
+              title={`Any ${filterValue} were found.`}
+              description="Try searching a new keyword."
+            >
+              <Button
+                onClick={() => {
+                  setFilterValue("");
+                  setSortBy({ ...sortBy, value: SortValue.CreateDate });
+                }}
+                sx={{ marginTop: 2 }}
               >
-                <Button
-                  onClick={() => {
-                    setFilterValue("");
-                    setSortBy({ ...sortBy, value: SortValue.CreateDate });
-                  }}
-                  sx={{ marginTop: 2 }}
-                >
-                  clear search
-                </Button>
-              </EmptyState>
-            )}
+                clear search
+              </Button>
+            </EmptyState>
+          )}
 
-            {!filterValue && !items.length && (
-              <EmptyState
-                title={`There are no items.`}
-                description="Create a new one or come back in another moment."
-              />
-            )}
-          </>
-        )}
-      </Container>
+          {!filterValue && !items.length && (
+            <EmptyState
+              title={`There are no items.`}
+              description="Create a new one or come back in another moment."
+            />
+          )}
+        </>
+      )}
 
       {modalRenderer && (
         <>

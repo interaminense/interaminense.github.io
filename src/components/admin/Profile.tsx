@@ -20,6 +20,7 @@ import {
   TReactions,
 } from "../../types";
 import { DEFAULT_LIST_DATA_PROPS } from "../../utils/constants";
+import { Card } from "./Card";
 
 const initialValues: Partial<TProfile> & { showFeedbackPopup: boolean } = {
   about: "",
@@ -88,7 +89,7 @@ export function Profile() {
 
   return (
     <>
-      <Container maxWidth="sm">
+      <Card title="PROFILE">
         <Formik
           enableReinitialize
           initialValues={{ ...(profile || initialValues) }}
@@ -188,7 +189,7 @@ export function Profile() {
             </Form>
           )}
         </Formik>
-      </Container>
+      </Card>
 
       <Snackbar
         open={!!alert.label}

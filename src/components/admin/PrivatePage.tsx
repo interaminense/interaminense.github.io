@@ -18,6 +18,8 @@ import {
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import "./Admin.scss";
+
 const profileDB = new DataBase({ path: "profile" });
 
 export function PrivatePage({ children }: { children: JSX.Element }) {

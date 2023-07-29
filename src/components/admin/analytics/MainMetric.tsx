@@ -1,5 +1,5 @@
-import { Typography } from "@mui/material";
-import { Card } from "./Card";
+import { Grid, Typography } from "@mui/material";
+import { Card } from "../Card";
 import { useAnalyticsData } from "../../../analytics";
 
 interface IMetricProps {
@@ -12,9 +12,11 @@ export function MainMetric({ title, metricName }: IMetricProps) {
 
   return (
     <Card title={title}>
-      <Typography variant="h1" className="text-center">
-        {data?.total ?? 0}
-      </Typography>
+      <Grid display="flex" justifyContent="center" alignItems="center">
+        <Typography variant="h1" className="text-center">
+          {data?.total ?? 0}
+        </Typography>
+      </Grid>
     </Card>
   );
 }
