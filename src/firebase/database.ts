@@ -202,7 +202,7 @@ export class DataBase {
       topResults?: number;
       sortBy?: SortBy;
       onlyOnce?: boolean;
-      rangeKey?: 1 | 7 | 30 | 90;
+      rangeKey?: 1 | 7 | 30 | 90 | 180 | 365;
     } = {}
   ) {
     if (!this.auth.currentUser) return;
