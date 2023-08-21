@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { DataBase } from "../firebase/database";
 import { UAParser } from "ua-parser-js";
-import { DEFAULT_LIST_DATA_PROPS } from "../utils/constants";
 import { SortValue } from "../firebase/types";
 import { SortType } from "../firebase/types";
 import { useSearchParams } from "react-router-dom";

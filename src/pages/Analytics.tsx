@@ -64,6 +64,8 @@ export function Analytics() {
               <MenuItem value={7}>Last 7 days</MenuItem>
               <MenuItem value={30}>Last 30 days</MenuItem>
               <MenuItem value={90}>Last 90 days</MenuItem>
+              <MenuItem value={180}>Last 180 days</MenuItem>
+              <MenuItem value={365}>Last year</MenuItem>
             </Select>
           </FormControl>
         }
