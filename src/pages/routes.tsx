@@ -4,6 +4,7 @@ import { Analytics } from "./Analytics";
 import { Route } from "./BundleRouter";
 import { Login } from "./Login";
 import { Projects } from "./Projects";
+import { DetailedProject } from "./DetailedProject";
 
 export const routes: Route[] = [
   {
@@ -19,6 +20,11 @@ export const routes: Route[] = [
   {
     path: "/projects",
     element: <Projects />,
+    publicPage: true,
+  },
+  {
+    path: "/project/:id",
+    element: <DetailedProject />,
     publicPage: true,
   },
   {

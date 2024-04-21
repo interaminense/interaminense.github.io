@@ -3,18 +3,22 @@ import { TProject } from "../../types";
 import { timestampToDate } from "../../utils/date";
 import { Badge } from "../badge/Badge";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 import "./Card.scss";
 
 export function Card({
   createDate,
   description,
+  id,
   imageURL,
   tags,
   label,
   url,
   featured,
 }: TProject) {
+  const navigate = useNavigate();
+
   return (
     <div className="card">
       {imageURL && (
@@ -26,36 +30,39 @@ export function Card({
       <div className="card__content">
         <span className="card__date">{timestampToDate(createDate)}</span>
 
-        <h3 className="card__title">
+        <h3
+          className="card__title"
+          onClick={() => {
+            window.Analytics.track("clickOnDetailedProject", {
+              label,
+              url,
+              id,
+            });
+
+            navigate(`/project/${id}`);
+          }}
+        >
           {featured && (
             <div className="card__featured">
               <FontAwesomeIcon icon={faStar} />
             </div>
           )}
-
-          <a
-            href={url}
-            onClick={() => {
-              window.Analytics.track("clickOnProject", { label, url });
-            }}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {label}
-          </a>
+          {label}
         </h3>
 
-        <p>
-          <a
-            href={url}
-            onClick={() => {
-              window.Analytics.track("clickOnProject", { label, url });
-            }}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {description}
-          </a>
+        <p
+          className="card__description"
+          onClick={() => {
+            window.Analytics.track("clickOnDetailedProject", {
+              label,
+              url,
+              id,
+            });
+
+            navigate(`/project/${id}`);
+          }}
+        >
+          {description}
         </p>
 
         {tags && tags.map(({ label, id }) => <Badge key={id} label={label} />)}

@@ -25,11 +25,11 @@ export function Projects({ featured }: { featured?: boolean }) {
 
   return (
     <div className="projects">
-      {projects.map((card) => (
-        <div key={card.id} className="projects__item">
-          <Card {...card} />
+      {projects.map((project) => (
+        <div key={project.id} className="projects__item">
+          <Card {...project} />
 
-          <Reactions size="small" reactionId={card.id} />
+          <Reactions size="small" reactionId={project.id} />
         </div>
       ))}
     </div>

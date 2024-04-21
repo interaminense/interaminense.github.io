@@ -26,6 +26,12 @@
     letter-spacing: -1px;
   }
 
+  &__title:hover,
+  &__description:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
   &__date {
     font-size: 0.75rem;
   }
