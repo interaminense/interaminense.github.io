@@ -36,9 +36,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d build"
   },
@@ -61,7 +61,9 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "@types/ua-parser-js": "^0.7.36",
+    "dotenv-webpack": "^8.1.0",
     "gh-pages": "^5.0.0",
     "uuid": "^9.0.0"
   }
