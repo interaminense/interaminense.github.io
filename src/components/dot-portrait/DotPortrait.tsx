@@ -8,21 +8,26 @@ export const DOT_COLUMNS = 60;
 
 const INTRO_MS = 1100;
 
-// Pointer scatter: dots near the pointer get kicked away (harder the faster
-// it moves), then a damped spring pulls each one back to its place.
-const POINTER_RADIUS = 80;
-const KICK_MIN = 1.2;
-const KICK_PER_PX = 0.25;
-const KICK_MAX = 14;
-const SPRING = 0.04;
-const DAMPING = 0.9;
+// Motion: no spring, so nothing bounces. A dot keeps whatever velocity it
+// was given, friction slows it down, and once it's (nearly) still it eases
+// back to its place, slowly, without overshooting.
+const FRICTION = 0.9; // velocity kept per frame
+const HOMING = 0.012; // share of the remaining distance recovered per frame
+const HOMING_SPEED = 1.5; // only home once slower than this (px/frame)
 
-// Click: every dot is blown away from the click, floats for a moment with
-// the spring off, then the spring pulls the portrait back together.
-const EXPLODE_HOLD_MS = 1400;
-const EXPLODE_MIN = 5;
-const EXPLODE_MAX = 13;
-const EXPLODE_DAMPING = 0.93;
+// Pointer: a round body that pushes. Dots it overlaps are shoved out to its
+// edge and dragged along the direction it's moving, harder the faster.
+const POINTER_RADIUS = 60;
+const PUSH_OUT = 0.5; // share of the overlap resolved per move
+const DRAG = 0.35; // share of the pointer's velocity passed on
+const POINTER_SPEED_MAX = 40; // px per move event
+
+// Click: every dot is blown away from the click, closer ones harder; they
+// coast to a stop and stay out a moment before drifting home.
+const EXPLODE_HOLD_MS = 900;
+const EXPLODE_MIN = 6;
+const EXPLODE_MAX = 18;
+const EXPLODE_FRICTION = 0.94;
 
 // The edge: instead of a square, the portrait dissolves into loose
 // "molecules". Distances are in grid cells.
@@ -193,7 +198,7 @@ function toDots(levels: number[]): Dot[] {
 /**
  * The profile photo drawn as a cloud of dots. They light up in a diagonal
  * sweep when the photo arrives, the outer ones float like loose molecules,
- * they scatter away from the pointer and spring back into place, and a click
+ * the pointer pushes them aside, they drift slowly back, and a click
  * blows them all apart for a couple of seconds.
  */
 export function DotPortrait({ src, label }: { src?: string; label: string }) {
@@ -255,7 +260,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       );
     }
 
-    function kick(x: number, y: number, strength: number) {
+    function push(x: number, y: number, moveX: number, moveY: number) {
       for (const dot of dots) {
         const dx = dot.cx - x;
         const dy = dot.cy - y;
@@ -265,15 +270,19 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
           continue;
         }
 
-        const falloff = Math.pow(1 - distance / POINTER_RADIUS, 2);
-        // A little angular jitter, so the dots spray instead of moving as a
-        // rigid ring.
-        const angle =
-          (distance > 0.01 ? Math.atan2(dy, dx) : Math.random() * Math.PI * 2) +
-          (Math.random() - 0.5) * 0.7;
+        // Out of the pointer's way, along the line from its center...
+        const nx = distance > 0.01 ? dx / distance : 1;
+        const ny = distance > 0.01 ? dy / distance : 0;
+        const overlap = POINTER_RADIUS - distance;
 
-        dot.vx += Math.cos(angle) * strength * falloff;
-        dot.vy += Math.sin(angle) * strength * falloff;
+        dot.ox += nx * overlap * PUSH_OUT;
+        dot.oy += ny * overlap * PUSH_OUT;
+
+        // ...and carried along with it, most at its center.
+        const contact = overlap / POINTER_RADIUS;
+
+        dot.vx += (moveX * DRAG + nx * 0.6) * contact;
+        dot.vy += (moveY * DRAG + ny * 0.6) * contact;
       }
 
       start();
@@ -289,7 +298,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
         const angle =
           (distance > 0.01 ? Math.atan2(dy, dx) : Math.random() * Math.PI * 2) +
           (Math.random() - 0.5) * 0.9;
-        // Closer to the click, harder the push; random so it isn't a ring.
+        // Closer to the click, harder the blast; random so it isn't a ring.
         const power =
           (EXPLODE_MIN +
             (EXPLODE_MAX - EXPLODE_MIN) * Math.max(0, 1 - distance / reach)) *
@@ -317,8 +326,8 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       context.fillStyle = ink;
 
       const exploding = now < explodeUntil;
-      const spring = exploding ? 0 : SPRING;
-      const damping = exploding ? EXPLODE_DAMPING : DAMPING;
+      const friction = Math.pow(exploding ? EXPLODE_FRICTION : FRICTION, step);
+      const homing = 1 - Math.pow(1 - HOMING, step);
       let busy = exploding;
 
       for (const dot of dots) {
@@ -331,10 +340,21 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
         }
 
         if (dot.vx || dot.vy || dot.ox || dot.oy) {
-          dot.vx = (dot.vx - spring * dot.ox * step) * Math.pow(damping, step);
-          dot.vy = (dot.vy - spring * dot.oy * step) * Math.pow(damping, step);
+          dot.vx *= friction;
+          dot.vy *= friction;
           dot.ox += dot.vx * step;
           dot.oy += dot.vy * step;
+
+          // Drift home once the dot has (nearly) stopped: a fraction of the
+          // remaining distance each frame, so it slows as it arrives and
+          // never overshoots.
+          if (
+            !exploding &&
+            Math.abs(dot.vx) + Math.abs(dot.vy) < HOMING_SPEED
+          ) {
+            dot.ox -= dot.ox * homing;
+            dot.oy -= dot.oy * homing;
+          }
 
           if (
             Math.abs(dot.ox) + Math.abs(dot.oy) < 0.05 &&
@@ -431,14 +451,19 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       }
 
       const { x, y } = toFrame(event);
-      const speed = pointer.inside
-        ? Math.hypot(x - pointer.x, y - pointer.y)
-        : 0;
+      let moveX = pointer.inside ? x - pointer.x : 0;
+      let moveY = pointer.inside ? y - pointer.y : 0;
+      const speed = Math.hypot(moveX, moveY);
+
+      if (speed > POINTER_SPEED_MAX) {
+        moveX *= POINTER_SPEED_MAX / speed;
+        moveY *= POINTER_SPEED_MAX / speed;
+      }
 
       pointer.x = x;
       pointer.y = y;
       pointer.inside = true;
-      kick(x, y, Math.min(KICK_MIN + speed * KICK_PER_PX, KICK_MAX));
+      push(x, y, moveX, moveY);
     }
 
     function onClick(event: MouseEvent) {
