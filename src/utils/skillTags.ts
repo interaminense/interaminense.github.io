@@ -13,7 +13,7 @@ export function normalize(label: string) {
  */
 const SKILL_TAGS: Record<string, string[]> = {
   react: ["reactjs"],
-  javascript: ["jquery"],
+  javascript: ["jquery", "angularjs"],
   csssass: [
     "css",
     "css3",
@@ -26,9 +26,9 @@ const SKILL_TAGS: Record<string, string[]> = {
     "materializecss",
   ],
   datavisualization: ["d3chart", "recharts"],
-  testingjestplaywright: ["jest", "playwright"],
+  testingjestplaywright: ["jest", "playwright", "vitest", "unittests"],
   chromeextensions: ["chromeextension"],
-  aiassisteddevelopment: ["geminiai", "langchain"],
+  aiassisteddevelopment: ["geminiai", "langchain", "claude"],
   canvaswebaudio: ["htmlcanvas", "webaudio", "webgl"],
 };
 
