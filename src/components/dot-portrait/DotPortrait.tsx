@@ -26,8 +26,8 @@ const EXPLODE_DAMPING = 0.93;
 
 // The edge: instead of a square, the portrait dissolves into loose
 // "molecules". Distances are in grid cells.
-const EDGE_DRIFT = 5; // how far the outermost dots sit from their grid spot
-const EDGE_FLOAT = 1.6; // how far they wander while floating
+const EDGE_DRIFT = 14; // how far the outermost dots sit from their grid spot
+const EDGE_FLOAT = 2.2; // how far they wander while floating
 
 type Dot = {
   x: number;
@@ -161,7 +161,8 @@ function toDots(levels: number[]): Dot[] {
       return;
     }
 
-    const drift = Math.pow(edge, 2) * EDGE_DRIFT * (0.5 + rand());
+    // Steep curve: the outermost dots go much further, the inner ones barely.
+    const drift = Math.pow(edge, 2.3) * EDGE_DRIFT * (0.5 + rand());
     const jitter = edge * 0.8;
 
     dots.push({
