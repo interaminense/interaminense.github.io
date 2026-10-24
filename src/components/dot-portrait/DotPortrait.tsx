@@ -3,8 +3,7 @@ import { Theme, ThemeContext } from "../../ThemeContext";
 
 import "./DotPortrait.scss";
 
-// Dots per row. The CSS dot pattern behind the canvas uses the same count, so
-// the skeleton grid and the drawn portrait line up exactly.
+// Dots per row of the sampled photo.
 export const DOT_COLUMNS = 60;
 
 const INTRO_MS = 1100;
@@ -18,17 +17,36 @@ const KICK_MAX = 14;
 const TAP_KICK = 9;
 const SPRING = 0.04;
 const DAMPING = 0.9;
-// Room around the frame so scattered dots can fly past its edges.
-const BLEED = 48;
+
+// The edge: instead of a square, the portrait dissolves into loose
+// "molecules". Distances are in grid cells.
+const EDGE_DRIFT = 5; // how far the outermost dots sit from their grid spot
+const EDGE_FLOAT = 1.6; // how far they wander while floating
+// Room around the frame so drifting and scattered dots can leave it.
+const BLEED = 64;
 
 type Dot = {
   x: number;
   y: number;
   level: number;
+  /** 0 in the core of the portrait, 1 at its outer edge. */
+  edge: number;
+  /** Resting offset from the grid, in cells (edge dots drift outward). */
+  hx: number;
+  hy: number;
+  /** Floating: amplitude (cells), speed (rad/ms) and phases. */
+  amp: number;
+  speed: number;
+  px: number;
+  py: number;
+  /** Scatter displacement (px) and velocity from the pointer. */
   ox: number;
   oy: number;
   vx: number;
   vy: number;
+  /** Where it was last drawn, for hit-testing the pointer. */
+  cx: number;
+  cy: number;
 };
 
 function prefersReducedMotion() {
@@ -41,6 +59,16 @@ function isDark(theme: Theme) {
     (theme === Theme.Auto &&
       window.matchMedia("(prefers-color-scheme: dark)").matches)
   );
+}
+
+/** Small seeded PRNG, so the edge looks the same on every visit. */
+function random(seed: number) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 /**
@@ -88,19 +116,76 @@ function sample(image: HTMLImageElement, dark: boolean): number[] {
   const high = sorted[Math.floor(sorted.length * 0.97)];
   const range = Math.max(high - low, 0.01);
 
-  const levels = luminances.map((luminance) => {
+  return luminances.map((luminance) => {
     const value = Math.min(1, Math.max(0, (luminance - low) / range));
 
     return Math.pow(dark ? value : 1 - value, 1.5);
   });
-
-  return levels;
 }
 
 /**
- * The profile photo drawn as a matrix of dots, like an LED panel. The dots
- * light up in a diagonal sweep when the photo arrives, scatter away from
- * the pointer and spring back into place.
+ * Lays the sampled levels out as dots. The core keeps the photo; towards an
+ * irregular round outline the dots shrink, thin out, drift away from the
+ * grid and float, so the portrait ends in a cloud instead of a square.
+ */
+function toDots(levels: number[]): Dot[] {
+  const rand = random(12699849);
+  const center = (DOT_COLUMNS - 1) / 2;
+  const dots: Dot[] = [];
+
+  levels.forEach((level, index) => {
+    const x = index % DOT_COLUMNS;
+    const y = Math.floor(index / DOT_COLUMNS);
+    const dx = x - center;
+    const dy = y - center;
+    const angle = Math.atan2(dy, dx);
+    const distance = Math.hypot(dx, dy) / (DOT_COLUMNS / 2);
+    // A wobbly circle rather than a perfect one.
+    const outline =
+      0.88 +
+      0.06 * Math.sin(3 * angle + 1.3) +
+      0.04 * Math.sin(5 * angle + 0.4) +
+      0.03 * Math.sin(7 * angle + 2.1);
+    const edge = Math.min(1, Math.max(0, (distance - (outline - 0.2)) / 0.42));
+    const roll = rand();
+
+    // Fewer dots the further out, and none in the far corners.
+    if (distance > 1.25 || roll < Math.max(0, (edge - 0.5) / 0.5) * 0.8) {
+      return;
+    }
+
+    const drift = Math.pow(edge, 2) * EDGE_DRIFT * (0.5 + rand());
+    const jitter = edge * 0.8;
+
+    dots.push({
+      x,
+      y,
+      // The photo fades out towards the edge, while a minimum size keeps the
+      // outer dots visible as small particles even over a blank background.
+      level: Math.max(level * (1 - 0.5 * edge), edge * (0.18 + 0.3 * rand())),
+      edge,
+      hx: Math.cos(angle) * drift + (rand() - 0.5) * jitter,
+      hy: Math.sin(angle) * drift + (rand() - 0.5) * jitter,
+      amp: Math.pow(edge, 1.3) * EDGE_FLOAT,
+      speed: 0.0004 + rand() * 0.0006,
+      px: rand() * Math.PI * 2,
+      py: rand() * Math.PI * 2,
+      ox: 0,
+      oy: 0,
+      vx: 0,
+      vy: 0,
+      cx: 0,
+      cy: 0,
+    });
+  });
+
+  return dots;
+}
+
+/**
+ * The profile photo drawn as a cloud of dots. They light up in a diagonal
+ * sweep when the photo arrives, the outer ones float like loose molecules,
+ * and they scatter away from the pointer and spring back into place.
  */
 export function DotPortrait({ src, label }: { src?: string; label: string }) {
   const {
@@ -125,6 +210,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     let introStart = 0;
     let lastFrame = 0;
     let animation = 0;
+    let visible = true;
     let cancelled = false;
 
     function resize() {
@@ -139,11 +225,9 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     }
 
     function kick(x: number, y: number, strength: number) {
-      const cell = size / DOT_COLUMNS;
-
       for (const dot of dots) {
-        const dx = (dot.x + 0.5) * cell + dot.ox - x;
-        const dy = (dot.y + 0.5) * cell + dot.oy - y;
+        const dx = dot.cx - x;
+        const dy = dot.cy - y;
         const distance = Math.hypot(dx, dy);
 
         if (distance >= POINTER_RADIUS) {
@@ -171,6 +255,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       const elapsed = reduced ? Infinity : now - introStart;
       // Physics steps are tuned for 60fps; scale them to the real frame time.
       const step = lastFrame ? Math.min((now - lastFrame) / 16.67, 3) : 1;
+      const floating = !reduced;
 
       lastFrame = now;
       context.clearRect(-BLEED, -BLEED, size + BLEED * 2, size + BLEED * 2);
@@ -203,26 +288,39 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
           }
         }
 
-        const cx = (dot.x + 0.5) * cell + dot.ox;
-        const cy = (dot.y + 0.5) * cell + dot.oy;
+        let fx = 0;
+        let fy = 0;
+
+        if (floating && dot.amp > 0) {
+          fx = Math.sin(now * dot.speed + dot.px) * dot.amp;
+          fy = Math.cos(now * dot.speed * 0.8 + dot.py) * dot.amp;
+        }
+
+        dot.cx = (dot.x + 0.5 + dot.hx + fx) * cell + dot.ox;
+        dot.cy = (dot.y + 0.5 + dot.hy + fy) * cell + dot.oy;
+
         const radius = maxRadius * dot.level * (1 - Math.pow(1 - grow, 3));
 
         if (radius > 0.15) {
           context.beginPath();
-          context.arc(cx, cy, radius, 0, Math.PI * 2);
+          context.arc(dot.cx, dot.cy, radius, 0, Math.PI * 2);
           context.fill();
         }
       }
 
-      animation = busy ? requestAnimationFrame(draw) : 0;
+      // Floating keeps the loop going, but only while the portrait is on
+      // screen; the pointer physics and the intro run until they settle.
+      const keepGoing = busy || (floating && visible);
 
-      if (!busy) {
+      animation = keepGoing ? requestAnimationFrame(draw) : 0;
+
+      if (!keepGoing) {
         lastFrame = 0;
       }
     }
 
     function start() {
-      if (!animation) {
+      if (!animation && dots.length) {
         animation = requestAnimationFrame(draw);
       }
     }
@@ -235,31 +333,32 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
         return;
       }
 
-      const dark = isDark(theme);
-
-      dots = sample(image, dark).map((level, index) => ({
-        x: index % DOT_COLUMNS,
-        y: Math.floor(index / DOT_COLUMNS),
-        level,
-        ox: 0,
-        oy: 0,
-        vx: 0,
-        vy: 0,
-      }));
+      dots = toDots(sample(image, isDark(theme)));
+      frame.classList.add("dot-portrait--drawn");
       resize();
       introStart = performance.now();
       start();
     };
     image.src = src;
 
-    const observer = new ResizeObserver(() => {
+    const resizeObserver = new ResizeObserver(() => {
       if (dots.length) {
         resize();
         start();
       }
     });
 
-    observer.observe(frame);
+    resizeObserver.observe(frame);
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+
+      if (visible) {
+        start();
+      }
+    });
+
+    visibilityObserver.observe(frame);
 
     function toFrame(event: PointerEvent) {
       const box = frame!.getBoundingClientRect();
@@ -304,7 +403,8 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     return () => {
       cancelled = true;
       cancelAnimationFrame(animation);
-      observer.disconnect();
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
       frame.removeEventListener("pointermove", onMove);
       frame.removeEventListener("pointerdown", onDown);
       frame.removeEventListener("pointerleave", onLeave);

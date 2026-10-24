@@ -7,9 +7,9 @@
   &__name {
     margin: 0 0 2rem;
     font-size: clamp(3rem, 7vw, 6.25rem);
-    font-weight: 600;
+    font-weight: 700;
     line-height: 0.95;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.04em;
 
     span {
       display: block;
@@ -45,8 +45,9 @@
 
   &__portrait {
     width: 100%;
-    max-width: 440px;
-    justify-self: end;
+    max-width: 420px;
+    // Centered in its column, so the floating edge has room on both sides.
+    justify-self: center;
   }
 }
 

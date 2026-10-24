@@ -27,7 +27,8 @@
 }
 
 :root {
-  --font-display: "Geist", system-ui, sans-serif;
+  // Titles use the same face as claude-console; body text stays in Geist.
+  --font-display: "Schibsted Grotesk", system-ui, sans-serif;
   --font-body: "Geist", system-ui, sans-serif;
 
   @include light-tokens;

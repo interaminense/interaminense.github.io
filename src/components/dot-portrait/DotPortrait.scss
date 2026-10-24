@@ -1,5 +1,7 @@
 // 60 matches DOT_COLUMNS in DotPortrait.tsx.
 $columns: 60;
+// 64px matches BLEED in DotPortrait.tsx.
+$bleed: 64px;
 
 .dot-portrait {
   position: relative;
@@ -7,22 +9,36 @@ $columns: 60;
   aspect-ratio: 1;
   touch-action: pan-y;
 
-  // The empty matrix: one faint dot per cell. It's also the loading state,
-  // in index.html and in React, before the photo is drawn on top.
-  background-image: radial-gradient(
-    circle,
-    var(--rule) 0 1px,
-    transparent 1.3px
-  );
-  background-size: calc(100% / #{$columns}) calc(100% / #{$columns});
+  // The empty dot grid, faded out towards a round edge like the portrait
+  // itself. It's the loading state (in index.html and in React) and fades
+  // away once the photo is drawn.
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      var(--rule) 0 1px,
+      transparent 1.3px
+    );
+    background-size: calc(100% / #{$columns}) calc(100% / #{$columns});
+    -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
+    mask-image: radial-gradient(closest-side, #000 55%, transparent);
+    transition: opacity 0.8s ease-out;
+  }
 
-  // Larger than the frame by BLEED (48px) on each side, so scattered dots
-  // can fly past its edges. It doesn't take pointer events: the frame does.
+  &--drawn::before {
+    opacity: 0;
+  }
+
+  // Larger than the frame by the bleed on each side, so drifting and
+  // scattered dots can leave it. It doesn't take pointer events: the frame
+  // does.
   &__canvas {
     position: absolute;
-    inset: -48px;
-    width: calc(100% + 96px);
-    height: calc(100% + 96px);
+    inset: -$bleed;
+    width: calc(100% + #{$bleed * 2});
+    height: calc(100% + #{$bleed * 2});
     pointer-events: none;
   }
 }
