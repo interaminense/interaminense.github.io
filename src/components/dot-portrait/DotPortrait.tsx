@@ -85,6 +85,9 @@ function sample(image: HTMLImageElement, dark: boolean): number[] {
   const side = Math.min(image.naturalWidth, image.naturalHeight);
 
   context.imageSmoothingQuality = "high";
+  // Mirrored horizontally, so the face turns to the right.
+  context.translate(DOT_COLUMNS, 0);
+  context.scale(-1, 1);
   context.drawImage(
     image,
     (image.naturalWidth - side) / 2,
