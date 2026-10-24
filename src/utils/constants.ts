@@ -1,4 +1,4 @@
-export const DEV_MODE = process.env.NODE_ENV === "development";
+export const DEV_MODE = import.meta.env.DEV;
 
 export const DEFAULT_LIST_DATA_PROPS = { topResults: 100 };
 
