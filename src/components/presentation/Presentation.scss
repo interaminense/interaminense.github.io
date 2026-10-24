@@ -10,6 +10,9 @@
   &__text {
     width: min-content;
     max-width: 100%;
+    // Above the portrait's canvas, which spans the whole hero.
+    position: relative;
+    z-index: 1;
   }
 
   &__name {

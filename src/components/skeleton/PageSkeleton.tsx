@@ -62,7 +62,9 @@ export function HeroSkeleton() {
       </div>
 
       <div className="hero__portrait">
-        <div className="dot-portrait" aria-hidden="true" />
+        <div className="dot-portrait" aria-hidden="true">
+          <div className="dot-portrait__grid" />
+        </div>
       </div>
     </section>
   );

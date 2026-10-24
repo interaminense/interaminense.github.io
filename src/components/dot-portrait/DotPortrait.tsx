@@ -28,8 +28,6 @@ const EXPLODE_DAMPING = 0.93;
 // "molecules". Distances are in grid cells.
 const EDGE_DRIFT = 5; // how far the outermost dots sit from their grid spot
 const EDGE_FLOAT = 1.6; // how far they wander while floating
-// Room around the frame so drifting, scattered and exploded dots can leave it.
-const BLEED = 120;
 
 type Dot = {
   x: number;
@@ -221,18 +219,39 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     let lastFrame = 0;
     let animation = 0;
     let visible = true;
+    // The canvas spans the whole hero (the "stage"), full page width; dots
+    // are laid out in the frame's coordinates, offset into the canvas.
+    const stage =
+      (frame.closest(".layout__presentation") as HTMLElement | null) ??
+      frame.parentElement!;
+    let offsetX = 0;
+    let offsetY = 0;
+    let canvasWidth = 0;
+    let canvasHeight = 0;
     let explodeUntil = 0;
     let cancelled = false;
 
     function resize() {
       const ratio = window.devicePixelRatio || 1;
-      const full = frame!.clientWidth + BLEED * 2;
+      const frameBox = frame!.getBoundingClientRect();
+      const canvasBox = canvas!.getBoundingClientRect();
 
-      size = frame!.clientWidth;
-      canvas!.width = Math.round(full * ratio);
-      canvas!.height = Math.round(full * ratio);
-      // Draw in frame coordinates; the bleed is the margin around them.
-      context.setTransform(ratio, 0, 0, ratio, BLEED * ratio, BLEED * ratio);
+      size = frameBox.width;
+      canvasWidth = canvasBox.width;
+      canvasHeight = canvasBox.height;
+      offsetX = frameBox.left - canvasBox.left;
+      offsetY = frameBox.top - canvasBox.top;
+      canvas!.width = Math.round(canvasWidth * ratio);
+      canvas!.height = Math.round(canvasHeight * ratio);
+      // Draw in frame coordinates, shifted to where the frame sits.
+      context.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        offsetX * ratio,
+        offsetY * ratio,
+      );
     }
 
     function kick(x: number, y: number, strength: number) {
@@ -293,7 +312,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       const floating = !reduced;
 
       lastFrame = now;
-      context.clearRect(-BLEED, -BLEED, size + BLEED * 2, size + BLEED * 2);
+      context.clearRect(-offsetX, -offsetY, canvasWidth, canvasHeight);
       context.fillStyle = ink;
 
       const exploding = now < explodeUntil;
@@ -387,6 +406,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     });
 
     resizeObserver.observe(frame);
+    resizeObserver.observe(canvas);
 
     const visibilityObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
@@ -434,23 +454,27 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       pointer.inside = false;
     }
 
-    frame.addEventListener("pointermove", onMove);
+    // The pointer stirs the dots anywhere on the stage (over the text too);
+    // only a click on the portrait itself blows them up, so clicking a link
+    // in the text doesn't.
+    stage.addEventListener("pointermove", onMove);
+    stage.addEventListener("pointerleave", onLeave);
     frame.addEventListener("click", onClick);
-    frame.addEventListener("pointerleave", onLeave);
 
     return () => {
       cancelled = true;
       cancelAnimationFrame(animation);
       resizeObserver.disconnect();
       visibilityObserver.disconnect();
-      frame.removeEventListener("pointermove", onMove);
+      stage.removeEventListener("pointermove", onMove);
+      stage.removeEventListener("pointerleave", onLeave);
       frame.removeEventListener("click", onClick);
-      frame.removeEventListener("pointerleave", onLeave);
     };
   }, [src, theme]);
 
   return (
     <div ref={frameRef} className="dot-portrait" role="img" aria-label={label}>
+      <div className="dot-portrait__grid" aria-hidden="true" />
       <canvas ref={canvasRef} className="dot-portrait__canvas" />
     </div>
   );

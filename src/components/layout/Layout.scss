@@ -29,6 +29,8 @@
   }
 
   &__presentation {
+    // The stage for the dot portrait's canvas, which spans it edge to edge.
+    position: relative;
     padding: 5rem 0 6rem;
   }
 

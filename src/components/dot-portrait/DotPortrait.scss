@@ -1,22 +1,18 @@
 // 60 matches DOT_COLUMNS in DotPortrait.tsx.
 $columns: 60;
-// 120px matches BLEED in DotPortrait.tsx.
-$bleed: 120px;
 
+// The frame isn't positioned: its canvas is placed against the hero
+// (.layout__presentation), so the dots can fly anywhere across it.
 .dot-portrait {
-  position: relative;
   width: 100%;
-  aspect-ratio: 1;
-  touch-action: pan-y;
   cursor: pointer;
+  touch-action: pan-y;
 
   // The empty dot grid, faded out towards a round edge like the portrait
   // itself. It's the loading state (in index.html and in React) and fades
   // away once the photo is drawn.
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
+  &__grid {
+    aspect-ratio: 1;
     background-image: radial-gradient(
       circle,
       var(--rule) 0 1px,
@@ -28,18 +24,19 @@ $bleed: 120px;
     transition: opacity 0.8s ease-out;
   }
 
-  &--drawn::before {
+  &--drawn &__grid {
     opacity: 0;
   }
 
-  // Larger than the frame by the bleed on each side, so drifting and
-  // scattered dots can leave it. It doesn't take pointer events: the frame
-  // does.
+  // The whole width of the page and the height of the hero, behind its text.
   &__canvas {
     position: absolute;
-    inset: -$bleed;
-    width: calc(100% + #{$bleed * 2});
-    height: calc(100% + #{$bleed * 2});
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 100vw;
+    height: 100%;
+    margin-left: -50vw;
     pointer-events: none;
   }
 }
