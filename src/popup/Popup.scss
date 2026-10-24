@@ -10,7 +10,9 @@
   margin: auto;
 
   &__content {
-    background-color: #fff;
+    background-color: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule);
     padding: 2rem;
     border-radius: 4px;
     box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
@@ -23,28 +25,7 @@
     right: 1rem;
     top: 1rem;
     font-size: 1rem;
+    color: var(--ink);
     cursor: pointer;
-  }
-}
-
-@mixin darkTheme {
-  .popup {
-    &__content {
-      background-color: #292929;
-    }
-
-    &__close {
-      color: #fff;
-    }
-  }
-}
-
-.theme--dark {
-  @include darkTheme();
-}
-
-@media (prefers-color-scheme: dark) {
-  .theme--auto {
-    @include darkTheme();
   }
 }

@@ -1,4 +1,22 @@
-.links .link {
-  display: block;
-  margin-bottom: 2rem;
+.links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+
+  .link {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    font-weight: 600;
+    line-height: 1.3;
+    text-decoration: underline;
+    text-decoration-color: var(--rule);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+    transition: text-decoration-color 0.2s ease-out;
+
+    &:hover {
+      text-decoration-color: var(--frevo-blue);
+    }
+  }
 }

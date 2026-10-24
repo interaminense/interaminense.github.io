@@ -1,20 +1,85 @@
 @use "./loading";
 
+// "Frevo": azulejo-blue ink on white paper, with the five colors of a Recife
+// frevo umbrella (the site's own COLORS) as the only accents.
+//
+// Tokens live on the theme wrapper (.theme--*), because that's where the
+// light/dark choice is applied.
+
+@mixin light-tokens {
+  --paper: #ffffff;
+  --paper-band: #f2f5fa;
+  --ink: #15233f;
+  --ink-soft: #55627c;
+  --rule: #dfe4ee;
+  --chip: #e9eef6;
+  --focus: #3376bd;
+}
+
+@mixin dark-tokens {
+  --paper: #0e1628;
+  --paper-band: #131e35;
+  --ink: #e9edf5;
+  --ink-soft: #9ba7c0;
+  --rule: #24314d;
+  --chip: #1c2945;
+  --focus: #7fb0ec;
+}
+
+:root {
+  --frevo-red: #e63946;
+  --frevo-amber: #edae49;
+  --frevo-blue: #3376bd;
+  --frevo-teal: #00798c;
+  --frevo-purple: #52489c;
+
+  --font-display: "Bricolage Grotesque", "Arial Narrow", sans-serif;
+  --font-body: "Instrument Sans", system-ui, sans-serif;
+
+  @include light-tokens;
+}
+
+.theme--light {
+  @include light-tokens;
+}
+
+.theme--dark {
+  @include dark-tokens;
+}
+
+@media (prefers-color-scheme: dark) {
+  .theme--auto {
+    @include dark-tokens;
+  }
+}
+
 html,
 body {
   margin: 0;
 }
 
 body {
-  font-family: "Roboto", sans-serif;
-  font-weight: 300;
+  font-family: var(--font-body);
+  font-weight: 400;
   font-size: 18px;
-  background-color: #fff;
-  color: #333;
+  line-height: 1.6;
+  background-color: #ffffff;
+  color: #15233f;
+  -webkit-font-smoothing: antialiased;
+}
+
+// The theme wrapper paints the whole page, so dark mode doesn't stop where
+// the content ends.
+[class*="theme--"] {
+  min-height: 100vh;
+  background-color: var(--paper);
+  color: var(--ink);
 }
 
 a {
-  color: #000;
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
   text-decoration: none;
 
   &:hover {
@@ -22,25 +87,16 @@ a {
   }
 }
 
-@mixin darkTheme {
-  background-color: #333;
-  color: #fff;
-
-  a {
-    color: #fff;
-  }
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
-body {
-  .theme--dark:not(.page--login) {
-    @include darkTheme();
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    .theme--auto:not(.page--login) {
-      @include darkTheme();
-    }
-  }
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.1;
 }

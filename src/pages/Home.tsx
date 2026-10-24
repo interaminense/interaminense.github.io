@@ -8,10 +8,10 @@ import { Footer } from "../components/footer/Footer";
 import { HTMLRenderer } from "../components/HTMLRenderer";
 import { Layout } from "../components/layout/Layout";
 import { Links } from "../components/Links/Links";
-import { SkeletonText } from "../components/skeleton/Skeleton";
 import { Paragraph } from "../components/paragraph/Paragraph";
 import { Presentation } from "../components/presentation/Presentation";
 import { Projects } from "../components/projects/Projects";
+import { SkeletonText } from "../components/skeleton/Skeleton";
 import { Skills } from "../components/Skills";
 import { Title } from "../components/title/Title";
 import { useProfileDB } from "../contexts/ProfileDBContext";
@@ -21,22 +21,22 @@ export function Home() {
 
   return (
     <Layout>
-      <Layout.Body>
+      <Layout.Body size={1200}>
         <Layout.Presentation>
           <Presentation />
         </Layout.Presentation>
 
-        <Layout.Paragraph>
-          <Title>Main Skills</Title>
+        <section className="layout__section">
+          <Title>Skills</Title>
 
           <Skills />
-        </Layout.Paragraph>
+        </section>
 
-        <Layout.Paragraph>
-          <Title>More About Me</Title>
+        <section className="layout__section">
+          <Title>About me</Title>
 
           {!profile ? (
-            <SkeletonText lines={6} />
+            <SkeletonText lines={8} />
           ) : (
             <div className="fade-in">
               <Paragraph>
@@ -44,33 +44,33 @@ export function Home() {
               </Paragraph>
             </div>
           )}
-        </Layout.Paragraph>
+        </section>
       </Layout.Body>
-      <div className="layout__projects">
+
+      <section className="layout__projects">
         <Layout.Body size={1200}>
-          <Title>Projects For Fun</Title>
+          <Title>Side projects</Title>
 
-          <Layout.Paragraph>
-            <Projects featured />
+          <Projects featured />
 
-            <Link
-              className="layout__link"
-              to={"/projects"}
-              onClick={() => {
-                window.Analytics.track("clickOnSeeAllButton", {});
-              }}
-            >
-              see all projects
-            </Link>
-          </Layout.Paragraph>
+          <Link
+            className="layout__link"
+            to={"/projects"}
+            onClick={() => {
+              window.Analytics.track("clickOnSeeAllButton", {});
+            }}
+          >
+            See all projects
+          </Link>
         </Layout.Body>
-      </div>
-      <Layout.Body>
-        <Layout.Paragraph>
+      </section>
+
+      <Layout.Body size={1200}>
+        <section className="layout__section">
           <Title>Links</Title>
 
           <Links />
-        </Layout.Paragraph>
+        </section>
       </Layout.Body>
 
       <Layout.Footer>

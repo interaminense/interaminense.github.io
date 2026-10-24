@@ -26,7 +26,7 @@
     <link rel="preconnect" href="https://home-page-877ff.firebaseio.com" />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Roboto:wght@100;300;400;500;700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Instrument+Sans:wght@400;500;600&display=swap"
     />
   </head>
   <body>
@@ -39,16 +39,13 @@
       -->
       <div id="boot" class="theme--light">
         <div class="layout">
-          <div class="layout__header">
+          <header class="layout__header">
             <div>
               <div class="logo">
                 <div class="logo__image">
                   <span class="skeleton skeleton--circle"></span>
                 </div>
-                <div class="logo__content">
-                  <span class="skeleton" style="width: 4.5em; height: 0.85em; margin: 0.2em 0"></span>
-                  <span class="skeleton" style="width: 6.5em; height: 0.85em; margin: 0.2em 0"></span>
-                </div>
+                <span class="skeleton" style="width: 11em; height: 0.9em"></span>
               </div>
             </div>
             <div class="layout--d-flex">
@@ -60,26 +57,53 @@
                 <li><span class="skeleton skeleton--circle skeleton--inline" style="width: 1em; height: 1em"></span></li>
               </ul>
             </div>
-          </div>
-          <div class="layout__body" style="max-width: calc(700px + 4rem)">
+          </header>
+          <div class="layout__body layout__body--wide">
             <div id="boot-presentation" class="layout__presentation">
-              <div class="presentation">
-                <div class="skeleton-text skeleton-presentation">
-                  <span class="skeleton skeleton-text__line"></span>
-                  <span class="skeleton skeleton-text__line"></span>
-                  <span class="skeleton skeleton-text__line"></span>
-                  <span class="skeleton skeleton-text__line"></span>
+              <section class="hero">
+                <div class="hero__text">
+                  <div class="hero__name">
+                    <span class="skeleton hero__name-line" style="width: 70%"></span>
+                    <span class="skeleton hero__name-line" style="width: 95%"></span>
+                  </div>
+                  <div class="hero__intro">
+                    <div class="skeleton-text">
+                      <span class="skeleton skeleton-text__line"></span>
+                      <span class="skeleton skeleton-text__line"></span>
+                      <span class="skeleton skeleton-text__line"></span>
+                    </div>
+                  </div>
+                  <div class="hero__meta">
+                    <div class="reactions">
+                      <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
+                      <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
+                      <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
+                      <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
+                      <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="presentation-feedback">
-                <div class="reactions">
-                  <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
-                  <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
-                  <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
-                  <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
-                  <span class="skeleton skeleton--pill skeleton--inline" style="width: 52px; height: 18px; margin-right: 1.25rem"></span>
+                <div class="hero__umbrella">
+                  <div class="frevo">
+                    <svg viewBox="-100 -100 200 200" aria-hidden="true">
+                      <g class="frevo__canopy">
+                      <path class="frevo__panel" fill="var(--frevo-red)" d="M0 0 L0.00 -96.00 Q27.29 -84.00 56.43 -77.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-amber)" d="M0 0 L56.43 -77.67 Q71.45 -51.91 91.30 -29.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-blue)" d="M0 0 L91.30 -29.67 Q88.32 0.00 91.30 29.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-teal)" d="M0 0 L91.30 29.67 Q71.45 51.91 56.43 77.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-purple)" d="M0 0 L56.43 77.67 Q27.29 84.00 0.00 96.00 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-red)" d="M0 0 L0.00 96.00 Q-27.29 84.00 -56.43 77.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-amber)" d="M0 0 L-56.43 77.67 Q-71.45 51.91 -91.30 29.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-blue)" d="M0 0 L-91.30 29.67 Q-88.32 0.00 -91.30 -29.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-teal)" d="M0 0 L-91.30 -29.67 Q-71.45 -51.91 -56.43 -77.67 Z"></path>
+                      <path class="frevo__panel" fill="var(--frevo-purple)" d="M0 0 L-56.43 -77.67 Q-27.29 -84.00 -0.00 -96.00 Z"></path>
+                      </g>
+                      <circle r="40" class="frevo__hub-ring"></circle>
+                      <circle r="38" class="frevo__hub"></circle>
+                    </svg>
+                  </div>
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         </div>

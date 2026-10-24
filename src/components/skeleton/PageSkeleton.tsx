@@ -1,3 +1,4 @@
+import { FrevoUmbrella } from "../frevo/FrevoUmbrella";
 import { ThemeSwitch } from "../theme-switch/ThemeSwitch";
 import { Skeleton, SkeletonText } from "./Skeleton";
 
@@ -7,11 +8,7 @@ export function LogoSkeleton() {
       <div className="logo__image">
         <Skeleton shape="circle" className="logo__image-skeleton" />
       </div>
-      <div className="logo__content">
-        {/* 0.85em bar + 0.2em margins = one 1.25em line of Quicksand. */}
-        <Skeleton width="4.5em" height="0.85em" style={{ margin: "0.2em 0" }} />
-        <Skeleton width="6.5em" height="0.85em" style={{ margin: "0.2em 0" }} />
-      </div>
+      <Skeleton width="11em" height="0.9em" />
     </div>
   );
 }
@@ -28,35 +25,48 @@ export function SocialNetworkSkeleton({ count = 4 }: { count?: number }) {
   );
 }
 
-export function PresentationSkeleton() {
+/**
+ * Same footprint as the hero: two name lines, the intro and the reactions,
+ * with the umbrella already drawn (it isn't data, so it can show right away).
+ */
+export function HeroSkeleton() {
   return (
-    <>
-      <div className="presentation">
-        <SkeletonText lines={4} className="skeleton-presentation" />
-      </div>
-
-      <div className="presentation-feedback">
-        <div className="reactions">
-          {Array.from({ length: 5 }, (_, index) => (
-            <Skeleton
-              key={index}
-              shape="pill"
-              width={52}
-              height={18}
-              inline
-              style={{ marginRight: "1.25rem" }}
-            />
-          ))}
+    <section className="hero" aria-busy="true">
+      <div className="hero__text">
+        <div className="hero__name">
+          <Skeleton className="hero__name-line" width="70%" />
+          <Skeleton className="hero__name-line" width="95%" />
+        </div>
+        <div className="hero__intro">
+          <SkeletonText lines={3} />
+        </div>
+        <div className="hero__meta">
+          <div className="reactions">
+            {Array.from({ length: 5 }, (_, index) => (
+              <Skeleton
+                key={index}
+                shape="pill"
+                width={52}
+                height={18}
+                inline
+                style={{ marginRight: "1.25rem" }}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </>
+
+      <div className="hero__umbrella">
+        <FrevoUmbrella still />
+      </div>
+    </section>
   );
 }
 
 /**
  * Same skeleton as the top of a page, rendered while the anonymous Firebase
  * sign-in runs. It uses the real layout classes, so the swap to the actual
- * page doesn't move anything.
+ * page doesn't move anything. index.html paints a static copy of it.
  */
 export function PageSkeleton({
   withPresentation = true,
@@ -65,7 +75,7 @@ export function PageSkeleton({
 }) {
   return (
     <div className="layout">
-      <div className="layout__header">
+      <header className="layout__header">
         <div>
           <LogoSkeleton />
         </div>
@@ -74,15 +84,12 @@ export function PageSkeleton({
           <ThemeSwitch />
           <SocialNetworkSkeleton />
         </div>
-      </div>
+      </header>
 
       {withPresentation && (
-        <div
-          className="layout__body"
-          style={{ maxWidth: "calc(700px + 4rem)" }}
-        >
+        <div className="layout__body layout__body--wide">
           <div className="layout__presentation">
-            <PresentationSkeleton />
+            <HeroSkeleton />
           </div>
         </div>
       )}

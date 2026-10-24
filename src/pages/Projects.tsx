@@ -11,12 +11,12 @@ import { Title } from "../components/title/Title";
 export function Projects() {
   return (
     <Layout>
-      <Layout.Body>
+      <Layout.Body size={1200}>
         <Layout.Breadcrumb />
       </Layout.Body>
 
       <Layout.Body size={1200}>
-        <Title>Projects For Fun</Title>
+        <Title>Side projects</Title>
 
         <Layout.Paragraph>
           <ProjectsComponent />

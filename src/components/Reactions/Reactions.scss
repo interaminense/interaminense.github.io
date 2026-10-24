@@ -15,6 +15,7 @@
   }
 
   &__items {
+    white-space: nowrap;
     margin-right: 1.25rem;
     cursor: pointer;
     position: relative;
@@ -68,7 +69,7 @@
 @media (max-width: 992px) {
   .reactions {
     max-width: 100%;
-    overflow-x: auto;
-    height: 100px;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
   }
 }

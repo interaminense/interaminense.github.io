@@ -30,7 +30,7 @@ export function DetailedProject() {
 
   return (
     <Layout>
-      <Layout.Body>
+      <Layout.Body size={1200}>
         <Layout.Breadcrumb />
       </Layout.Body>
 

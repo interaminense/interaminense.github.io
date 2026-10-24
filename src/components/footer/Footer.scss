@@ -1,4 +1,12 @@
 .footer {
-  text-align: center;
-  line-height: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+
+  strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
 }

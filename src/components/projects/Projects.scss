@@ -3,12 +3,13 @@
 .projects {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 3rem 2.5rem;
+  gap: 3.5rem 2.5rem;
   padding: 0;
 
   &__item {
     display: grid;
     grid-template-rows: 1fr auto;
+    gap: 0.5rem;
   }
 }
 

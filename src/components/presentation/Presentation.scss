@@ -1,32 +1,66 @@
-.presentation {
-  font-size: 48px;
-  font-family: "Quicksand", sans-serif;
-  letter-spacing: -3px;
-  line-height: 4rem;
-  margin-bottom: 2rem;
-}
-
-.presentation-feedback {
-  display: flex;
-  justify-content: space-between;
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
   align-items: center;
+  gap: 4rem;
 
-  .badge {
-    margin: 0;
+  &__name {
+    margin: 0 0 2rem;
+    font-size: clamp(3.5rem, 8.5vw, 7.5rem);
+    font-weight: 800;
+    font-stretch: 75%;
+    font-variation-settings: "wdth" 75;
+    line-height: 0.88;
+    letter-spacing: -0.02em;
+
+    span {
+      display: block;
+    }
+
+    // Skeleton bars: 0.72em + 0.16em of margin = one 0.88em line of the name.
+    .hero__name-line {
+      height: 0.72em;
+      margin: 0.08em 0;
+    }
+  }
+
+  &__intro {
+    max-width: 30ch;
+    font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+    line-height: 1.45;
+    color: var(--ink-soft);
+
+    b,
+    strong {
+      font-weight: 600;
+      color: var(--ink);
+    }
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2rem;
+    margin-top: 2.5rem;
+  }
+
+  &__umbrella {
+    width: 100%;
+    max-width: 440px;
+    justify-self: end;
   }
 }
 
 @media (max-width: 992px) {
-  .presentation {
-    font-size: 36px;
-    line-height: 3rem;
-  }
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
 
-  .presentation-feedback {
-    flex-direction: column;
-
-    .badge {
-      margin-top: 2rem;
+    &__umbrella {
+      order: -1;
+      max-width: min(72vw, 320px);
+      justify-self: start;
     }
   }
 }

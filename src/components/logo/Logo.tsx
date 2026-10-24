@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useProfileDB } from "../../contexts/ProfileDBContext";
 import { FadeImage } from "../skeleton/Skeleton";
 import { LogoSkeleton } from "../skeleton/PageSkeleton";
@@ -12,14 +13,13 @@ export function Logo() {
   }
 
   return (
-    <div className="logo fade-in">
-      <div className="logo__image">
-        <FadeImage src={profile?.imageURL} alt="profile" />
-      </div>
-      <div className="logo__content">
-        <div className="logo__first-name">{profile?.firstName}</div>
-        <div className="logo__last-name">{profile?.lastName}</div>
-      </div>
-    </div>
+    <Link to="/" className="logo fade-in">
+      <span className="logo__image">
+        <FadeImage src={profile.imageURL} alt="" />
+      </span>
+      <span className="logo__name">
+        {profile.firstName} {profile.lastName}
+      </span>
+    </Link>
   );
 }

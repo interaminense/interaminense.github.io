@@ -1,70 +1,95 @@
-@mixin dash {
-  background: rgb(0, 65, 255);
-  background: linear-gradient(
-    45deg,
-    rgb(0, 65, 255) 0%,
-    rgb(255, 222, 0) 50%,
-    rgb(0, 175, 5) 100%
-  );
-  height: 2px;
-  content: "";
-  display: block;
-  width: 100%;
-}
-
 .layout {
+  // The frevo colors once more, as the thin stripe that closes every page.
   &:after {
-    @include dash();
-  }
-
-  &__header,
-  &__footer {
-    padding: 2rem 4rem;
+    content: "";
+    display: block;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--frevo-red) 0 20%,
+      var(--frevo-amber) 20% 40%,
+      var(--frevo-blue) 40% 60%,
+      var(--frevo-teal) 60% 80%,
+      var(--frevo-purple) 80% 100%
+    );
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1rem 2rem;
+    flex-wrap: wrap;
+    padding: 1.25rem 4rem;
     position: sticky;
     top: 0;
-    background-color: #fff;
-    z-index: 1;
-  }
-
-  &__footer {
-    margin-top: 8rem;
-  }
-
-  &__presentation {
-    padding: 8rem 0;
-  }
-
-  &__paragraph {
-    padding: 2rem 0;
+    z-index: 2;
+    background-color: var(--paper);
+    border-bottom: 1px solid var(--rule);
   }
 
   &__body {
     width: calc(100% - 4rem);
     padding: 2rem;
     margin: 0 auto;
+
+    &--wide {
+      max-width: calc(1200px + 4rem);
+    }
+  }
+
+  &__presentation {
+    padding: 5rem 0 6rem;
+  }
+
+  &__paragraph {
+    padding: 2.5rem 0;
+  }
+
+  // A heading on the left, its content on the right: the "About me" and
+  // "Links" sections read like a résumé entry rather than a centered column.
+  &__section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
+    gap: 1rem 4rem;
+    padding: 3rem 0;
+    border-top: 1px solid var(--rule);
+
+    > .title {
+      margin: 0;
+    }
   }
 
   &__projects {
-    background-color: #efefef;
+    background-color: var(--paper-band);
+    padding: 3rem 0 4rem;
+  }
+
+  &__footer {
+    padding: 3rem 4rem 2.5rem;
+    margin-top: 4rem;
+    border-top: 1px solid var(--rule);
   }
 
   &__breadcrumb a {
     margin-right: 2rem;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   &__link {
-    text-align: center;
-    display: block;
-    width: 100%;
-    margin-top: 3rem;
-    text-transform: uppercase;
+    display: inline-block;
+    margin-top: 2rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.25rem;
+    text-decoration: underline;
+    text-decoration-color: var(--frevo-amber);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.3em;
+
+    &:hover {
+      text-decoration-color: var(--frevo-red);
+    }
   }
 
   &--d-flex {
@@ -76,44 +101,31 @@
 @media (max-width: 992px) {
   .layout {
     &__header {
-      position: relative;
-      flex-direction: column;
-      padding-top: 8rem;
+      padding: 1rem 1.25rem;
+      row-gap: 0.75rem;
     }
 
-    &__header,
-    &__footer {
-      padding: 2rem;
+    // Logo on the first row; theme switch and social links share the second.
+    &__header > .layout--d-flex {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    &__body {
+      width: calc(100% - 2.5rem);
+      padding: 1.25rem;
     }
 
     &__presentation {
-      padding: 2rem 0;
+      padding: 1.5rem 0 3rem;
     }
 
-    &--d-flex {
-      flex-direction: column;
-    }
-  }
-}
-
-@mixin darkTheme {
-  .layout {
-    &__header {
-      background-color: #333;
+    &__section {
+      grid-template-columns: minmax(0, 1fr);
     }
 
-    &__projects {
-      background-color: #292929;
+    &__footer {
+      padding: 2rem 1.25rem;
     }
-  }
-}
-
-.theme--dark {
-  @include darkTheme();
-}
-
-@media (prefers-color-scheme: dark) {
-  .theme--auto {
-    @include darkTheme();
   }
 }

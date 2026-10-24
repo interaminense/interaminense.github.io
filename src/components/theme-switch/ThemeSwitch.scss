@@ -2,8 +2,9 @@ $transitionDelay: 0.2s;
 
 .theme-switch {
   display: flex;
-  padding-right: 2rem;
-  border-right: 1px solid rgba(0, 0, 0, 0.2);
+  padding-right: 1.5rem;
+  margin-right: 0.25rem;
+  border-right: 1px solid var(--rule);
   user-select: none;
 
   &--light {
@@ -14,10 +15,6 @@ $transitionDelay: 0.2s;
     .theme-switch__toggle-item__dark {
       opacity: 0;
       transition: ease-in-out $transitionDelay;
-    }
-
-    .theme-switch__text--light {
-      font-weight: bold;
     }
   }
 
@@ -30,10 +27,6 @@ $transitionDelay: 0.2s;
       opacity: 0;
       transition: ease-in-out $transitionDelay;
     }
-
-    .theme-switch__text--dark {
-      font-weight: bold;
-    }
   }
 
   &--auto {
@@ -43,15 +36,15 @@ $transitionDelay: 0.2s;
     }
 
     .theme-switch__auto-mode {
-      background-color: #000;
-      font-weight: bold;
-      color: #fff;
+      background-color: var(--ink);
+      font-weight: 600;
+      color: var(--paper);
     }
 
     .theme-switch__toggle {
       width: 15px;
       height: 15px;
-      background-color: #ebebeb;
+      background-color: var(--chip);
     }
   }
 
@@ -62,9 +55,9 @@ $transitionDelay: 0.2s;
   }
 
   &__auto-mode {
-    margin-right: 2rem;
-    padding: 5px;
-    background-color: #ebebeb;
+    margin-right: 1.25rem;
+    padding: 4px;
+    background-color: var(--chip);
     border-radius: 50px;
     width: 50px;
     text-align: center;
@@ -74,8 +67,8 @@ $transitionDelay: 0.2s;
 
   &__toggle {
     margin: 0 0.5rem;
-    background-color: #000;
-    color: #fff;
+    background-color: var(--ink);
+    color: var(--paper);
     border-radius: 60px;
     width: 50px;
     position: relative;
@@ -102,51 +95,20 @@ $transitionDelay: 0.2s;
   }
 
   .theme-switch__text {
-    text-transform: uppercase;
     font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  &--light .theme-switch__text--light,
+  &--dark .theme-switch__text--dark {
+    color: var(--ink);
+    font-weight: 600;
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 600px) {
   .theme-switch {
-    margin-bottom: 4rem;
     padding-right: 0;
-    border-right: none !important;
-  }
-}
-
-@mixin darkTheme {
-  .theme-switch {
-    border-right: 1px solid rgba(255, 255, 255, 0.2);
-
-    &--auto {
-      .theme-switch__auto-mode {
-        background-color: #fff;
-        color: #000;
-      }
-
-      .theme-switch__toggle {
-        background-color: #555555;
-      }
-    }
-
-    &__auto-mode {
-      background-color: #555555;
-    }
-
-    &__toggle {
-      background-color: #fff;
-      color: #333;
-    }
-  }
-}
-
-.theme--dark {
-  @include darkTheme();
-}
-
-@media (prefers-color-scheme: dark) {
-  .theme--auto {
-    @include darkTheme();
+    border-right: 0;
   }
 }

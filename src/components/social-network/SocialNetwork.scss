@@ -3,20 +3,16 @@
   padding: 0;
   list-style: none;
   display: flex;
-  font-size: 22px;
+  gap: 1.25rem;
+  font-size: 20px;
 
-  li {
-    margin-left: 2rem;
-  }
-}
+  a {
+    display: inline-flex;
+    color: var(--ink-soft);
+    transition: color 0.2s ease-out;
 
-@media (max-width: 992px) {
-  .social-network {
-    display: block;
-
-    li {
-      display: inline-block;
-      margin: 1rem;
+    &:hover {
+      color: var(--ink);
     }
   }
 }
