@@ -14,9 +14,23 @@ const PrivatePage = lazy(() =>
   }))
 );
 
-export type Route = RouteObject & { publicPage: boolean; children?: Route[] };
+export type Route = RouteObject & {
+  publicPage: boolean;
+  /**
+   * Render the element without the public/private wrapper. The login page
+   * needs this: it signs the anonymous user out, and if it shared the
+   * PublicPage instance with the next route, that route would query the
+   * database signed out and never get data.
+   */
+  bare?: boolean;
+  children?: Route[];
+};
 
 function processRoute(route: Route) {
+  if (route.bare) {
+    return { ...route, errorElement: <RootBoundary /> };
+  }
+
   return {
     ...route,
     ...(route.publicPage

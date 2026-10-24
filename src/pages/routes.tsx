@@ -63,5 +63,6 @@ export const routes: Route[] = [
       </Suspense>
     ),
     publicPage: true,
+    bare: true,
   },
 ];
