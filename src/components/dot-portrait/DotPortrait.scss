@@ -16,10 +16,13 @@ $columns: 60;
   );
   background-size: calc(100% / #{$columns}) calc(100% / #{$columns});
 
+  // Larger than the frame by BLEED (48px) on each side, so scattered dots
+  // can fly past its edges. It doesn't take pointer events: the frame does.
   &__canvas {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    inset: -48px;
+    width: calc(100% + 96px);
+    height: calc(100% + 96px);
+    pointer-events: none;
   }
 }

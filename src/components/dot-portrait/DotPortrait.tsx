@@ -8,10 +8,28 @@ import "./DotPortrait.scss";
 export const DOT_COLUMNS = 60;
 
 const INTRO_MS = 1100;
-const POINTER_RADIUS = 70;
-const POINTER_PUSH = 10;
 
-type Dot = { x: number; y: number; level: number };
+// Pointer scatter: dots near the pointer get kicked away (harder the faster
+// it moves), then a damped spring pulls each one back to its place.
+const POINTER_RADIUS = 80;
+const KICK_MIN = 1.2;
+const KICK_PER_PX = 0.25;
+const KICK_MAX = 14;
+const TAP_KICK = 9;
+const SPRING = 0.04;
+const DAMPING = 0.9;
+// Room around the frame so scattered dots can fly past its edges.
+const BLEED = 48;
+
+type Dot = {
+  x: number;
+  y: number;
+  level: number;
+  ox: number;
+  oy: number;
+  vx: number;
+  vy: number;
+};
 
 function prefersReducedMotion() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -59,7 +77,7 @@ function sample(image: HTMLImageElement, dark: boolean): number[] {
       (0.2126 * data[index] +
         0.7152 * data[index + 1] +
         0.0722 * data[index + 2]) /
-        255
+        255,
     );
   }
 
@@ -81,8 +99,8 @@ function sample(image: HTMLImageElement, dark: boolean): number[] {
 
 /**
  * The profile photo drawn as a matrix of dots, like an LED panel. The dots
- * light up in a diagonal sweep when the photo arrives, and lean away from
- * the pointer.
+ * light up in a diagonal sweep when the photo arrives, scatter away from
+ * the pointer and spring back into place.
  */
 export function DotPortrait({ src, label }: { src?: string; label: string }) {
   const {
@@ -101,20 +119,49 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
 
     const context = canvas.getContext("2d")!;
     const reduced = prefersReducedMotion();
-    const pointer = { x: 0, y: 0, strength: 0, target: 0 };
+    const pointer = { x: 0, y: 0, inside: false };
     let dots: Dot[] = [];
     let size = 0;
     let introStart = 0;
+    let lastFrame = 0;
     let animation = 0;
     let cancelled = false;
 
     function resize() {
       const ratio = window.devicePixelRatio || 1;
+      const full = frame!.clientWidth + BLEED * 2;
 
       size = frame!.clientWidth;
-      canvas!.width = Math.round(size * ratio);
-      canvas!.height = Math.round(size * ratio);
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      canvas!.width = Math.round(full * ratio);
+      canvas!.height = Math.round(full * ratio);
+      // Draw in frame coordinates; the bleed is the margin around them.
+      context.setTransform(ratio, 0, 0, ratio, BLEED * ratio, BLEED * ratio);
+    }
+
+    function kick(x: number, y: number, strength: number) {
+      const cell = size / DOT_COLUMNS;
+
+      for (const dot of dots) {
+        const dx = (dot.x + 0.5) * cell + dot.ox - x;
+        const dy = (dot.y + 0.5) * cell + dot.oy - y;
+        const distance = Math.hypot(dx, dy);
+
+        if (distance >= POINTER_RADIUS) {
+          continue;
+        }
+
+        const falloff = Math.pow(1 - distance / POINTER_RADIUS, 2);
+        // A little angular jitter, so the dots spray instead of moving as a
+        // rigid ring.
+        const angle =
+          (distance > 0.01 ? Math.atan2(dy, dx) : Math.random() * Math.PI * 2) +
+          (Math.random() - 0.5) * 0.7;
+
+        dot.vx += Math.cos(angle) * strength * falloff;
+        dot.vy += Math.sin(angle) * strength * falloff;
+      }
+
+      start();
     }
 
     function draw(now: number) {
@@ -122,12 +169,14 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       const maxRadius = cell * 0.48;
       const ink = getComputedStyle(frame!).getPropertyValue("--ink").trim();
       const elapsed = reduced ? Infinity : now - introStart;
+      // Physics steps are tuned for 60fps; scale them to the real frame time.
+      const step = lastFrame ? Math.min((now - lastFrame) / 16.67, 3) : 1;
 
-      pointer.strength += (pointer.target - pointer.strength) * 0.18;
-      context.clearRect(0, 0, size, size);
+      lastFrame = now;
+      context.clearRect(-BLEED, -BLEED, size + BLEED * 2, size + BLEED * 2);
       context.fillStyle = ink;
 
-      let busy = Math.abs(pointer.target - pointer.strength) > 0.01;
+      let busy = false;
 
       for (const dot of dots) {
         // Diagonal sweep: each dot starts a little after the one above-left.
@@ -138,24 +187,25 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
           busy = true;
         }
 
-        let cx = (dot.x + 0.5) * cell;
-        let cy = (dot.y + 0.5) * cell;
-        let radius = maxRadius * dot.level * (1 - Math.pow(1 - grow, 3));
+        if (dot.vx || dot.vy || dot.ox || dot.oy) {
+          dot.vx = (dot.vx - SPRING * dot.ox * step) * Math.pow(DAMPING, step);
+          dot.vy = (dot.vy - SPRING * dot.oy * step) * Math.pow(DAMPING, step);
+          dot.ox += dot.vx * step;
+          dot.oy += dot.vy * step;
 
-        if (pointer.strength > 0.01) {
-          const dx = cx - pointer.x;
-          const dy = cy - pointer.y;
-          const distance = Math.hypot(dx, dy);
-
-          if (distance < POINTER_RADIUS && distance > 0) {
-            const force =
-              Math.pow(1 - distance / POINTER_RADIUS, 2) * pointer.strength;
-
-            cx += (dx / distance) * POINTER_PUSH * force;
-            cy += (dy / distance) * POINTER_PUSH * force;
-            radius *= 1 - 0.35 * force;
+          if (
+            Math.abs(dot.ox) + Math.abs(dot.oy) < 0.05 &&
+            Math.abs(dot.vx) + Math.abs(dot.vy) < 0.05
+          ) {
+            dot.ox = dot.oy = dot.vx = dot.vy = 0;
+          } else {
+            busy = true;
           }
         }
+
+        const cx = (dot.x + 0.5) * cell + dot.ox;
+        const cy = (dot.y + 0.5) * cell + dot.oy;
+        const radius = maxRadius * dot.level * (1 - Math.pow(1 - grow, 3));
 
         if (radius > 0.15) {
           context.beginPath();
@@ -165,6 +215,10 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       }
 
       animation = busy ? requestAnimationFrame(draw) : 0;
+
+      if (!busy) {
+        lastFrame = 0;
+      }
     }
 
     function start() {
@@ -187,6 +241,10 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
         x: index % DOT_COLUMNS,
         y: Math.floor(index / DOT_COLUMNS),
         level,
+        ox: 0,
+        oy: 0,
+        vx: 0,
+        vy: 0,
       }));
       resize();
       introStart = performance.now();
@@ -203,25 +261,44 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
 
     observer.observe(frame);
 
+    function toFrame(event: PointerEvent) {
+      const box = frame!.getBoundingClientRect();
+
+      return { x: event.clientX - box.left, y: event.clientY - box.top };
+    }
+
     function onMove(event: PointerEvent) {
-      if (reduced) {
+      if (reduced || !dots.length) {
         return;
       }
 
-      const box = canvas!.getBoundingClientRect();
+      const { x, y } = toFrame(event);
+      const speed = pointer.inside
+        ? Math.hypot(x - pointer.x, y - pointer.y)
+        : 0;
 
-      pointer.x = event.clientX - box.left;
-      pointer.y = event.clientY - box.top;
-      pointer.target = 1;
-      start();
+      pointer.x = x;
+      pointer.y = y;
+      pointer.inside = true;
+      kick(x, y, Math.min(KICK_MIN + speed * KICK_PER_PX, KICK_MAX));
+    }
+
+    function onDown(event: PointerEvent) {
+      if (reduced || !dots.length) {
+        return;
+      }
+
+      const { x, y } = toFrame(event);
+
+      kick(x, y, TAP_KICK);
     }
 
     function onLeave() {
-      pointer.target = 0;
-      start();
+      pointer.inside = false;
     }
 
     frame.addEventListener("pointermove", onMove);
+    frame.addEventListener("pointerdown", onDown);
     frame.addEventListener("pointerleave", onLeave);
 
     return () => {
@@ -229,6 +306,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       cancelAnimationFrame(animation);
       observer.disconnect();
       frame.removeEventListener("pointermove", onMove);
+      frame.removeEventListener("pointerdown", onDown);
       frame.removeEventListener("pointerleave", onLeave);
     };
   }, [src, theme]);

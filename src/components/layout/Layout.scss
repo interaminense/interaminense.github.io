@@ -1,4 +1,9 @@
 .layout {
+  // The portrait's scattered dots may fly past the page edge; clip them there
+  // instead of adding a horizontal scrollbar. (clip, unlike hidden, doesn't
+  // break the sticky header.)
+  overflow-x: clip;
+
   &__header {
     display: flex;
     justify-content: space-between;
