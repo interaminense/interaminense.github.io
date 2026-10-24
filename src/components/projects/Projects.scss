@@ -1,25 +1,18 @@
 .projects {
-  column-count: 3;
-  column-gap: 4rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 4rem;
   padding: 0;
   position: relative;
+
+  &__column {
+    flex: 1;
+    min-width: 0;
+  }
 
   &__item {
     display: grid;
     grid-template-rows: 1fr auto;
     margin-bottom: 4rem;
-    break-inside: avoid;
-    filter: grayscale(1);
-    transition: filter 0.25s linear;
-
-    &:hover {
-      filter: grayscale(0);
-    }
-  }
-}
-
-@media (max-width: 992px) {
-  .projects {
-    column-count: 1;
   }
 }
