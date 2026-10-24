@@ -5,6 +5,7 @@ import { DBPath, TReactions } from "../../types";
 import { TOTAL_REACTION_COUNT } from "../../utils/constants";
 import { formatNumber } from "../../utils/numbers";
 
+import { emitBurst } from "../burst/Burst";
 import { Skeleton } from "../skeleton/Skeleton";
 
 import "./Reactions.scss";
@@ -39,10 +40,7 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
   const items = reactionsKeys as Partial<TReactions>;
 
   return (
-    <div
-      className={`reactions reactions--${size}`}
-      aria-busy={!reactions}
-    >
+    <div className={`reactions reactions--${size}`} aria-busy={!reactions}>
       {!reactions &&
         Array.from({ length: 5 }, (_, index) => (
           <Skeleton
@@ -62,7 +60,7 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
             key={key}
             icon={key}
             onClick={(count) => handleUpdateReaction(key, count)}
-            value={formatNumber(items[key as keyof TReactions] as number)}
+            value={items[key as keyof TReactions] as number}
           />
         ))}
     </div>
@@ -72,18 +70,40 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
 interface IReactionProps {
   index: number;
   onClick: (count: number) => void;
-  value: string;
+  value: number;
   icon: string;
 }
 
 function Reaction({ index, onClick, value, icon }: IReactionProps) {
   const [count, setCount] = useState(0);
   const [showReaction, setShowReaction] = useState(false);
+  const iconRef = useRef<HTMLSpanElement>(null);
+  const previous = useRef<number | null>(null);
+  // Like claude-console's cost: each time the saved total goes up (from this
+  // visitor or anyone else, it's live), the number pops. The first value,
+  // when the page loads, doesn't count as an increase.
+  const [pop, setPop] = useState(0);
+
+  useEffect(() => {
+    const before = previous.current;
+
+    previous.current = value;
+
+    if (
+      before === null ||
+      value <= before ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+
+    setPop((n) => n + 1);
+  }, [value]);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const { auth } = useAppContext();
   const [ableToReaction, setAbleToReaction] = useState(() => {
     const userSession = sessionStorage.getItem(
-      auth?.auth.currentUser?.uid as string
+      auth?.auth.currentUser?.uid as string,
     );
     const userSessionObj = userSession ? JSON.parse(userSession) : null;
 
@@ -98,6 +118,13 @@ function Reaction({ index, onClick, value, icon }: IReactionProps) {
         clearTimeout(timeoutRef.current);
 
         if (ableToReaction) {
+          // Instant feedback on every click: the emoji bursts out of itself.
+          const box = iconRef.current?.getBoundingClientRect();
+
+          if (box) {
+            emitBurst(box.left + box.width / 2, box.top + box.height / 2, icon);
+          }
+
           setCount((newVal) => {
             count = newVal + 1;
 
@@ -107,7 +134,7 @@ function Reaction({ index, onClick, value, icon }: IReactionProps) {
 
         timeoutRef.current = setTimeout(() => {
           const userSession = sessionStorage.getItem(
-            auth?.auth.currentUser?.uid as string
+            auth?.auth.currentUser?.uid as string,
           );
 
           const userSessionObj = userSession ? JSON.parse(userSession) : {};
@@ -123,7 +150,7 @@ function Reaction({ index, onClick, value, icon }: IReactionProps) {
               JSON.stringify({
                 ...userSessionObj,
                 count: userSessionObj.count ? userSessionObj.count + count : 1,
-              })
+              }),
             );
 
             setAbleToReaction(true);
@@ -142,15 +169,17 @@ function Reaction({ index, onClick, value, icon }: IReactionProps) {
       className="reactions__items fade-in"
       style={{ "--fade-delay": `${index * 40}ms` } as React.CSSProperties}
     >
-      <span className="reactions__items-total">{value}</span>
-      <span className="reactions__items-icon">{icon}</span>
+      {/* Re-keyed on every increase so the pop animation replays. */}
+      <span key={pop} className="reactions__pop" data-pop={pop > 0}>
+        <span className="reactions__items-total">{formatNumber(value)}</span>
+        <span ref={iconRef} className="reactions__items-icon">
+          {icon}
+        </span>
+      </span>
 
-      {showReaction &&
-        (ableToReaction ? (
-          <span className="reactions__animation">+{count}</span>
-        ) : (
-          <span className="reactions__animation">max limit reached</span>
-        ))}
+      {showReaction && !ableToReaction && (
+        <span className="reactions__animation">max limit reached</span>
+      )}
     </div>
   );
 }

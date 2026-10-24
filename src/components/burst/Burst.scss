@@ -1,0 +1,14 @@
+.burst-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.burst {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}

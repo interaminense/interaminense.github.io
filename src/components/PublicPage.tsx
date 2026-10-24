@@ -4,6 +4,7 @@ import { useAppContext } from "../AppContext";
 import { ProfileDBContextProvider } from "../contexts/ProfileDBContext";
 import { ThemeContext } from "../ThemeContext";
 import { extractPath } from "../utils/path";
+import { BurstLayer } from "./burst/Burst";
 import { PageSkeleton } from "./skeleton/PageSkeleton";
 
 export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
@@ -51,6 +52,7 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
     <ProfileDBContextProvider>
       <div className={themeClassName}>
         {children}
+        <BurstLayer />
       </div>
     </ProfileDBContextProvider>
   );
