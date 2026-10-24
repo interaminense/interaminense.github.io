@@ -1,6 +1,12 @@
 // Loading primitives shared by every public page: skeleton placeholders that
 // hold the final layout in place, and a fade-in for content once it arrives.
 
+// The boot skeleton in index.html starts hidden; reveal it once this
+// stylesheet is applied.
+#boot {
+  visibility: visible;
+}
+
 $skeleton-color: rgba(127, 127, 127, 0.16);
 $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 

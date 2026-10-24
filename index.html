@@ -7,6 +7,18 @@
     <meta name="description" content="Adriano Interaminense" />
     <title>Adriano Interaminense</title>
 
+    <!--
+      Keep the boot skeleton hidden until the app stylesheet applies (it sets
+      #boot back to visible). In production that stylesheet is in <head>, so
+      nothing changes; in dev, Vite injects CSS from JS, and without this the
+      unstyled skeleton flashes a giant theme-switch icon.
+    -->
+    <style>
+      #boot {
+        visibility: hidden;
+      }
+    </style>
+
     <!-- Open connections early so fonts, sign-in and data don't wait on the bundle. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
