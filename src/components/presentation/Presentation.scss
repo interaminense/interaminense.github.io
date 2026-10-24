@@ -4,6 +4,14 @@
   align-items: center;
   gap: 4rem;
 
+  // The column is exactly as wide as the longest line of the name
+  // ("Interaminense"), so the intro, reactions and feedback below wrap to the
+  // same width and both edges line up.
+  &__text {
+    width: min-content;
+    max-width: 100%;
+  }
+
   &__name {
     margin: 0 0 2rem;
     font-size: clamp(3rem, 7vw, 6.25rem);
@@ -13,6 +21,7 @@
 
     span {
       display: block;
+      white-space: nowrap;
     }
 
     // Skeleton bars: 0.75em + 0.2em of margin = one 0.95em line of the name.
@@ -23,7 +32,6 @@
   }
 
   &__intro {
-    max-width: 30ch;
     font-size: clamp(1.25rem, 2.2vw, 1.6rem);
     line-height: 1.45;
     color: var(--ink-soft);
@@ -48,6 +56,13 @@
     }
   }
 
+  // While loading there's no name to measure, so the skeleton reserves the
+  // width of "Interaminense": about 6.65 times the name's font size.
+  &[aria-busy="true"] &__name {
+    width: 6.65em;
+    max-width: 100%;
+  }
+
   &__feedback-skeleton {
     border-radius: 6px;
   }
@@ -64,6 +79,11 @@
   .hero {
     grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
+
+    // Scales with the screen so the name always fits the phone's width.
+    &__name {
+      font-size: clamp(2.25rem, 11vw, 4.5rem);
+    }
 
     &__portrait {
       order: -1;
