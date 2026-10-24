@@ -9,7 +9,7 @@ import { Layout } from "../components/layout/Layout";
 import { DetailedProject as DetailedProjectComponent } from "../components/detailed-project/DetailedProject";
 import { useEffect, useState } from "react";
 import { DBPath, TProject } from "../types";
-import { Loading } from "../components/Loading";
+import { Skeleton, SkeletonText } from "../components/skeleton/Skeleton";
 import { DataBase } from "../firebase/database";
 
 const projectsDB = new DataBase({ path: DBPath.Projects });
@@ -28,17 +28,30 @@ export function DetailedProject() {
     });
   }, [id]);
 
-  if (loading) {
-    return <Loading />;
-  }
-
   return (
     <Layout>
       <Layout.Body>
         <Layout.Breadcrumb />
       </Layout.Body>
 
-      <DetailedProjectComponent project={project as TProject} />
+      {loading ? (
+        <Layout.Body size={1200}>
+          <div aria-busy="true">
+            <Layout.Paragraph>
+              <Skeleton width={110} height="1em" />
+            </Layout.Paragraph>
+            <Skeleton width="55%" height="2.5rem" style={{ margin: "1rem 0 2rem" }} />
+            <Skeleton height="clamp(200px, 40vw, 480px)" />
+            <Layout.Paragraph>
+              <SkeletonText lines={4} />
+            </Layout.Paragraph>
+          </div>
+        </Layout.Body>
+      ) : (
+        <div className="fade-in">
+          <DetailedProjectComponent project={project as TProject} />
+        </div>
+      )}
 
       <Layout.Footer>
         <Footer />

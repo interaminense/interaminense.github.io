@@ -1,6 +1,7 @@
 .reactions {
   display: flex;
   align-items: center;
+  min-height: 1.75rem;
   user-select: none;
 
   &--small &__items-icon {

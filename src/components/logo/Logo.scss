@@ -9,8 +9,13 @@
 
   &__image {
     margin-right: 0.5rem;
+    border-radius: 50%;
+    // Placeholder disc while the photo downloads.
+    background-color: rgba(127, 127, 127, 0.16);
 
-    img {
+    img,
+    .skeleton {
+      display: block;
       border-radius: 50%;
       width: 46px;
       height: 46px;
@@ -30,12 +35,18 @@
 
     &__content {
       text-align: center;
+
+      .skeleton {
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
     }
 
     &__image {
       margin: 0;
 
-      img {
+      img,
+      .skeleton {
         width: 184px;
         height: 184px;
       }

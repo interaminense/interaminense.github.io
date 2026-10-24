@@ -5,6 +5,8 @@ import { Badge } from "../badge/Badge";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
+import { FadeImage } from "../skeleton/Skeleton";
+
 import "./Card.scss";
 
 export function Card({
@@ -23,7 +25,7 @@ export function Card({
     <div className="card">
       {imageURL && (
         <div className="card__image">
-          <img src={imageURL} alt={label} />
+          <FadeImage src={imageURL} alt={label} loading="lazy" decoding="async" />
         </div>
       )}
 

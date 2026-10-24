@@ -1,7 +1,7 @@
 import { useProfileDB } from "../../contexts/ProfileDBContext";
 import { Feedback } from "../feedback/Feedback";
 import { HTMLRenderer } from "../HTMLRenderer";
-import { Loading } from "../Loading";
+import { PresentationSkeleton } from "../skeleton/PageSkeleton";
 import { Reactions } from "../Reactions/Reactions";
 
 import "./Presentation.scss";
@@ -10,12 +10,12 @@ export function Presentation() {
   const { profile } = useProfileDB();
 
   if (!profile) {
-    return <Loading />;
+    return <PresentationSkeleton />;
   }
 
   return (
     <>
-      <div className="presentation">
+      <div className="presentation fade-in">
         <HTMLRenderer html={profile?.description as string} />
       </div>
 

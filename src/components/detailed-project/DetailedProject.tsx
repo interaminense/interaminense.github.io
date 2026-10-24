@@ -11,6 +11,8 @@ import { Badge } from "../badge/Badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 
+import { FadeImage } from "../skeleton/Skeleton";
+
 import "./DetailedProject.scss";
 import { timestampToDate } from "../../utils/date";
 
@@ -47,7 +49,7 @@ export const DetailedProject: React.FC<IDetailedProjectProps> = ({
       </Layout.Body>
 
       {imageURL && (
-        <img className="detailed-project__cover" src={imageURL} alt={label} />
+        <FadeImage className="detailed-project__cover" src={imageURL} alt={label} />
       )}
 
       <Layout.Body size={1200}>

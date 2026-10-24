@@ -13,10 +13,19 @@
   &__image {
     overflow: hidden;
     border-radius: 8px 8px 0 0;
+    // Placeholder tint while the thumbnail downloads.
+    background-color: rgba(127, 127, 127, 0.12);
 
     img {
+      display: block;
       width: 100%;
+      min-height: 120px;
+      object-fit: cover;
     }
+  }
+
+  &__image-skeleton {
+    border-radius: 8px 8px 0 0;
   }
 
   &__title {

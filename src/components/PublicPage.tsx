@@ -4,7 +4,7 @@ import { useAppContext } from "../AppContext";
 import { ProfileDBContextProvider } from "../contexts/ProfileDBContext";
 import { ThemeContext } from "../ThemeContext";
 import { extractPath } from "../utils/path";
-import { Loading } from "./Loading";
+import { PageSkeleton } from "./skeleton/PageSkeleton";
 
 export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
   const {
@@ -32,19 +32,24 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
     }
   }, [theme, loading]);
 
-  if (loading) {
-    return <Loading page />;
-  }
-
   const extractedHash = extractPath(window.location.hash);
+  const themeClassName = classNames(`theme--${theme}`, {
+    [`page--${extractedHash}`]: extractedHash,
+  });
+
+  if (loading) {
+    return (
+      <div className={themeClassName}>
+        <PageSkeleton
+          withPresentation={!extractedHash || extractedHash === "home"}
+        />
+      </div>
+    );
+  }
 
   return (
     <ProfileDBContextProvider>
-      <div
-        className={classNames(`theme--${theme}`, {
-          [`page--${extractedHash}`]: extractedHash,
-        })}
-      >
+      <div className={themeClassName}>
         {children}
       </div>
     </ProfileDBContextProvider>

@@ -1,5 +1,5 @@
 import { useProfileDB } from "../../contexts/ProfileDBContext";
-import { Loading } from "../Loading";
+import { Skeleton } from "../skeleton/Skeleton";
 import "./Footer.scss";
 
 export function Footer() {
@@ -7,11 +7,16 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   if (!profile) {
-    return <Loading />;
+    return (
+      <div className="footer" aria-busy="true">
+        <Skeleton width="min(560px, 90%)" height="1em" style={{ margin: "0.5rem auto" }} />
+        <Skeleton width={220} height="1em" style={{ margin: "0.5rem auto" }} />
+      </div>
+    );
   }
 
   return (
-    <div className="footer">
+    <div className="footer fade-in">
       Made with care, just like grandmothers prepare food 🥗 for their
       grandchildren{" / "}
       <a href="https://interaminense.dev" target="_blank" rel="noreferrer">

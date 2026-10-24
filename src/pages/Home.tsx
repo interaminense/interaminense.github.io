@@ -8,7 +8,7 @@ import { Footer } from "../components/footer/Footer";
 import { HTMLRenderer } from "../components/HTMLRenderer";
 import { Layout } from "../components/layout/Layout";
 import { Links } from "../components/Links/Links";
-import { Loading } from "../components/Loading";
+import { SkeletonText } from "../components/skeleton/Skeleton";
 import { Paragraph } from "../components/paragraph/Paragraph";
 import { Presentation } from "../components/presentation/Presentation";
 import { Projects } from "../components/projects/Projects";
@@ -36,11 +36,13 @@ export function Home() {
           <Title>More About Me</Title>
 
           {!profile ? (
-            <Loading />
+            <SkeletonText lines={6} />
           ) : (
-            <Paragraph>
-              <HTMLRenderer html={profile?.about as string} />
-            </Paragraph>
+            <div className="fade-in">
+              <Paragraph>
+                <HTMLRenderer html={profile?.about as string} />
+              </Paragraph>
+            </div>
           )}
         </Layout.Paragraph>
       </Layout.Body>

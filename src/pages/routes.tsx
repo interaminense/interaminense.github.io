@@ -1,10 +1,20 @@
+import { lazy, Suspense } from "react";
 import { Home } from "./Home";
-import { Settings } from "./Settings";
-import { Analytics } from "./Analytics";
 import { Route } from "./BundleRouter";
-import { Login } from "./Login";
 import { Projects } from "./Projects";
 import { DetailedProject } from "./DetailedProject";
+
+// Admin pages pull in MUI, the data grid and charts. Loading them on demand
+// keeps all of that out of the bundle every visitor downloads.
+const Settings = lazy(() =>
+  import("./Settings").then((module) => ({ default: module.Settings }))
+);
+const Analytics = lazy(() =>
+  import("./Analytics").then((module) => ({ default: module.Analytics }))
+);
+const Login = lazy(() =>
+  import("./Login").then((module) => ({ default: module.Login }))
+);
 
 export const routes: Route[] = [
   {
@@ -29,17 +39,29 @@ export const routes: Route[] = [
   },
   {
     path: "/settings",
-    element: <Settings />,
+    element: (
+      <Suspense fallback={null}>
+        <Settings />
+      </Suspense>
+    ),
     publicPage: false,
   },
   {
     path: "/analytics",
-    element: <Analytics />,
+    element: (
+      <Suspense fallback={null}>
+        <Analytics />
+      </Suspense>
+    ),
     publicPage: false,
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <Suspense fallback={null}>
+        <Login />
+      </Suspense>
+    ),
     publicPage: true,
   },
 ];

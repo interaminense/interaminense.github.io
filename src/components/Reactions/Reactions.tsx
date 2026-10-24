@@ -5,6 +5,8 @@ import { DBPath, TReactions } from "../../types";
 import { TOTAL_REACTION_COUNT } from "../../utils/constants";
 import { formatNumber } from "../../utils/numbers";
 
+import { Skeleton } from "../skeleton/Skeleton";
+
 import "./Reactions.scss";
 
 const reactionsDB = new DataBase({ path: DBPath.Reactions });
@@ -37,10 +39,26 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
   const items = reactionsKeys as Partial<TReactions>;
 
   return (
-    <div className={`reactions reactions--${size}`}>
+    <div
+      className={`reactions reactions--${size}`}
+      aria-busy={!reactions}
+    >
+      {!reactions &&
+        Array.from({ length: 5 }, (_, index) => (
+          <Skeleton
+            key={index}
+            shape="pill"
+            inline
+            className="reactions__items"
+            width={size === "small" ? 34 : 52}
+            height={size === "small" ? 14 : 18}
+          />
+        ))}
+
       {reactions &&
-        Object.keys(reactionsKeys).map((key) => (
+        Object.keys(reactionsKeys).map((key, index) => (
           <Reaction
+            index={index}
             key={key}
             icon={key}
             onClick={(count) => handleUpdateReaction(key, count)}
@@ -52,12 +70,13 @@ export function Reactions({ reactionId, size = "default" }: IReactionsProps) {
 }
 
 interface IReactionProps {
+  index: number;
   onClick: (count: number) => void;
   value: string;
   icon: string;
 }
 
-function Reaction({ onClick, value, icon }: IReactionProps) {
+function Reaction({ index, onClick, value, icon }: IReactionProps) {
   const [count, setCount] = useState(0);
   const [showReaction, setShowReaction] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
@@ -120,7 +139,8 @@ function Reaction({ onClick, value, icon }: IReactionProps) {
           }, 500);
         }, 500);
       }}
-      className="reactions__items"
+      className="reactions__items fade-in"
+      style={{ "--fade-delay": `${index * 40}ms` } as React.CSSProperties}
     >
       <span className="reactions__items-total">{value}</span>
       <span className="reactions__items-icon">{icon}</span>
