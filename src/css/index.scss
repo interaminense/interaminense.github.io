@@ -1,40 +1,34 @@
 @use "./loading";
 
-// "Frevo": azulejo-blue ink on white paper, with the five colors of a Recife
-// frevo umbrella (the site's own COLORS) as the only accents.
+// Monochrome: neutral grays only, so the dot-matrix portrait is the one thing
+// that draws the eye.
 //
 // Tokens live on the theme wrapper (.theme--*), because that's where the
 // light/dark choice is applied.
 
 @mixin light-tokens {
   --paper: #ffffff;
-  --paper-band: #f2f5fa;
-  --ink: #15233f;
-  --ink-soft: #55627c;
-  --rule: #dfe4ee;
-  --chip: #e9eef6;
-  --focus: #3376bd;
+  --paper-band: #f5f5f5;
+  --ink: #1a1a1a;
+  --ink-soft: #6b6b6b;
+  --rule: #e5e5e5;
+  --chip: #efefef;
+  --focus: #1a1a1a;
 }
 
 @mixin dark-tokens {
-  --paper: #0e1628;
-  --paper-band: #131e35;
-  --ink: #e9edf5;
-  --ink-soft: #9ba7c0;
-  --rule: #24314d;
-  --chip: #1c2945;
-  --focus: #7fb0ec;
+  --paper: #121212;
+  --paper-band: #191919;
+  --ink: #ededed;
+  --ink-soft: #9a9a9a;
+  --rule: #2a2a2a;
+  --chip: #222222;
+  --focus: #ededed;
 }
 
 :root {
-  --frevo-red: #e63946;
-  --frevo-amber: #edae49;
-  --frevo-blue: #3376bd;
-  --frevo-teal: #00798c;
-  --frevo-purple: #52489c;
-
-  --font-display: "Bricolage Grotesque", "Arial Narrow", sans-serif;
-  --font-body: "Instrument Sans", system-ui, sans-serif;
+  --font-display: "Geist", system-ui, sans-serif;
+  --font-body: "Geist", system-ui, sans-serif;
 
   @include light-tokens;
 }
@@ -64,7 +58,7 @@ body {
   font-size: 18px;
   line-height: 1.6;
   background-color: #ffffff;
-  color: #15233f;
+  color: #1a1a1a;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -97,6 +91,7 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
+  letter-spacing: -0.02em;
 }

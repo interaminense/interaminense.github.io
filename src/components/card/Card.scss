@@ -52,8 +52,8 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   &__title {
     margin: 0.2rem 0 0.4rem;
     font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.01em;
   }
@@ -82,7 +82,7 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 0.2em;
-    text-decoration-color: var(--frevo-amber);
+    text-decoration-color: var(--ink-soft);
   }
 
   &:focus-within {
@@ -109,7 +109,7 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   &__featured {
     display: inline-block;
     margin-right: 0.35em;
-    color: var(--frevo-amber);
+    color: var(--ink);
     font-size: 0.85em;
   }
 }

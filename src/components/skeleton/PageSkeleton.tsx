@@ -1,5 +1,5 @@
-import { FrevoUmbrella } from "../frevo/FrevoUmbrella";
 import { ThemeSwitch } from "../theme-switch/ThemeSwitch";
+import "../dot-portrait/DotPortrait.scss";
 import { Skeleton, SkeletonText } from "./Skeleton";
 
 export function LogoSkeleton() {
@@ -27,7 +27,7 @@ export function SocialNetworkSkeleton({ count = 4 }: { count?: number }) {
 
 /**
  * Same footprint as the hero: two name lines, the intro and the reactions,
- * with the umbrella already drawn (it isn't data, so it can show right away).
+ * and the empty dot matrix where the portrait will be drawn.
  */
 export function HeroSkeleton() {
   return (
@@ -56,8 +56,8 @@ export function HeroSkeleton() {
         </div>
       </div>
 
-      <div className="hero__umbrella">
-        <FrevoUmbrella still />
+      <div className="hero__portrait">
+        <div className="dot-portrait" aria-hidden="true" />
       </div>
     </section>
   );

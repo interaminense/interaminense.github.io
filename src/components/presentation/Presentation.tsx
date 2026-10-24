@@ -1,6 +1,6 @@
 import { useProfileDB } from "../../contexts/ProfileDBContext";
 import { Feedback } from "../feedback/Feedback";
-import { FrevoUmbrella } from "../frevo/FrevoUmbrella";
+import { DotPortrait } from "../dot-portrait/DotPortrait";
 import { HTMLRenderer } from "../HTMLRenderer";
 import { Reactions } from "../Reactions/Reactions";
 import { HeroSkeleton } from "../skeleton/PageSkeleton";
@@ -35,8 +35,11 @@ export function Presentation() {
         </div>
       </div>
 
-      <div className="hero__umbrella">
-        <FrevoUmbrella photo={profile.imageURL as string} />
+      <div className="hero__portrait">
+        <DotPortrait
+          src={profile.imageURL as string}
+          label={`Portrait of ${profile.firstName} ${profile.lastName}`}
+        />
       </div>
     </section>
   );

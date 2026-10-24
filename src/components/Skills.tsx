@@ -5,7 +5,6 @@ import { Skeleton } from "./skeleton/Skeleton";
 import "./Skills.scss";
 
 const SKELETON_WIDTHS = [92, 120, 76, 140, 104, 84, 128, 96, 112, 70, 150, 90];
-const COLORS = ["red", "amber", "blue", "teal", "purple"];
 
 export function Skills() {
   const skills = useDB<TSkill[]>(DBPath.Skills);
@@ -34,14 +33,8 @@ export function Skills() {
             } as React.CSSProperties
           }
         >
-          {/* The frevo umbrella colors, in turn. */}
-          <span
-            className="skills__wedge"
-            style={{
-              background: `var(--frevo-${COLORS[index % COLORS.length]})`,
-            }}
-            aria-hidden="true"
-          />
+          {/* One "pixel" of the portrait's dot matrix. */}
+          <span className="skills__pixel" aria-hidden="true" />
           {label}
         </li>
       ))}

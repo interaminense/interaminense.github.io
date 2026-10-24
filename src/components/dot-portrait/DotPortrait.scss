@@ -1,0 +1,25 @@
+// 60 matches DOT_COLUMNS in DotPortrait.tsx.
+$columns: 60;
+
+.dot-portrait {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  touch-action: pan-y;
+
+  // The empty matrix: one faint dot per cell. It's also the loading state,
+  // in index.html and in React, before the photo is drawn on top.
+  background-image: radial-gradient(
+    circle,
+    var(--rule) 0 1px,
+    transparent 1.3px
+  );
+  background-size: calc(100% / #{$columns}) calc(100% / #{$columns});
+
+  &__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}

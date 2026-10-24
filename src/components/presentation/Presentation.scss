@@ -6,21 +6,19 @@
 
   &__name {
     margin: 0 0 2rem;
-    font-size: clamp(3.5rem, 8.5vw, 7.5rem);
-    font-weight: 800;
-    font-stretch: 75%;
-    font-variation-settings: "wdth" 75;
-    line-height: 0.88;
-    letter-spacing: -0.02em;
+    font-size: clamp(3rem, 7vw, 6.25rem);
+    font-weight: 600;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
 
     span {
       display: block;
     }
 
-    // Skeleton bars: 0.72em + 0.16em of margin = one 0.88em line of the name.
+    // Skeleton bars: 0.75em + 0.2em of margin = one 0.95em line of the name.
     .hero__name-line {
-      height: 0.72em;
-      margin: 0.08em 0;
+      height: 0.75em;
+      margin: 0.1em 0;
     }
   }
 
@@ -45,7 +43,7 @@
     margin-top: 2.5rem;
   }
 
-  &__umbrella {
+  &__portrait {
     width: 100%;
     max-width: 440px;
     justify-self: end;
@@ -57,9 +55,9 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 2.5rem;
 
-    &__umbrella {
+    &__portrait {
       order: -1;
-      max-width: min(72vw, 320px);
+      max-width: min(80vw, 340px);
       justify-self: start;
     }
   }

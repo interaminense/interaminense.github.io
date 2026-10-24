@@ -1,19 +1,4 @@
 .layout {
-  // The frevo colors once more, as the thin stripe that closes every page.
-  &:after {
-    content: "";
-    display: block;
-    height: 4px;
-    background: linear-gradient(
-      90deg,
-      var(--frevo-red) 0 20%,
-      var(--frevo-amber) 20% 40%,
-      var(--frevo-blue) 40% 60%,
-      var(--frevo-teal) 60% 80%,
-      var(--frevo-purple) 80% 100%
-    );
-  }
-
   &__header {
     display: flex;
     justify-content: space-between;
@@ -80,15 +65,15 @@
     display: inline-block;
     margin-top: 2rem;
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.25rem;
+    font-weight: 500;
+    font-size: 1.15rem;
     text-decoration: underline;
-    text-decoration-color: var(--frevo-amber);
-    text-decoration-thickness: 3px;
+    text-decoration-color: var(--ink-soft);
+    text-decoration-thickness: 1px;
     text-underline-offset: 0.3em;
 
     &:hover {
-      text-decoration-color: var(--frevo-red);
+      text-decoration-color: var(--ink);
     }
   }
 
