@@ -25,3 +25,36 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.projects__empty {
+  color: var(--ink-soft);
+
+  a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+.projects-page__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  margin-bottom: 2rem;
+
+  .title {
+    margin: 0;
+  }
+}
+
+.projects-page__clear {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover {
+    color: var(--ink);
+  }
+}

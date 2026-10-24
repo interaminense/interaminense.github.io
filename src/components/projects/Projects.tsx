@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { SortType } from "../../firebase/types";
 import { DBPath, TProject } from "../../types";
+import { projectUsesSkill } from "../../utils/skillTags";
 import { useDB } from "../../utils/useDB";
 import { Card } from "../card/Card";
 import { FadeIn, Skeleton, SkeletonText } from "../skeleton/Skeleton";
@@ -22,7 +24,14 @@ function ProjectSkeleton() {
   );
 }
 
-export function Projects({ featured }: { featured?: boolean }) {
+export function Projects({
+  featured,
+  skill,
+}: {
+  featured?: boolean;
+  /** Only show projects that use this skill (see utils/skillTags). */
+  skill?: string;
+}) {
   let props = {};
 
   if (featured) {
@@ -46,9 +55,18 @@ export function Projects({ featured }: { featured?: boolean }) {
 
   // Newest first everywhere, including the featured list, which the database
   // returns ordered by the "featured" flag rather than by date.
-  const sorted = [...projects].sort(
-    (a, b) => (b.createDate ?? 0) - (a.createDate ?? 0)
-  );
+  const sorted = [...projects]
+    .filter((project) => !skill || projectUsesSkill(project, skill))
+    .sort((a, b) => (b.createDate ?? 0) - (a.createDate ?? 0));
+
+  if (!sorted.length) {
+    return (
+      <p className="projects__empty">
+        No projects use {skill} yet.{" "}
+        <Link to="/projects">Show all projects</Link>
+      </p>
+    );
+  }
 
   return (
     <div className="projects">

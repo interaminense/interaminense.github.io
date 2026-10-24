@@ -1,13 +1,14 @@
 // 60 matches DOT_COLUMNS in DotPortrait.tsx.
 $columns: 60;
-// 64px matches BLEED in DotPortrait.tsx.
-$bleed: 64px;
+// 120px matches BLEED in DotPortrait.tsx.
+$bleed: 120px;
 
 .dot-portrait {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
   touch-action: pan-y;
+  cursor: pointer;
 
   // The empty dot grid, faded out towards a round edge like the portrait
   // itself. It's the loading state (in index.html and in React) and fades

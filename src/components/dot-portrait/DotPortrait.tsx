@@ -14,16 +14,22 @@ const POINTER_RADIUS = 80;
 const KICK_MIN = 1.2;
 const KICK_PER_PX = 0.25;
 const KICK_MAX = 14;
-const TAP_KICK = 9;
 const SPRING = 0.04;
 const DAMPING = 0.9;
+
+// Click: every dot is blown away from the click, floats for a moment with
+// the spring off, then the spring pulls the portrait back together.
+const EXPLODE_HOLD_MS = 1400;
+const EXPLODE_MIN = 5;
+const EXPLODE_MAX = 13;
+const EXPLODE_DAMPING = 0.93;
 
 // The edge: instead of a square, the portrait dissolves into loose
 // "molecules". Distances are in grid cells.
 const EDGE_DRIFT = 5; // how far the outermost dots sit from their grid spot
 const EDGE_FLOAT = 1.6; // how far they wander while floating
-// Room around the frame so drifting and scattered dots can leave it.
-const BLEED = 64;
+// Room around the frame so drifting, scattered and exploded dots can leave it.
+const BLEED = 120;
 
 type Dot = {
   x: number;
@@ -188,7 +194,8 @@ function toDots(levels: number[]): Dot[] {
 /**
  * The profile photo drawn as a cloud of dots. They light up in a diagonal
  * sweep when the photo arrives, the outer ones float like loose molecules,
- * and they scatter away from the pointer and spring back into place.
+ * they scatter away from the pointer and spring back into place, and a click
+ * blows them all apart for a couple of seconds.
  */
 export function DotPortrait({ src, label }: { src?: string; label: string }) {
   const {
@@ -214,6 +221,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     let lastFrame = 0;
     let animation = 0;
     let visible = true;
+    let explodeUntil = 0;
     let cancelled = false;
 
     function resize() {
@@ -251,6 +259,30 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       start();
     }
 
+    function explode(x: number, y: number) {
+      const reach = size * 0.75;
+
+      for (const dot of dots) {
+        const dx = dot.cx - x;
+        const dy = dot.cy - y;
+        const distance = Math.hypot(dx, dy);
+        const angle =
+          (distance > 0.01 ? Math.atan2(dy, dx) : Math.random() * Math.PI * 2) +
+          (Math.random() - 0.5) * 0.9;
+        // Closer to the click, harder the push; random so it isn't a ring.
+        const power =
+          (EXPLODE_MIN +
+            (EXPLODE_MAX - EXPLODE_MIN) * Math.max(0, 1 - distance / reach)) *
+          (0.6 + Math.random() * 0.6);
+
+        dot.vx += Math.cos(angle) * power;
+        dot.vy += Math.sin(angle) * power;
+      }
+
+      explodeUntil = performance.now() + EXPLODE_HOLD_MS;
+      start();
+    }
+
     function draw(now: number) {
       const cell = size / DOT_COLUMNS;
       const maxRadius = cell * 0.48;
@@ -264,7 +296,10 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       context.clearRect(-BLEED, -BLEED, size + BLEED * 2, size + BLEED * 2);
       context.fillStyle = ink;
 
-      let busy = false;
+      const exploding = now < explodeUntil;
+      const spring = exploding ? 0 : SPRING;
+      const damping = exploding ? EXPLODE_DAMPING : DAMPING;
+      let busy = exploding;
 
       for (const dot of dots) {
         // Diagonal sweep: each dot starts a little after the one above-left.
@@ -276,8 +311,8 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
         }
 
         if (dot.vx || dot.vy || dot.ox || dot.oy) {
-          dot.vx = (dot.vx - SPRING * dot.ox * step) * Math.pow(DAMPING, step);
-          dot.vy = (dot.vy - SPRING * dot.oy * step) * Math.pow(DAMPING, step);
+          dot.vx = (dot.vx - spring * dot.ox * step) * Math.pow(damping, step);
+          dot.vy = (dot.vy - spring * dot.oy * step) * Math.pow(damping, step);
           dot.ox += dot.vx * step;
           dot.oy += dot.vy * step;
 
@@ -385,14 +420,14 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       kick(x, y, Math.min(KICK_MIN + speed * KICK_PER_PX, KICK_MAX));
     }
 
-    function onDown(event: PointerEvent) {
+    function onClick(event: MouseEvent) {
       if (reduced || !dots.length) {
         return;
       }
 
-      const { x, y } = toFrame(event);
+      const box = frame!.getBoundingClientRect();
 
-      kick(x, y, TAP_KICK);
+      explode(event.clientX - box.left, event.clientY - box.top);
     }
 
     function onLeave() {
@@ -400,7 +435,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     }
 
     frame.addEventListener("pointermove", onMove);
-    frame.addEventListener("pointerdown", onDown);
+    frame.addEventListener("click", onClick);
     frame.addEventListener("pointerleave", onLeave);
 
     return () => {
@@ -409,7 +444,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       resizeObserver.disconnect();
       visibilityObserver.disconnect();
       frame.removeEventListener("pointermove", onMove);
-      frame.removeEventListener("pointerdown", onDown);
+      frame.removeEventListener("click", onClick);
       frame.removeEventListener("pointerleave", onLeave);
     };
   }, [src, theme]);

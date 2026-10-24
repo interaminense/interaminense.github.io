@@ -23,3 +23,25 @@
     background-color: var(--ink-soft);
   }
 }
+
+.skills__link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  text-decoration: underline;
+  text-decoration-color: var(--rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 0.2s ease-out;
+
+  &:hover {
+    text-decoration-color: var(--ink);
+  }
+}
+
+.skills__count {
+  font-family: var(--font-body);
+  font-size: 0.7em;
+  font-weight: 500;
+  color: var(--ink-soft);
+}

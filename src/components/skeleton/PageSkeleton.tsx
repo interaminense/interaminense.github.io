@@ -53,6 +53,11 @@ export function HeroSkeleton() {
               />
             ))}
           </div>
+          <Skeleton
+            className="hero__feedback-skeleton"
+            width={150}
+            height={29}
+          />
         </div>
       </div>
 
