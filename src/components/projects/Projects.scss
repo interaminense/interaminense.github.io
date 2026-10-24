@@ -1,18 +1,26 @@
+// Thumbnails share one aspect ratio, so a plain grid lines the cards up in
+// rows, newest first, left to right.
 .projects {
-  display: flex;
-  align-items: flex-start;
-  gap: 4rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3rem 2.5rem;
   padding: 0;
-  position: relative;
-
-  &__column {
-    flex: 1;
-    min-width: 0;
-  }
 
   &__item {
     display: grid;
     grid-template-rows: 1fr auto;
-    margin-bottom: 4rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .projects {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .projects {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
