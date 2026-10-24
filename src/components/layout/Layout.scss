@@ -92,15 +92,16 @@
 
 @media (max-width: 992px) {
   .layout {
+    // One row: the photo on the left, theme switch and social links on the
+    // right. The name is hidden on phones (it's in the hero right below).
     &__header {
-      padding: 1rem 1.25rem;
-      row-gap: 0.75rem;
+      flex-wrap: nowrap;
+      column-gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
     }
 
-    // Logo on the first row; theme switch and social links share the second.
     &__header > .layout--d-flex {
-      width: 100%;
-      justify-content: space-between;
+      gap: 0.75rem;
     }
 
     &__body {
@@ -118,6 +119,29 @@
 
     &__footer {
       padding: 2rem 1.25rem;
+    }
+  }
+}
+
+// The narrowest phones (320px): tighten the header so it still fits one row.
+@media (max-width: 380px) {
+  .layout__header {
+    padding: 0.75rem 1rem;
+
+    > .layout--d-flex {
+      gap: 0.6rem;
+    }
+  }
+
+  .layout__header .social-network {
+    gap: 0.65rem;
+  }
+
+  .layout__header .theme-switch {
+    padding-right: 0.5rem;
+
+    &__auto-mode {
+      margin-right: 0.35rem;
     }
   }
 }

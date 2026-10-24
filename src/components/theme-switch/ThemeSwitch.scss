@@ -106,9 +106,24 @@ $transitionDelay: 0.2s;
   }
 }
 
+// Compact on phones so the header fits one row: "auto" and the toggle stay
+// (its sun/moon icon shows the mode); the dark/light words go.
 @media (max-width: 600px) {
   .theme-switch {
-    padding-right: 0;
-    border-right: 0;
+    padding-right: 0.75rem;
+    margin-right: 0;
+
+    &__auto-mode {
+      margin-right: 0.5rem;
+    }
+
+    &__toggle {
+      margin: 0;
+    }
+
+    .theme-switch__text--dark,
+    .theme-switch__text--light {
+      display: none;
+    }
   }
 }

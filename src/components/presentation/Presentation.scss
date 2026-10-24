@@ -88,10 +88,38 @@
       font-size: clamp(2.25rem, 11vw, 4.5rem);
     }
 
+    // Everything centered: the text column, its lines, and the reactions and
+    // feedback under it.
+    &__text {
+      justify-self: center;
+      text-align: center;
+    }
+
+    &__meta {
+      align-items: center;
+    }
+
+    // Even spacing instead of each item's right margin, so the row centers.
+    .reactions {
+      justify-content: center;
+      column-gap: 0.75rem;
+
+      > * {
+        margin-right: 0 !important;
+      }
+    }
+
+    // Skeleton bars are blocks: center them like the text they stand for.
+    .hero__name-line,
+    .skeleton-text__line {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     &__portrait {
       order: -1;
       max-width: min(80vw, 340px);
-      justify-self: start;
+      justify-self: center;
     }
   }
 }

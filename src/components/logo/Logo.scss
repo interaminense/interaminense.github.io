@@ -33,3 +33,21 @@
     letter-spacing: -0.02em;
   }
 }
+
+// On phones the header shows only the photo; the name stays for screen
+// readers (the hero shows it right below).
+@media (max-width: 600px) {
+  .logo__name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  // The skeleton's name bar.
+  .logo > .skeleton {
+    display: none;
+  }
+}
