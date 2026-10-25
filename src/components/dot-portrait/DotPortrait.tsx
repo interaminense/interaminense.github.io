@@ -8,26 +8,27 @@ export const DOT_COLUMNS = 60;
 
 const INTRO_MS = 1100;
 
-// Motion: no spring, so nothing bounces. A dot keeps whatever velocity it
-// was given, friction slows it down, and once it's (nearly) still it eases
-// back to its place, slowly, without overshooting.
-const FRICTION = 0.9; // velocity kept per frame
-const HOMING = 0.012; // share of the remaining distance recovered per frame
-const HOMING_SPEED = 1.5; // only home once slower than this (px/frame)
+// Motion: every dot is a particle of its own, with its own mass. A push
+// gives it momentum; it coasts on that inertia, slowed only by friction,
+// and stays wherever it stopped. REST_MS after it was last disturbed, it
+// goes back home, quickly.
+const FRICTION = 0.955; // velocity kept per frame
+const MAX_SPEED = 32; // px per frame
+const REST_MS = 5000;
+const RETURN = 0.14; // share of the way home covered per frame on return
 
-// Pointer: a round body that pushes. Dots it overlaps are shoved out to its
-// edge and dragged along the direction it's moving, harder the faster.
-const POINTER_RADIUS = 60;
-const PUSH_OUT = 0.5; // share of the overlap resolved per move
-const DRAG = 0.35; // share of the pointer's velocity passed on
+// Pointer: a round body. Dots it runs into take the part of its velocity
+// that points at them (a hit, not a drag), plus a nudge out of its way.
+const POINTER_RADIUS = 50;
+const POINTER_KICK = 0.9;
+const POINTER_NUDGE = 0.8;
 const POINTER_SPEED_MAX = 40; // px per move event
 
 // Click: every dot is blown away from the click, closer ones harder; they
-// coast to a stop and stay out a moment before drifting home.
-const EXPLODE_HOLD_MS = 900;
+// coast to a stop and go home sooner than after a push.
+const EXPLODE_REST_MS = 2000;
 const EXPLODE_MIN = 6;
 const EXPLODE_MAX = 18;
-const EXPLODE_FRICTION = 0.94;
 
 // The edge: instead of a square, the portrait dissolves into loose
 // "molecules". Distances are in grid cells.
@@ -48,6 +49,10 @@ type Dot = {
   speed: number;
   px: number;
   py: number;
+  /** Heavier dots (the bigger ones) are harder to move. */
+  mass: number;
+  /** When it starts going home (ms, performance.now()). */
+  restAt: number;
   /** Scatter displacement (px) and velocity from the pointer. */
   ox: number;
   oy: number;
@@ -183,6 +188,9 @@ function toDots(levels: number[]): Dot[] {
       speed: 0.0004 + rand() * 0.0006,
       px: rand() * Math.PI * 2,
       py: rand() * Math.PI * 2,
+      // Deterministic per dot, without consuming the edge's random sequence.
+      mass: 0.7 + level * 0.6 + (((x * 7919 + y * 104729) % 97) / 97) * 0.4,
+      restAt: 0,
       ox: 0,
       oy: 0,
       vx: 0,
@@ -198,8 +206,8 @@ function toDots(levels: number[]): Dot[] {
 /**
  * The profile photo drawn as a cloud of dots. They light up in a diagonal
  * sweep when the photo arrives, the outer ones float like loose molecules,
- * the pointer pushes them aside, they drift slowly back, and a click
- * blows them all apart for a couple of seconds.
+ * each one is a particle the pointer can knock away (it coasts on its
+ * inertia and comes back home 5s later), and a click blows them all apart.
  */
 export function DotPortrait({ src, label }: { src?: string; label: string }) {
   const {
@@ -234,7 +242,6 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
     let offsetY = 0;
     let canvasWidth = 0;
     let canvasHeight = 0;
-    let explodeUntil = 0;
     let cancelled = false;
 
     function resize() {
@@ -260,7 +267,23 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       );
     }
 
+    function kick(dot: Dot, vx: number, vy: number, restAt: number) {
+      dot.vx += vx / dot.mass;
+      dot.vy += vy / dot.mass;
+
+      const speed = Math.hypot(dot.vx, dot.vy);
+
+      if (speed > MAX_SPEED) {
+        dot.vx *= MAX_SPEED / speed;
+        dot.vy *= MAX_SPEED / speed;
+      }
+
+      dot.restAt = Math.max(dot.restAt, restAt);
+    }
+
     function push(x: number, y: number, moveX: number, moveY: number) {
+      const restAt = performance.now() + REST_MS;
+
       for (const dot of dots) {
         const dx = dot.cx - x;
         const dy = dot.cy - y;
@@ -270,19 +293,14 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
           continue;
         }
 
-        // Out of the pointer's way, along the line from its center...
         const nx = distance > 0.01 ? dx / distance : 1;
         const ny = distance > 0.01 ? dy / distance : 0;
-        const overlap = POINTER_RADIUS - distance;
+        const contact = 1 - distance / POINTER_RADIUS;
+        // Only the part of the pointer's motion heading into the dot hits it.
+        const hit = Math.max(0, moveX * nx + moveY * ny) * POINTER_KICK;
+        const impulse = hit + POINTER_NUDGE * contact;
 
-        dot.ox += nx * overlap * PUSH_OUT;
-        dot.oy += ny * overlap * PUSH_OUT;
-
-        // ...and carried along with it, most at its center.
-        const contact = overlap / POINTER_RADIUS;
-
-        dot.vx += (moveX * DRAG + nx * 0.6) * contact;
-        dot.vy += (moveY * DRAG + ny * 0.6) * contact;
+        kick(dot, nx * impulse, ny * impulse, restAt);
       }
 
       start();
@@ -290,6 +308,7 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
 
     function explode(x: number, y: number) {
       const reach = size * 0.75;
+      const now = performance.now();
 
       for (const dot of dots) {
         const dx = dot.cx - x;
@@ -304,11 +323,16 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
             (EXPLODE_MAX - EXPLODE_MIN) * Math.max(0, 1 - distance / reach)) *
           (0.6 + Math.random() * 0.6);
 
-        dot.vx += Math.cos(angle) * power;
-        dot.vy += Math.sin(angle) * power;
+        // A click always wins over a pending push: home in EXPLODE_REST_MS.
+        dot.restAt = 0;
+        kick(
+          dot,
+          Math.cos(angle) * power,
+          Math.sin(angle) * power,
+          now + EXPLODE_REST_MS + Math.random() * 300,
+        );
       }
 
-      explodeUntil = performance.now() + EXPLODE_HOLD_MS;
       start();
     }
 
@@ -325,10 +349,9 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
       context.clearRect(-offsetX, -offsetY, canvasWidth, canvasHeight);
       context.fillStyle = ink;
 
-      const exploding = now < explodeUntil;
-      const friction = Math.pow(exploding ? EXPLODE_FRICTION : FRICTION, step);
-      const homing = 1 - Math.pow(1 - HOMING, step);
-      let busy = exploding;
+      const friction = Math.pow(FRICTION, step);
+      const homing = 1 - Math.pow(1 - RETURN, step);
+      let busy = false;
 
       for (const dot of dots) {
         // Diagonal sweep: each dot starts a little after the one above-left.
@@ -340,29 +363,27 @@ export function DotPortrait({ src, label }: { src?: string; label: string }) {
         }
 
         if (dot.vx || dot.vy || dot.ox || dot.oy) {
-          dot.vx *= friction;
-          dot.vy *= friction;
-          dot.ox += dot.vx * step;
-          dot.oy += dot.vy * step;
+          busy = true;
 
-          // Drift home once the dot has (nearly) stopped: a fraction of the
-          // remaining distance each frame, so it slows as it arrives and
-          // never overshoots.
-          if (
-            !exploding &&
-            Math.abs(dot.vx) + Math.abs(dot.vy) < HOMING_SPEED
-          ) {
+          if (now < dot.restAt) {
+            // Coasting on its own inertia; it stays wherever it stops.
+            dot.vx *= friction;
+            dot.vy *= friction;
+            dot.ox += dot.vx * step;
+            dot.oy += dot.vy * step;
+
+            if (Math.abs(dot.vx) + Math.abs(dot.vy) < 0.02) {
+              dot.vx = dot.vy = 0;
+            }
+          } else {
+            // Rested long enough: straight home, fast, easing in at the end.
+            dot.vx = dot.vy = 0;
             dot.ox -= dot.ox * homing;
             dot.oy -= dot.oy * homing;
-          }
 
-          if (
-            Math.abs(dot.ox) + Math.abs(dot.oy) < 0.05 &&
-            Math.abs(dot.vx) + Math.abs(dot.vy) < 0.05
-          ) {
-            dot.ox = dot.oy = dot.vx = dot.vy = 0;
-          } else {
-            busy = true;
+            if (Math.abs(dot.ox) + Math.abs(dot.oy) < 0.05) {
+              dot.ox = dot.oy = 0;
+            }
           }
         }
 
