@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSiteStats } from "../../stats/SiteStatsContext";
 import { Activity, dayKey, SiteStats } from "../../stats/stats";
 import { Skeleton } from "../skeleton/Skeleton";
+import { countryName, VisitorMap } from "./VisitorMap";
 
 import "./SiteActivity.scss";
 
@@ -40,29 +41,19 @@ function ago(time: number, now: number) {
   return "just now";
 }
 
-function describe(activity: Activity) {
-  const who = activity.os ? `Someone on ${activity.os}` : "Someone";
-
+function action(activity: Activity) {
   if (activity.type === "project") {
     return (
       <>
-        {who} opened <b>{activity.label}</b>
+        opened <b>{activity.label}</b>
       </>
     );
   }
 
-  const page =
-    !activity.label || activity.label === "home"
-      ? "this page"
-      : activity.label.startsWith("project")
-        ? "a project page"
-        : `the ${activity.label} page`;
+  if (!activity.label || activity.label === "home") return "visited the home page";
+  if (activity.label.startsWith("project")) return "visited a project page";
 
-  return (
-    <>
-      {who} visited {page}
-    </>
-  );
+  return `visited the ${activity.label} page`;
 }
 
 /**
@@ -169,6 +160,40 @@ function VisitCalendar({ stats }: { stats: SiteStats }) {
   );
 }
 
+/** The all-time numbers, in a slim row under the header. */
+export function SiteNumbers() {
+  const stats = useSiteStats();
+
+  if (!stats) {
+    return (
+      <div className="site-numbers" aria-busy="true">
+        <Skeleton width="min(34rem, 90%)" height="1.4rem" />
+      </div>
+    );
+  }
+
+  const items: Array<[number, string]> = [
+    [stats.views, "page views"],
+    [stats.opens, "project opens"],
+    [stats.reactions, "reactions"],
+    [Object.keys(stats.days).length, "days with visitors"],
+  ];
+
+  return (
+    <dl
+      className="site-numbers fade-in"
+      title={`Since ${monthYear.format(stats.since)}`}
+    >
+      {items.map(([value, label]) => (
+        <div key={label}>
+          <dd>{number.format(value)}</dd>
+          <dt>{label}</dt>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 export function SiteActivity() {
   const stats = useSiteStats();
   const [now, setNow] = useState(Date.now());
@@ -183,59 +208,49 @@ export function SiteActivity() {
   if (!stats) {
     return (
       <div className="site-activity" aria-busy="true">
-        <Skeleton width="60%" height="3rem" />
-        <Skeleton width="100%" height="12rem" style={{ marginTop: "2rem" }} />
+        <Skeleton width="100%" height="16rem" />
+        <Skeleton width="100%" height="16rem" />
       </div>
     );
   }
 
-  const activeDays = Object.keys(stats.days).length;
-
   return (
     <div className="site-activity fade-in">
-      <dl className="site-activity__numbers">
-        <div>
-          <dt>page views</dt>
-          <dd>{number.format(stats.views)}</dd>
-        </div>
-        <div>
-          <dt>project opens</dt>
-          <dd>{number.format(stats.opens)}</dd>
-        </div>
-        <div>
-          <dt>reactions</dt>
-          <dd>{number.format(stats.reactions)}</dd>
-        </div>
-        <div>
-          <dt>days with visitors</dt>
-          <dd>{number.format(activeDays)}</dd>
-        </div>
-      </dl>
+      <div className="site-activity__calendar">
+        <p className="site-activity__caption">
+          Every visit since {monthYear.format(stats.since)}, one dot per day.
+        </p>
+        <VisitCalendar stats={stats} />
+      </div>
 
-      <p className="site-activity__since">
-        Every visit since {monthYear.format(stats.since)}, one dot per day.
-      </p>
+      <div className="site-activity__world">
+        <VisitorMap stats={stats} />
 
-      <VisitCalendar stats={stats} />
-
-      {stats.recent.length > 0 && (
-        <div className="site-activity__live">
-          <h3 className="site-activity__live-title">
-            <span className="site-activity__pulse" aria-hidden="true" />
-            Recently
-          </h3>
-          <ul aria-live="polite">
-            {stats.recent.map((activity) => (
-              <li key={`${activity.at}-${activity.type}`}>
-                <span>{describe(activity)}</span>
-                <time dateTime={new Date(activity.at).toISOString()}>
-                  {ago(activity.at, now)}
-                </time>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+        {stats.recent.length > 0 && (
+          <div className="site-activity__live">
+            <h3 className="site-activity__live-title">
+              <span className="site-activity__pulse" aria-hidden="true" />
+              Recently
+            </h3>
+            <ul aria-live="polite">
+              {stats.recent.map((activity) => (
+                <li key={`${activity.at}-${activity.type}`}>
+                  <span className="site-activity__where">
+                    {countryName(activity.country) || "Somewhere"}
+                  </span>
+                  <span className="site-activity__what">
+                    {action(activity)}
+                    {activity.os && <> on {activity.os}</>}
+                  </span>
+                  <time dateTime={new Date(activity.at).toISOString()}>
+                    {ago(activity.at, now)}
+                  </time>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

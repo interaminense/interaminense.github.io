@@ -22,6 +22,8 @@ export type Activity = {
   projectId?: string;
   os?: string;
   theme?: string;
+  /** ISO 3166 alpha-2, guessed from the visitor's time zone. */
+  country?: string;
 };
 
 export type ProjectOpens = { id?: string; label: string; opens: number };
@@ -36,6 +38,8 @@ export type SiteStats = {
   opens: number;
   projects: ProjectOpens[];
   reactions: number;
+  /** Visits per country (alpha-2). Only known since the feed started. */
+  countries: Record<string, number>;
   recent: Activity[];
 };
 
@@ -61,6 +65,17 @@ export function isAutomated() {
     BOT.test(navigator.userAgent) ||
     BOT.test(new UAParser().getBrowser().name ?? "")
   );
+}
+
+/** The visitor's country, from the time zone: no IP lookup, no permission. */
+export function currentCountry(timeZoneCountry: Record<string, string>) {
+  try {
+    const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    return timeZoneCountry[zone] || undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function currentOS() {
@@ -102,10 +117,16 @@ function isBotEvent(event: RawEvent) {
   return BOT.test(browser ?? "") || BOT.test(ua ?? "");
 }
 
-/** Builds the public summary from every raw analytics event. */
+/**
+ * Builds the public summary from every raw analytics event. Countries only
+ * exist in the activity feed, whose entries get removed once summarized, so
+ * they're added to the previous summary's counts instead of recounted.
+ */
 export function computeStats(
   events: Record<string, Record<string, RawEvent>>,
   reactions: Record<string, Record<string, unknown>> | null,
+  previous: SiteStats | null,
+  activity: Activity[],
   now = Date.now(),
 ): SiteStats {
   const stats: SiteStats = {
@@ -117,9 +138,17 @@ export function computeStats(
     opens: 0,
     projects: [],
     reactions: 0,
+    countries: { ...(previous?.countries ?? {}) },
     recent: [],
   };
   const recent: Activity[] = [];
+
+  for (const entry of activity) {
+    if (entry.country && entry.type === "view") {
+      stats.countries[entry.country] = (stats.countries[entry.country] ?? 0) + 1;
+    }
+  }
+
 
   for (const event of Object.values(events.pageViewed ?? {})) {
     if (!event.createDate || isBotEvent(event)) continue;
@@ -187,6 +216,14 @@ export function computeStats(
   stats.recent = recent
     .sort((a, b) => b.at - a.at)
     .slice(0, RECENT)
+    // The same visit is also in the activity feed, which knows the country.
+    .map((entry) => {
+      const fed = activity.find(
+        (item) => item.type === entry.type && Math.abs(item.at - entry.at) < 5000,
+      );
+
+      return fed?.country ? { ...entry, country: fed.country } : entry;
+    })
     // Firebase rejects undefined values.
     .map((activity) => JSON.parse(JSON.stringify(activity)));
 
@@ -199,6 +236,7 @@ export function withActivity(stats: SiteStats, activity: Activity[]): SiteStats 
     ...stats,
     days: { ...stats.days },
     themes: { ...stats.themes },
+    countries: { ...(stats.countries ?? {}) },
     projects: stats.projects.map((project) => ({ ...project })),
   };
 
@@ -210,6 +248,9 @@ export function withActivity(stats: SiteStats, activity: Activity[]): SiteStats 
       merged.days[dayKey(entry.at)] = (merged.days[dayKey(entry.at)] ?? 0) + 1;
       if (entry.theme) {
         merged.themes[entry.theme] = (merged.themes[entry.theme] ?? 0) + 1;
+      }
+      if (entry.country) {
+        merged.countries[entry.country] = (merged.countries[entry.country] ?? 0) + 1;
       }
     } else {
       merged.opens++;

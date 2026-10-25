@@ -50,6 +50,12 @@
     > .title {
       margin: 0;
     }
+
+    // Title above, content across the full width.
+    &--stacked {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
   }
 
   &__projects {

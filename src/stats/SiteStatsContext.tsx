@@ -16,6 +16,7 @@ import {
   ACTIVITY_PATH,
   ActivityType,
   computeStats,
+  currentCountry,
   currentOS,
   isAutomated,
   SiteStats,
@@ -23,6 +24,7 @@ import {
   uuidv7Floor,
   withActivity,
 } from "./stats";
+import { TIMEZONE_COUNTRY } from "./worldMap";
 
 const db = () => new DataBase({ path: STATS_PATH });
 
@@ -38,7 +40,13 @@ export function trackActivity(
   if (!auth.currentUser) return;
 
   const id = uuidv7();
-  const entry: Activity = { at: Date.now(), type, os: currentOS(), ...details };
+  const entry: Activity = {
+    at: Date.now(),
+    type,
+    os: currentOS(),
+    country: currentCountry(TIMEZONE_COUNTRY),
+    ...details,
+  };
 
   set(
     ref(database, `${ACTIVITY_PATH}/${id}`),
@@ -53,20 +61,32 @@ export function trackActivity(
  */
 export async function publishStats() {
   const { database } = db();
-  const [events, reactions] = await Promise.all([
+  // Taken before reading, so nothing written meanwhile falls between the
+  // summary and the live feed.
+  const startedAt = Date.now();
+  const [events, reactions, previous] = await Promise.all([
     get(ref(database, "events")),
     get(ref(database, "reactions")),
+    get(ref(database, STATS_PATH)),
   ]);
   const all = events.val() ?? {};
-  const stats = computeStats(all, reactions.val());
+  const feed = Object.entries(all[ACTIVITY_PATH.split("/")[1]] ?? {}) as Array<
+    [string, { properties?: Activity }]
+  >;
+  const stats = computeStats(
+    all,
+    reactions.val(),
+    previous.val(),
+    feed.map(([, entry]) => entry.properties).filter((entry): entry is Activity => !!entry?.at),
+    startedAt,
+  );
 
   await set(ref(database, STATS_PATH), stats);
 
-  const covered = Object.entries(all[ACTIVITY_PATH.split("/")[1]] ?? {})
-    .filter(([, entry]: [string, any]) => (entry?.createDate ?? 0) <= stats.updatedAt)
-    .map(([key]) => remove(ref(database, `${ACTIVITY_PATH}/${key}`)));
-
-  await Promise.allSettled(covered);
+  // Everything in the feed is in the summary now (countries included).
+  await Promise.allSettled(
+    feed.map(([key]) => remove(ref(database, `${ACTIVITY_PATH}/${key}`))),
+  );
 
   return stats;
 }

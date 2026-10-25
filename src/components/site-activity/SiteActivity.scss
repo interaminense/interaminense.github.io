@@ -1,43 +1,80 @@
 $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 
-.site-activity {
-  min-width: 0;
+// The all-time numbers, a slim row right under the header.
+.site-numbers {
+  position: relative;
+  box-sizing: content-box;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem 2.5rem;
+  // Flush with the header (cancels the body's top padding), with the same
+  // space above and below, so the row sits centered in its band.
+  margin: -2rem 0 0;
+  padding: 1.25rem 0;
 
-  &__numbers {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.5rem;
-    margin: 0;
-
-    div {
-      display: flex;
-      flex-direction: column-reverse;
-      gap: 0.15rem;
-    }
-
-    dt {
-      font-size: 0.85rem;
-      color: var(--ink-soft);
-    }
-
-    dd {
-      margin: 0;
-      font-family: var(--font-display);
-      font-size: clamp(1.75rem, 3.6vw, 2.75rem);
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: -0.03em;
-    }
+  // The rule under it runs the full width of the page, edge to edge.
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100vw;
+    height: 1px;
+    margin-left: -50vw;
+    background: var(--rule);
   }
 
-  &__since {
-    margin: 2.25rem 0 0.75rem;
+  div {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    line-height: 1.4rem;
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  dt {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  &[aria-busy="true"] {
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (max-width: 600px) {
+    // Same height as the loaded 2x2 grid.
+    &[aria-busy="true"] {
+      min-height: calc(2 * 2.6rem + 0.6rem);
+      align-items: center;
+    }
+  }
+}
+
+// Calendar on the left, the world and the latest visits on the right.
+.site-activity {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2.5rem 4rem;
+  align-items: start;
+
+  &__caption {
+    margin: 0 0 0.75rem;
     font-size: 0.9rem;
     color: var(--ink-soft);
   }
 
   &__live {
-    margin-top: 2rem;
+    margin-top: 1.75rem;
 
     ul {
       margin: 0;
@@ -46,12 +83,13 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     }
 
     li {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 7.5rem minmax(0, 1fr) auto;
+      align-items: baseline;
       gap: 1rem;
       padding: 0.55rem 0;
       border-top: 1px solid var(--rule);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
 
       b {
         font-weight: 600;
@@ -59,10 +97,25 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     }
 
     time {
-      flex: none;
       color: var(--ink-soft);
-      font-size: 0.85rem;
-      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+  }
+
+  &__where {
+    font-family: var(--font-display);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__what {
+    color: var(--ink-soft);
+
+    b {
+      color: var(--ink);
     }
   }
 
@@ -91,6 +144,62 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
       background: var(--ink);
       animation: site-activity-pulse 2s ease-out infinite;
     }
+  }
+}
+
+.visitor-map {
+  margin: 0;
+
+  &__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  &__dot {
+    fill: var(--rule);
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0);
+
+    &--visited {
+      fill: var(--ink);
+    }
+  }
+
+  &__svg--shown &__dot {
+    animation: visit-calendar-grow 0.5s $ease-out both;
+  }
+
+  &__latest-dot {
+    fill: var(--ink);
+  }
+
+  &__latest-ring {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: visitor-map-ping 2s ease-out infinite;
+  }
+
+  &__caption {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+}
+
+@keyframes visitor-map-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  to {
+    transform: scale(3.5);
+    opacity: 0;
   }
 }
 
@@ -157,14 +266,41 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 }
 
+@media (max-width: 992px) {
+  .site-activity {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .site-numbers {
+    margin-top: -1.25rem;
+  }
+}
+
 @media (max-width: 600px) {
-  .site-activity__numbers {
+  .site-numbers {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 1rem;
+
+    div {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      line-height: 1.3rem;
+    }
   }
 
   .site-activity__live li {
-    flex-direction: column;
-    gap: 0.1rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.1rem 1rem;
+  }
+
+  .site-activity__what {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 }
 
@@ -173,7 +309,13 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     transform: none;
   }
 
+  .visitor-map__dot {
+    transform: none;
+  }
+
   .visit-calendar__svg--shown .visit-calendar__dot,
+  .visitor-map__svg--shown .visitor-map__dot,
+  .visitor-map__latest-ring,
   .site-activity__pulse::after {
     animation: none;
   }

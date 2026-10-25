@@ -1,5 +1,6 @@
 import { ThemeSwitch } from "../theme-switch/ThemeSwitch";
 import "../dot-portrait/DotPortrait.scss";
+import "../site-activity/SiteActivity.scss";
 import { Skeleton, SkeletonText } from "./Skeleton";
 
 export function LogoSkeleton() {
@@ -95,6 +96,9 @@ export function PageSkeleton({
 
       {withPresentation && (
         <div className="layout__body layout__body--wide">
+          <div className="site-numbers" aria-busy="true">
+            <Skeleton width="min(34rem, 90%)" height="1.4rem" />
+          </div>
           <div className="layout__presentation">
             <HeroSkeleton />
           </div>
