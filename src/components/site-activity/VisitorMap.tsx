@@ -35,6 +35,24 @@ const CELLS: Cell[] = MAP.flatMap((row, y) =>
 
 const COUNTRY_CELLS = new Set(CELLS.map((cell) => cell.country));
 
+// Country of each grid cell, for hit-testing the pointer.
+const AT: Array<Array<string | undefined>> = Array.from({ length: MAP_ROWS }, () => []);
+
+CELLS.forEach((cell) => {
+  AT[cell.y][cell.x] = cell.country;
+});
+
+/** The country under (or right next to) a grid position. */
+function countryAt(col: number, row: number, extra: Cell[]) {
+  for (const [dx, dy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
+    const code = AT[row + dy]?.[col + dx];
+
+    if (code) return code;
+  }
+
+  return extra.find((cell) => Math.abs(cell.x - col) <= 1 && Math.abs(cell.y - row) <= 1)?.country;
+}
+
 /**
  * The world as a dot matrix, like the portrait: land is a field of faint
  * dots, countries with visitors are inked (darker the more visits) and the
@@ -43,6 +61,9 @@ const COUNTRY_CELLS = new Set(CELLS.map((cell) => cell.country));
 export function VisitorMap({ stats }: { stats: SiteStats }) {
   const ref = useRef<SVGSVGElement>(null);
   const [shown, setShown] = useState(false);
+  // The country under the pointer, and the cell the label floats above.
+  const [hover, setHover] = useState<{ code: string; col: number; row: number } | null>(null);
+  const hovered = hover?.code ?? null;
   const countries = stats.countries ?? {};
   // Ranked: the country with the most visits gets the full ink (white on the
   // dark theme) and each one after it a little less.
@@ -102,13 +123,29 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
 
   const visited = Object.keys(countries).length;
 
+  function onPointerMove(event: React.PointerEvent<SVGSVGElement>) {
+    const box = event.currentTarget.getBoundingClientRect();
+    const col = Math.floor(((event.clientX - box.left) / box.width) * MAP_COLUMNS);
+    const row = Math.floor(((event.clientY - box.top) / box.height) * MAP_ROWS);
+
+    const code = countryAt(col, row, extra);
+
+    setHover(code ? { code, col, row } : null);
+  }
+
+  const anchor = hover && { x: hover.col + 0.5, y: hover.row };
+  const hoveredVisits = hovered ? countries[hovered] ?? 0 : 0;
+
   return (
     <figure className="visitor-map">
+      <div className="visitor-map__stage">
       <svg
         ref={ref}
         className={`visitor-map__svg ${shown ? "visitor-map__svg--shown" : ""}`}
         viewBox={`0 0 ${MAP_COLUMNS * PITCH} ${MAP_ROWS * PITCH}`}
         role="img"
+        onPointerMove={onPointerMove}
+        onPointerLeave={() => setHover(null)}
         aria-label={
           visited
             ? `Visitors from ${visited} countries`
@@ -122,7 +159,13 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
           return (
             <circle
               key={`${cell.x}-${cell.y}-${cell.country ?? ""}`}
-              className={visits ? "visitor-map__dot visitor-map__dot--visited" : "visitor-map__dot"}
+              className={[
+                "visitor-map__dot",
+                visits && "visitor-map__dot--visited",
+                hovered && cell.country === hovered && "visitor-map__dot--hovered",
+              ]
+                .filter(Boolean)
+                .join(" ")}
               cx={cell.x * PITCH + PITCH / 2}
               cy={cell.y * PITCH + PITCH / 2}
               r={visits ? 2.6 + 1.2 * strength : 1.6}
@@ -130,14 +173,7 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
                 opacity: visits ? strength : undefined,
                 animationDelay: `${cell.x * 12}ms`,
               }}
-            >
-              {cell.country && (
-                <title>
-                  {countryName(cell.country)}
-                  {visits ? `: ${visits === 1 ? "1 visit" : `${visits} visits`}` : ""}
-                </title>
-              )}
-            </circle>
+            />
           );
         })}
 
@@ -148,6 +184,22 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
           </g>
         )}
       </svg>
+
+      {anchor && hovered && (
+        <div
+          className="visitor-map__label"
+          style={{
+            left: `${(anchor.x / MAP_COLUMNS) * 100}%`,
+            top: `${(anchor.y / MAP_ROWS) * 100}%`,
+          }}
+        >
+          <b>{countryName(hovered)}</b>{" "}
+          {hoveredVisits
+            ? `${hoveredVisits.toLocaleString("en-US")} ${hoveredVisits === 1 ? "visit" : "visits"}`
+            : "no visits yet"}
+        </div>
+      )}
+      </div>
 
       <figcaption className="visitor-map__caption">
         {visited

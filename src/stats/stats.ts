@@ -43,12 +43,23 @@ export type SiteStats = {
    * the activity feed, which knows the country from the visitor's time zone.
    */
   countries: Record<string, number>;
-  /** Feed entries up to this time are already counted in `countries`. */
+  /** Visits per country seen by the activity feed, accumulated. */
+  countryFeed?: Record<string, number>;
+  /** Feed entries up to this time are already counted in `countryFeed`. */
   feedUntil?: number;
   recent: Activity[];
   /** Live only: feed entries from the last hour (not stored). */
   live?: Activity[];
 };
+
+/**
+ * When the activity feed (which knows the country) started. Older visits
+ * only tell their country when the browser puts its locale in the user
+ * agent, like Instagram's in-app browser ("pt_BR").
+ */
+const FEED_STARTED_AT = Date.UTC(2026, 9, 24, 23);
+
+const UA_LOCALE = /[;(\s][a-z]{2}[_-]([A-Z]{2})[;)\s]/;
 
 /** How far back the floating "recent visitors" counter looks. */
 export const RECENT_WINDOW_MS = 30 * 60 * 1000;
@@ -148,7 +159,8 @@ export function computeStats(
     opens: 0,
     projects: [],
     reactions: 0,
-    countries: { ...(previous?.countries ?? {}) },
+    countries: {},
+    countryFeed: { ...(previous?.countryFeed ?? {}) },
     recent: [],
   };
   const recent: Activity[] = [];
@@ -163,9 +175,11 @@ export function computeStats(
     if (entry.at <= from || entry.at > now) continue;
 
     if (entry.country && entry.type === "view") {
-      stats.countries[entry.country] = (stats.countries[entry.country] ?? 0) + 1;
+      stats.countryFeed![entry.country] = (stats.countryFeed![entry.country] ?? 0) + 1;
     }
   }
+
+  Object.assign(stats.countries, stats.countryFeed);
 
 
   for (const event of Object.values(events.pageViewed ?? {})) {
@@ -178,6 +192,12 @@ export function computeStats(
     stats.days[dayKey(event.createDate)] =
       (stats.days[dayKey(event.createDate)] ?? 0) + 1;
     if (theme) stats.themes[theme] = (stats.themes[theme] ?? 0) + 1;
+
+    const locale =
+      event.createDate < FEED_STARTED_AT ? platformOf(event).ua?.match(UA_LOCALE)?.[1] : undefined;
+
+    if (locale) stats.countries[locale] = (stats.countries[locale] ?? 0) + 1;
+
     recent.push({
       at: event.createDate,
       type: "view",

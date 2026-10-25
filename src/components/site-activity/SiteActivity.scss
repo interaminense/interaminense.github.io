@@ -94,6 +94,41 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 .visitor-map {
   margin: 0;
 
+  &__stage {
+    position: relative;
+  }
+
+  // Floats above the hovered country.
+  &__label {
+    position: absolute;
+    z-index: 2;
+    transform: translate(-50%, calc(-100% - 6px));
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.78rem;
+    white-space: nowrap;
+    pointer-events: none;
+
+    b {
+      font-weight: 600;
+    }
+
+    // A small pointer down to the country.
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -4px;
+      width: 8px;
+      height: 8px;
+      margin-left: -4px;
+      background: inherit;
+      transform: rotate(45deg);
+    }
+  }
+
   &__svg {
     display: block;
     width: 100%;
@@ -107,6 +142,15 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     transform: scale(0);
 
     &--visited {
+      fill: var(--ink);
+    }
+
+    &--hovered {
+      fill: var(--ink-soft);
+    }
+
+    &--visited#{&}--hovered {
+      opacity: 1 !important;
       fill: var(--ink);
     }
   }
