@@ -24,9 +24,9 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Schibsted+Grotesk:wght@500;600;700&display=swap"
     />
-    <script type="module" crossorigin src="/assets/index-DMGFIzQa.js"></script>
+    <script type="module" crossorigin src="/assets/index-LX9l7_zS.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/jsx-runtime-PcM8onQG.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-CuHs9kdx.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-Byh7kPdy.css">
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -58,6 +58,9 @@
             </div>
           </header>
           <div class="layout__body layout__body--wide">
+            <div id="boot-numbers" class="site-numbers" aria-busy="true">
+              <span class="skeleton" style="width: min(34rem, 90%); height: 1.4rem"></span>
+            </div>
             <div id="boot-presentation" class="layout__presentation">
               <section class="hero">
                 <div class="hero__text">
@@ -104,6 +107,7 @@
           // Only the home page opens with the presentation block.
           if (route && route !== "home") {
             document.getElementById("boot-presentation").remove();
+            document.getElementById("boot-numbers").remove();
           }
         })();
       </script>
