@@ -4,6 +4,7 @@ import { UAParser } from "ua-parser-js";
 import { SortValue } from "../firebase/types";
 import { SortType } from "../firebase/types";
 import { useSearchParams } from "react-router-dom";
+import { isAutomated } from "../stats/stats";
 
 export function useAnalyticsData(id: string) {
   const [searchParams] = useSearchParams();
@@ -27,6 +28,9 @@ export class Analytics {
     id: string,
     initialProps: { [key: string]: string | number | boolean }
   ) {
+    // Tests and crawlers would only inflate the numbers.
+    if (isAutomated()) return;
+
     const parser = new UAParser();
 
     const data = {

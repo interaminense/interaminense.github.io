@@ -44,9 +44,38 @@ $ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
     padding-top: 1rem;
   }
 
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
   &__date {
     font-size: 0.8rem;
     color: var(--ink-soft);
+  }
+
+  &__popular {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    // A dot like the ones in the portrait.
+    &::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
   }
 
   &__title {

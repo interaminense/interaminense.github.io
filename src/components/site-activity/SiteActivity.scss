@@ -1,0 +1,180 @@
+$ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+.site-activity {
+  min-width: 0;
+
+  &__numbers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
+    margin: 0;
+
+    div {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 0.15rem;
+    }
+
+    dt {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+    }
+
+    dd {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+  }
+
+  &__since {
+    margin: 2.25rem 0 0.75rem;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+  }
+
+  &__live {
+    margin-top: 2rem;
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.55rem 0;
+      border-top: 1px solid var(--rule);
+      font-size: 0.95rem;
+
+      b {
+        font-weight: 600;
+      }
+    }
+
+    time {
+      flex: none;
+      color: var(--ink-soft);
+      font-size: 0.85rem;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__live-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  &__pulse {
+    position: relative;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink);
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--ink);
+      animation: site-activity-pulse 2s ease-out infinite;
+    }
+  }
+}
+
+.visit-calendar {
+  // On narrow screens the years scroll sideways instead of shrinking the
+  // dots to specks.
+  overflow-x: auto;
+  scrollbar-width: thin;
+
+  &__svg {
+    display: block;
+    width: 100%;
+    min-width: 480px;
+    height: auto;
+  }
+
+  &__year {
+    fill: var(--ink-soft);
+    font-family: var(--font-body);
+    font-size: 11px;
+  }
+
+  &__dot {
+    fill: var(--ink);
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scale(0);
+
+    &--empty {
+      fill: var(--rule);
+    }
+
+    &:hover {
+      fill: var(--ink-soft);
+    }
+  }
+
+  // Swept in from January to December once the calendar scrolls into view,
+  // like the portrait's dots.
+  &__svg--shown &__dot {
+    animation: visit-calendar-grow 0.5s $ease-out both;
+  }
+}
+
+@keyframes visit-calendar-grow {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes site-activity-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-activity__numbers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-activity__live li {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visit-calendar__dot {
+    transform: none;
+  }
+
+  .visit-calendar__svg--shown .visit-calendar__dot,
+  .site-activity__pulse::after {
+    animation: none;
+  }
+}

@@ -5,8 +5,12 @@ import { TProject } from "../../types";
 import { timestampToDate } from "../../utils/date";
 import { Badge } from "../badge/Badge";
 import { FadeImage } from "../skeleton/Skeleton";
+import { trackActivity, useSiteStats } from "../../stats/SiteStatsContext";
 
 import "./Card.scss";
+
+// The most opened projects get a badge.
+const POPULAR = 3;
 
 export function Card({
   createDate,
@@ -18,6 +22,13 @@ export function Card({
   url,
   featured,
 }: TProject) {
+  const stats = useSiteStats();
+  const rank = stats?.projects
+    .slice(0, POPULAR)
+    .findIndex((project) => project.id === id || project.label === label);
+  const opens =
+    rank !== undefined && rank >= 0 ? stats!.projects[rank].opens : 0;
+
   return (
     <article className="card">
       <div className="card__image">
@@ -32,7 +43,18 @@ export function Card({
       </div>
 
       <div className="card__content">
-        <span className="card__date">{timestampToDate(createDate)}</span>
+        <div className="card__meta">
+          <span className="card__date">{timestampToDate(createDate)}</span>
+
+          {opens > 0 && (
+            <span
+              className="card__popular"
+              title={`Opened ${opens} times since ${new Date(stats!.since).getFullYear()}`}
+            >
+              {rank === 0 ? "Most opened" : "Popular"} · {opens}
+            </span>
+          )}
+        </div>
 
         <h3 className="card__title">
           {featured && (
@@ -51,6 +73,7 @@ export function Card({
                 url,
                 id,
               });
+              trackActivity("project", { label, projectId: id });
             }}
           >
             {label}

@@ -12,6 +12,7 @@ import { Paragraph } from "../components/paragraph/Paragraph";
 import { Presentation } from "../components/presentation/Presentation";
 import { Projects } from "../components/projects/Projects";
 import { SkeletonText } from "../components/skeleton/Skeleton";
+import { SiteActivity } from "../components/site-activity/SiteActivity";
 import { Skills } from "../components/Skills";
 import { Title } from "../components/title/Title";
 import { useProfileDB } from "../contexts/ProfileDBContext";
@@ -66,6 +67,12 @@ export function Home() {
       </section>
 
       <Layout.Body size={1200}>
+        <section className="layout__section">
+          <Title>Visitors</Title>
+
+          <SiteActivity />
+        </section>
+
         <section className="layout__section">
           <Title>Links</Title>
 

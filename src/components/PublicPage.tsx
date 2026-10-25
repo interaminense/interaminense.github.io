@@ -5,6 +5,7 @@ import { ProfileDBContextProvider } from "../contexts/ProfileDBContext";
 import { ThemeContext } from "../ThemeContext";
 import { extractPath } from "../utils/path";
 import { BurstLayer } from "./burst/Burst";
+import { SiteStatsProvider, trackActivity } from "../stats/SiteStatsContext";
 import { PageSkeleton } from "./skeleton/PageSkeleton";
 
 export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
@@ -33,6 +34,17 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
     }
   }, [theme, loading]);
 
+  // One entry per visit for the live feed (not one per theme change).
+  useEffect(() => {
+    if (!loading) {
+      trackActivity("view", {
+        label: extractPath(window.location.hash) || "home",
+        theme,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
   const extractedHash = extractPath(window.location.hash);
   const themeClassName = classNames(`theme--${theme}`, {
     [`page--${extractedHash}`]: extractedHash,
@@ -50,10 +62,12 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
 
   return (
     <ProfileDBContextProvider>
-      <div className={themeClassName}>
-        {children}
-        <BurstLayer />
-      </div>
+      <SiteStatsProvider>
+        <div className={themeClassName}>
+          {children}
+          <BurstLayer />
+        </div>
+      </SiteStatsProvider>
     </ProfileDBContextProvider>
   );
 }

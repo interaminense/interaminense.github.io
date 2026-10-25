@@ -1,6 +1,7 @@
 $transitionDelay: 0.2s;
 
 .theme-switch {
+  position: relative;
   display: flex;
   padding-right: 1.5rem;
   margin-right: 0.25rem;
@@ -125,5 +126,51 @@ $transitionDelay: 0.2s;
     .theme-switch__text--light {
       display: none;
     }
+  }
+}
+
+// A short line under the switch after picking a theme.
+.theme-switch__note {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 1.5rem;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.theme-switch__note-text {
+  display: block;
+  width: max-content;
+  max-width: min(260px, 70vw);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  white-space: normal;
+  animation: theme-switch-note 4s ease both;
+}
+
+@keyframes theme-switch-note {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  8%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-switch__note-text {
+    animation: none;
   }
 }

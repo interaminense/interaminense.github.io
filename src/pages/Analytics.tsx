@@ -14,6 +14,7 @@ import { ViewsByPlatform } from "../components/admin/analytics/ViewsByPlatform";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Feedbacks } from "../components/admin/Feedbacks";
+import { publishStats } from "../stats/SiteStatsContext";
 
 function setRangekeyParam(value: number) {
   const url = new URLSearchParams();
@@ -25,6 +26,19 @@ function setRangekeyParam(value: number) {
 export function Analytics() {
   const [rangeKey, setRangekey] = useState(30);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [published, setPublished] = useState<string | null>(null);
+
+  // The home page's "Visitors" numbers come from a summary that only the
+  // admin can write: refresh it with every event each time this page opens.
+  useEffect(() => {
+    publishStats()
+      .then((stats) =>
+        setPublished(
+          `Public stats updated: ${stats.views.toLocaleString("en-US")} page views since ${new Date(stats.since).toLocaleDateString("en-US", { month: "short", year: "numeric" })}.`,
+        ),
+      )
+      .catch(() => setPublished("Couldn't update the public stats."));
+  }, []);
 
   useEffect(() => {
     if (searchParams) {
@@ -45,6 +59,12 @@ export function Analytics() {
       <Typography variant="subtitle1" marginBottom={2}>
         Analyze real-time data and information from your website.
       </Typography>
+
+      {published && (
+        <Alert sx={{ mb: 2 }} severity="success">
+          {published}
+        </Alert>
+      )}
 
       <Alert
         sx={{ mb: 2 }}
