@@ -55,6 +55,8 @@
     &--stacked {
       grid-template-columns: minmax(0, 1fr);
       gap: 2rem;
+      // Follows the projects band, which already sets it apart.
+      border-top: none;
     }
   }
 
