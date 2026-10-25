@@ -138,6 +138,21 @@ function isBotEvent(event: RawEvent) {
   return BOT.test(browser ?? "") || BOT.test(ua ?? "");
 }
 
+/** Every emoji count of every reaction record. */
+export function sumReactions(reactions: Record<string, Record<string, unknown>> | null) {
+  let total = 0;
+
+  for (const reaction of Object.values(reactions ?? {})) {
+    for (const [key, value] of Object.entries(reaction ?? {})) {
+      if (key !== "createDate" && key !== "id" && typeof value === "number") {
+        total += value;
+      }
+    }
+  }
+
+  return total;
+}
+
 /**
  * Builds the public summary from every raw analytics event. Countries only
  * exist in the activity feed, whose entries get removed once summarized, so
@@ -243,13 +258,7 @@ export function computeStats(
     .slice(0, 20)
     .map(({ id, label, opens }) => (id ? { id, label, opens } : { label, opens }));
 
-  for (const reaction of Object.values(reactions ?? {})) {
-    for (const [key, value] of Object.entries(reaction)) {
-      if (key !== "createDate" && key !== "id" && typeof value === "number") {
-        stats.reactions += value;
-      }
-    }
-  }
+  stats.reactions = sumReactions(reactions);
 
   stats.recent = recent
     .sort((a, b) => b.at - a.at)

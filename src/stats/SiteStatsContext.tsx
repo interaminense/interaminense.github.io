@@ -17,6 +17,7 @@ import {
   ActivityType,
   computeStats,
   RECENT_WINDOW_MS,
+  sumReactions,
   currentCountry,
   currentOS,
   isAutomated,
@@ -101,6 +102,19 @@ const SiteStatsContext = createContext<SiteStats | null>(null);
 export function SiteStatsProvider({ children }: { children: React.ReactNode }) {
   const [base, setBase] = useState<SiteStats | null>(null);
   const [activity, setActivity] = useState<Activity[]>([]);
+  const [reactions, setReactions] = useState<number | null>(null);
+
+  // Reactions are few small records: sum them live, so a click on an emoji
+  // shows up in the total right away.
+  useEffect(() => {
+    const { database } = db();
+
+    return onValue(
+      ref(database, "reactions"),
+      (snapshot) => setReactions(sumReactions(snapshot.val())),
+      () => {},
+    );
+  }, []);
 
   useEffect(() => {
     const { database } = db();
@@ -142,10 +156,13 @@ export function SiteStatsProvider({ children }: { children: React.ReactNode }) {
     );
   }, [updatedAt]);
 
-  const stats = useMemo(
-    () => (base?.views ? withActivity(base, activity) : null),
-    [base, activity],
-  );
+  const stats = useMemo(() => {
+    if (!base?.views) return null;
+
+    const merged = withActivity(base, activity);
+
+    return reactions === null ? merged : { ...merged, reactions };
+  }, [base, activity, reactions]);
 
   return (
     <SiteStatsContext.Provider value={stats}>{children}</SiteStatsContext.Provider>
