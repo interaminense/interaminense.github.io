@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSiteStats } from "../../stats/SiteStatsContext";
-import { Activity, dayKey, SiteStats } from "../../stats/stats";
+import { dayKey, SiteStats } from "../../stats/stats";
 import { Skeleton } from "../skeleton/Skeleton";
-import { countryName, VisitorMap } from "./VisitorMap";
+import { VisitorMap } from "./VisitorMap";
 
 import "./SiteActivity.scss";
 
@@ -11,7 +11,6 @@ const PITCH = 10; // px between dots in the calendar's own coordinates
 const LABEL = 40; // room for the year on the left
 
 const number = new Intl.NumberFormat("en-US");
-const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 const monthYear = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 const longDate = new Intl.DateTimeFormat("en-US", {
   weekday: "short",
@@ -20,41 +19,6 @@ const longDate = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
   timeZone: "UTC",
 });
-
-function ago(time: number, now: number) {
-  const seconds = Math.round((time - now) / 1000);
-  const units: Array<[Intl.RelativeTimeFormatUnit, number]> = [
-    ["year", 31536000],
-    ["month", 2592000],
-    ["week", 604800],
-    ["day", 86400],
-    ["hour", 3600],
-    ["minute", 60],
-  ];
-
-  for (const [unit, size] of units) {
-    if (Math.abs(seconds) >= size) {
-      return relative.format(Math.round(seconds / size), unit);
-    }
-  }
-
-  return "just now";
-}
-
-function action(activity: Activity) {
-  if (activity.type === "project") {
-    return (
-      <>
-        opened <b>{activity.label}</b>
-      </>
-    );
-  }
-
-  if (!activity.label || activity.label === "home") return "visited the home page";
-  if (activity.label.startsWith("project")) return "visited a project page";
-
-  return `visited the ${activity.label} page`;
-}
 
 /**
  * Every day since the first visit, one dot per day, a row of weeks per
@@ -196,14 +160,6 @@ export function SiteNumbers() {
 
 export function SiteActivity() {
   const stats = useSiteStats();
-  const [now, setNow] = useState(Date.now());
-
-  // Keeps "3 minutes ago" honest.
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 30000);
-
-    return () => clearInterval(timer);
-  }, []);
 
   if (!stats) {
     return (
@@ -226,30 +182,6 @@ export function SiteActivity() {
       <div className="site-activity__world">
         <VisitorMap stats={stats} />
 
-        {stats.recent.length > 0 && (
-          <div className="site-activity__live">
-            <h3 className="site-activity__live-title">
-              <span className="site-activity__pulse" aria-hidden="true" />
-              Recently
-            </h3>
-            <ul aria-live="polite">
-              {stats.recent.map((activity) => (
-                <li key={`${activity.at}-${activity.type}`}>
-                  <span className="site-activity__where">
-                    {countryName(activity.country) || "Somewhere"}
-                  </span>
-                  <span className="site-activity__what">
-                    {action(activity)}
-                    {activity.os && <> on {activity.os}</>}
-                  </span>
-                  <time dateTime={new Date(activity.at).toISOString()}>
-                    {ago(activity.at, now)}
-                  </time>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
     </div>
   );

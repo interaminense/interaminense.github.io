@@ -5,6 +5,8 @@ import { ProfileDBContextProvider } from "../contexts/ProfileDBContext";
 import { ThemeContext } from "../ThemeContext";
 import { extractPath } from "../utils/path";
 import { BurstLayer } from "./burst/Burst";
+import { RecentVisitors } from "./site-activity/RecentVisitors";
+import "./site-activity/SiteActivity.scss";
 import { SiteStatsProvider, trackActivity } from "../stats/SiteStatsContext";
 import { PageSkeleton } from "./skeleton/PageSkeleton";
 
@@ -66,6 +68,7 @@ export function PublicPage({ children }: React.HTMLAttributes<HTMLElement>) {
         <div className={themeClassName}>
           {children}
           <BurstLayer />
+          <RecentVisitors />
         </div>
       </SiteStatsProvider>
     </ProfileDBContextProvider>

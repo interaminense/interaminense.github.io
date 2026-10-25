@@ -16,6 +16,7 @@ import {
   ACTIVITY_PATH,
   ActivityType,
   computeStats,
+  RECENT_WINDOW_MS,
   currentCountry,
   currentOS,
   isAutomated,
@@ -83,9 +84,12 @@ export async function publishStats() {
 
   await set(ref(database, STATS_PATH), stats);
 
-  // Everything in the feed is in the summary now (countries included).
+  // Everything in the feed is in the summary now; keep the last stretch
+  // for the live counter of recent visitors.
   await Promise.allSettled(
-    feed.map(([key]) => remove(ref(database, `${ACTIVITY_PATH}/${key}`))),
+    feed
+      .filter(([, entry]) => (entry.properties?.at ?? 0) < startedAt - RECENT_WINDOW_MS)
+      .map(([key]) => remove(ref(database, `${ACTIVITY_PATH}/${key}`))),
   );
 
   return stats;
@@ -117,7 +121,8 @@ export function SiteStatsProvider({ children }: { children: React.ReactNode }) {
     const newer = query(
       ref(database, ACTIVITY_PATH),
       orderByKey(),
-      startAt(uuidv7Floor(updatedAt)),
+      // From the summary on, or the last half hour for the live counter.
+      startAt(uuidv7Floor(Math.min(updatedAt, Date.now() - RECENT_WINDOW_MS))),
     );
 
     return onValue(

@@ -38,10 +38,20 @@ export type SiteStats = {
   opens: number;
   projects: ProjectOpens[];
   reactions: number;
-  /** Visits per country (alpha-2). Only known since the feed started. */
+  /**
+   * Visits per country (alpha-2): imported history (Google Analytics) plus
+   * the activity feed, which knows the country from the visitor's time zone.
+   */
   countries: Record<string, number>;
+  /** Feed entries up to this time are already counted in `countries`. */
+  feedUntil?: number;
   recent: Activity[];
+  /** Live only: feed entries from the last hour (not stored). */
+  live?: Activity[];
 };
+
+/** How far back the floating "recent visitors" counter looks. */
+export const RECENT_WINDOW_MS = 30 * 60 * 1000;
 
 const RECENT = 5;
 
@@ -143,7 +153,15 @@ export function computeStats(
   };
   const recent: Activity[] = [];
 
+  const from = previous?.feedUntil ?? 0;
+
+  stats.feedUntil = now;
+
   for (const entry of activity) {
+    // Entries stay in the feed for a while (for the live counter); count
+    // each one once.
+    if (entry.at <= from || entry.at > now) continue;
+
     if (entry.country && entry.type === "view") {
       stats.countries[entry.country] = (stats.countries[entry.country] ?? 0) + 1;
     }
@@ -270,6 +288,7 @@ export function withActivity(stats: SiteStats, activity: Activity[]): SiteStats 
   }
 
   merged.projects.sort((a, b) => b.opens - a.opens);
+  merged.live = activity;
   merged.recent = [...activity.filter((a) => a.at > stats.updatedAt), ...stats.recent]
     .sort((a, b) => b.at - a.at)
     .slice(0, RECENT);

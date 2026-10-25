@@ -44,7 +44,17 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
   const ref = useRef<SVGSVGElement>(null);
   const [shown, setShown] = useState(false);
   const countries = stats.countries ?? {};
-  const max = Math.max(1, ...Object.values(countries));
+  // Ranked: the country with the most visits gets the full ink (white on the
+  // dark theme) and each one after it a little less.
+  const ranked = Object.entries(countries)
+    .filter(([, visits]) => visits > 0)
+    .sort((a, b) => b[1] - a[1]);
+  const strengthOf = new Map(
+    ranked.map(([code], rank) => [
+      code,
+      ranked.length > 1 ? 1 - 0.78 * (rank / (ranked.length - 1)) : 1,
+    ]),
+  );
   const latest = stats.recent.find((activity) => activity.country)?.country;
 
   // Countries too small to own a land cell get a dot at their centroid.
@@ -107,7 +117,7 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
       >
         {[...CELLS, ...extra].map((cell) => {
           const visits = cell.country ? countries[cell.country] ?? 0 : 0;
-          const strength = visits ? 0.35 + 0.65 * Math.sqrt(visits / max) : 0;
+          const strength = visits ? strengthOf.get(cell.country!) ?? 0 : 0;
 
           return (
             <circle
@@ -115,7 +125,7 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
               className={visits ? "visitor-map__dot visitor-map__dot--visited" : "visitor-map__dot"}
               cx={cell.x * PITCH + PITCH / 2}
               cy={cell.y * PITCH + PITCH / 2}
-              r={visits ? 2.4 + 1.6 * strength : 1.6}
+              r={visits ? 2.6 + 1.2 * strength : 1.6}
               style={{
                 opacity: visits ? strength : undefined,
                 animationDelay: `${cell.x * 12}ms`,
@@ -141,7 +151,7 @@ export function VisitorMap({ stats }: { stats: SiteStats }) {
 
       <figcaption className="visitor-map__caption">
         {visited
-          ? `Visitors from ${visited} ${visited === 1 ? "country" : "countries"} so far.`
+          ? `Visitors from ${visited} ${visited === 1 ? "country" : "countries"}${ranked[0] ? `, most of them from ${countryName(ranked[0][0])}` : ""}.`
           : "Countries light up as visitors arrive."}
       </figcaption>
     </figure>
